@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
 use indicatif::{ProgressBar, ProgressStyle};
+use itertools::Itertools;
 
 pub struct Counts {
     samples: Vec<String>,
@@ -37,7 +38,7 @@ impl Counts {
             "site/sample size mismatch"
         );
 
-        // Build a compact list of (index, allele) for non-missing calls.
+        // Build a compact list of (sample index, allele) for non-missing calls.
         // This avoids branching from checking for missingness in the loop
         let present: Vec<(usize, Allele)> = site
             .genotypes
@@ -47,16 +48,13 @@ impl Counts {
             .filter(|&(_, a)| a != Allele::Missing)
             .collect();
 
-        for present_idx in 0..present.len() {
-            let (i, genotype_i) = present[present_idx];
-            for present_idx in (present_idx + 1)..present.len() {
-                let (j, genotype_j) = present[present_idx];
-                let counter_idx = self.idx(i, j);
-                self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j);
-                // 2 alleles per site
+        present.iter().tuple_combinations().for_each(
+            |(&(sample_idx_i, genotype_i), &(sample_idx_j, genotype_j))| {
+                let counter_idx = self.idx(sample_idx_i, sample_idx_j);
+                self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
                 self.totals[counter_idx] += 2;
-            }
-        }
+            },
+        );
     }
 
     pub fn consume_reader<R: SiteReader>(mut self, reader: &mut R) -> Result<Self>
