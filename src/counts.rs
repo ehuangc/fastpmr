@@ -57,7 +57,7 @@ impl Counts {
         );
     }
 
-    pub fn consume_reader<R: SiteReader>(mut self, reader: &mut R) -> Result<Self>
+    pub fn consume_reader<R>(mut self, reader: &mut R) -> Result<Self>
     where
         R: SiteReader + ?Sized, // Allow trait objects
     {
