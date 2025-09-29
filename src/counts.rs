@@ -68,7 +68,8 @@ impl Counts {
         );
 
         let mut n_processed_sites: u64 = 0;
-        while let Some(site) = reader.next_site()? {
+        for site in reader {
+            let site = site?;
             self.push_site(&site);
             n_processed_sites += 1;
             pb.set_position(n_processed_sites);
