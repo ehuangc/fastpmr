@@ -57,10 +57,7 @@ impl Counts {
         );
     }
 
-    pub fn consume_reader<R>(mut self, reader: &mut R) -> Result<Self>
-    where
-        R: SiteReader + ?Sized, // Allow trait objects
-    {
+    pub fn consume_reader(mut self, reader: &mut impl SiteReader) -> Result<Self> {
         let n_sites = reader.n_sites();
         let pb = ProgressBar::new(n_sites as u64);
         pb.set_style(
