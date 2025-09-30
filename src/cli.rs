@@ -54,9 +54,15 @@ pub fn build_input_spec(args: &Vec<String>) -> Result<InputSpec> {
 }
 
 pub fn run(reader: &mut impl SiteReader) -> Result<()> {
+    const PARALLEL_THRESHOLD: usize = 500;
     let samples: Vec<String> = reader.samples().to_vec();
+
     let mut counts = Counts::new(samples);
-    counts = counts.consume_reader(reader)?;
+    if counts.n_samples() < PARALLEL_THRESHOLD {
+        counts = counts.consume_reader(reader)?;
+    } else {
+        counts = counts.consume_reader_parallel(reader)?;
+    }
 
     let output_path = "mismatch_rates.csv";
     write_mismatch_rates(&counts, output_path)?;
