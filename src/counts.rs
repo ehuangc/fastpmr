@@ -1,8 +1,10 @@
 use crate::error::Result;
-use crate::model::{Allele, Site};
+use crate::model::Allele;
 use crate::reader::SiteReader;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use rayon::prelude::*;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 pub struct Counts {
     samples: Vec<String>,
@@ -31,48 +33,76 @@ impl Counts {
         }
     }
 
-    pub fn push_site(&mut self, site: &Site) {
-        assert_eq!(
-            self.n_samples,
-            site.genotypes.len(),
-            "site/sample size mismatch"
+    pub fn consume_reader(mut self, reader: &mut impl SiteReader) -> Result<Self> {
+        let pb = ProgressBar::new(reader.n_sites() as u64);
+        pb.set_style(
+            ProgressStyle::with_template("[{elapsed_precise}] {bar:30} {pos}/{len} sites").unwrap(),
         );
 
-        // Build a compact list of (sample index, allele) for non-missing calls.
-        // This avoids branching from checking for missingness in the loop
-        let present: Vec<(usize, Allele)> = site
-            .genotypes
-            .iter()
-            .copied()
-            .enumerate()
-            .filter(|&(_, a)| a != Allele::Missing)
-            .collect();
+        for site in reader {
+            let site = site?;
+            let present: Vec<(usize, Allele)> = site
+                .genotypes
+                .iter()
+                .copied()
+                .enumerate()
+                .filter(|&(_, a)| a != Allele::Missing)
+                .collect();
 
-        present.iter().tuple_combinations().for_each(
-            |(&(sample_idx_i, genotype_i), &(sample_idx_j, genotype_j))| {
+            for (&(sample_idx_i, genotype_i), &(sample_idx_j, genotype_j)) in
+                present.iter().tuple_combinations()
+            {
                 let counter_idx = self.idx(sample_idx_i, sample_idx_j);
                 self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
-                self.totals[counter_idx] += 2;
-            },
-        );
+                self.totals[counter_idx] += 2; // Two alleles per site
+            }
+            pb.inc(1);
+        }
+        pb.abandon();
+        Ok(self)
     }
 
-    pub fn consume_reader<R>(mut self, reader: &mut R) -> Result<Self>
-    where
-        R: SiteReader + ?Sized, // Allow trait objects
-    {
+    pub fn consume_reader_parallel(mut self, reader: &mut impl SiteReader) -> Result<Self> {
         let n_sites = reader.n_sites();
         let pb = ProgressBar::new(n_sites as u64);
         pb.set_style(
             ProgressStyle::with_template("[{elapsed_precise}] {bar:30} {pos}/{len} sites").unwrap(),
         );
 
-        let mut n_processed_sites: u64 = 0;
-        while let Some(site) = reader.next_site()? {
-            self.push_site(&site);
-            n_processed_sites += 1;
-            pb.set_position(n_processed_sites);
-        }
+        let mismatches: Vec<AtomicU64> = (0..self.n_samples * self.n_samples).map(|_| AtomicU64::new(0)).collect();
+        let totals: Vec<AtomicU64> = (0..self.n_samples * self.n_samples).map(|_| AtomicU64::new(0)).collect();
+
+        reader.par_bridge().try_for_each(|site| -> Result<()> {
+            let site = site?;
+            let present: Vec<(usize, Allele)> = site
+                .genotypes
+                .iter()
+                .copied()
+                .enumerate()
+                .filter(|&(_, a)| a != Allele::Missing)
+                .collect();
+
+            for (&(sample_idx_i, genotype_i), &(sample_idx_j, genotype_j)) in
+                present.iter().tuple_combinations()
+            {
+                let idx = self.idx(sample_idx_i, sample_idx_j);
+                mismatches[idx]
+                    .fetch_add(genotype_i.mismatch(genotype_j) as u64, Ordering::Relaxed);
+                totals[idx].fetch_add(2, Ordering::Relaxed);
+            }
+            pb.inc(1);
+            Ok(())
+        })?;
+
+        self.mismatches = mismatches
+            .into_iter()
+            .map(|x| x.load(Ordering::Relaxed))
+            .collect();
+        self.totals = totals
+            .into_iter()
+            .map(|x| x.load(Ordering::Relaxed))
+            .collect();
+
         pb.abandon();
         println!();
         Ok(self)

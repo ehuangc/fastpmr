@@ -105,20 +105,24 @@ impl SiteReader for PackedAncestryMapReader {
     fn n_sites(&self) -> usize {
         self.header.n_variants
     }
+}
 
-    fn next_site(&mut self) -> Result<Option<Site>> {
+impl Iterator for PackedAncestryMapReader {
+    type Item = Result<Site>;
+
+    fn next(&mut self) -> Option<Self::Item> {
         if self.next_variant_idx >= self.header.n_variants {
-            return Ok(None);
+            return None;
         }
 
-        // Read one variant block
-        self.reader
-            .read_exact(&mut self.block_buf)
-            .map_err(|e| CustomError::ReadWithoutPath { source: e })?;
-        let genotypes = parse_variant_block(&self.block_buf, self.header.n_samples);
-        let site = Site { genotypes };
-        self.next_variant_idx += 1;
-        Ok(Some(site))
+        match self.reader.read_exact(&mut self.block_buf) {
+            Ok(()) => {
+                let genotypes = parse_variant_block(&self.block_buf, self.header.n_samples);
+                self.next_variant_idx += 1;
+                Some(Ok(Site { genotypes }))
+            }
+            Err(e) => Some(Err(CustomError::ReadWithoutPath { source: e })),
+        }
     }
 }
 

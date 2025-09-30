@@ -35,11 +35,11 @@ impl InputSpec {
     }
 
     // Open the appropriate reader for the given input spec
-    pub fn open_reader(&self) -> Result<Box<dyn SiteReader>> {
+    pub fn open_reader(&self) -> Result<impl SiteReader> {
         match self {
             InputSpec::PackedAncestryMap { ind, geno, snp } => {
                 let reader = PackedAncestryMapReader::open(ind, geno, snp)?;
-                Ok(Box::new(reader))
+                Ok(reader)
             }
         }
     }
@@ -53,10 +53,16 @@ pub fn build_input_spec(args: &Vec<String>) -> Result<InputSpec> {
     Ok(InputSpec::from_prefix_packedancestrymap(prefix))
 }
 
-pub fn run(reader: &mut dyn SiteReader) -> Result<()> {
+pub fn run(reader: &mut impl SiteReader) -> Result<()> {
+    const PARALLEL_THRESHOLD: usize = 500;
     let samples: Vec<String> = reader.samples().to_vec();
+
     let mut counts = Counts::new(samples);
-    counts = counts.consume_reader(reader)?;
+    if counts.n_samples() < PARALLEL_THRESHOLD {
+        counts = counts.consume_reader(reader)?;
+    } else {
+        counts = counts.consume_reader_parallel(reader)?;
+    }
 
     let output_path = "mismatch_rates.csv";
     write_mismatch_rates(&counts, output_path)?;

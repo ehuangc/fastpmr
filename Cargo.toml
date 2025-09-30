@@ -9,4 +9,5 @@ indicatif = "0.18.0"
 itertools = "0.14.0"
 miette = { version = "7.6.0", features = ["fancy"] }
 plotters = "0.3.7"
+rayon = "1.11.0"
 thiserror = "2.0.16"
