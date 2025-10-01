@@ -17,12 +17,12 @@ pub fn write_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
             let counter_idx = counts.idx(i, j);
             let overlap = overlaps[counter_idx];
             let rate = rates[counter_idx];
-            wtr.write_record(&[
+            wtr.serialize((
                 pairs[counter_idx].0.as_str(),
                 pairs[counter_idx].1.as_str(),
-                overlap.to_string().as_str(),
-                rate.to_string().as_str(),
-            ])?;
+                overlap,
+                rate,
+            ))?;
         }
     }
     wtr.flush().map_err(|e| CustomError::Write {
