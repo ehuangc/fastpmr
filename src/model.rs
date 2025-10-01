@@ -8,7 +8,7 @@ pub enum Allele {
 }
 
 impl Allele {
-    pub const fn mismatch(self, other: Self) -> u64 {
+    pub fn mismatch(self, other: Self) -> u64 {
         (self as u8).abs_diff(other as u8) as u64
     }
 }
