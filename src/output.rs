@@ -18,10 +18,10 @@ pub fn write_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
             let overlap = overlaps[counter_idx];
             let rate = rates[counter_idx];
             wtr.write_record(&[
-                pairs[counter_idx].0.clone(),
-                pairs[counter_idx].1.clone(),
-                overlap.to_string(),
-                rate.to_string(),
+                pairs[counter_idx].0.as_str(),
+                pairs[counter_idx].1.as_str(),
+                overlap.to_string().as_str(),
+                rate.to_string().as_str(),
             ])?;
         }
     }
