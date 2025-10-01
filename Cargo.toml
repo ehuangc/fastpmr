@@ -8,6 +8,7 @@ csv = "1.3.1"
 indicatif = "0.18.0"
 itertools = "0.14.0"
 miette = { version = "7.6.0", features = ["fancy"] }
-plotters = "0.3.7"
+# Use ab_glyph to avoid font discovery issues
+plotters = { version = "0.3.7", default-features = false, features = ["ab_glyph", "bitmap_backend", "bitmap_encoder"] }
 rayon = "1.11.0"
 thiserror = "2.0.16"

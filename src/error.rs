@@ -34,6 +34,9 @@ pub enum CustomError {
         source: Box<dyn std::error::Error + Send + Sync>,
     },
 
+    #[error("could not find font")]
+    Font,
+
     #[error("file too small to contain data")]
     PackedAncestryMapFileSize,
 

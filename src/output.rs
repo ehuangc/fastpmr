@@ -2,6 +2,7 @@ use crate::counts::Counts;
 use crate::error::{CustomError, Result};
 use plotters::coord::combinators::IntoLogRange;
 use plotters::prelude::*;
+use plotters::style::{register_font, FontStyle};
 
 pub fn write_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
     let n_samples = counts.n_samples();
@@ -69,6 +70,13 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         }
     }
 
+    const ROBOTO_MONO: &[u8] = include_bytes!("../assets/fonts/roboto-mono/RobotoMono-Regular.ttf");
+    register_font(
+        "roboto-mono",
+        FontStyle::Normal,
+        ROBOTO_MONO,
+    ).map_err(|_| CustomError::Font)?;
+
     let root_area = BitMapBackend::new(path, (3840, 2160)).into_drawing_area();
     root_area.fill(&WHITE).map_err(|e| CustomError::Plot {
         source: Box::new(e),
@@ -77,8 +85,9 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
     let mut chart = ChartBuilder::on(&root_area)
         .set_label_area_size(LabelAreaPosition::Left, 230)
         .set_label_area_size(LabelAreaPosition::Bottom, 160)
-        .margin_right(40)
-        .caption("Pairwise Mismatch Rate Distribution", ("sans-serif", 96))
+        .margin(20)
+        .margin_right(60)
+        .caption("Pairwise Mismatch Rate Distribution", ("roboto-mono", 96))
         .build_cartesian_2d(
             BIN_SIZE..(N_BINS as f32) * BIN_SIZE,
             (0usize..filtered_percentages.len()).log_scale(),
@@ -89,7 +98,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
 
     chart
         .configure_mesh()
-        .label_style(("sans-serif", 80)) // tick label font size
+        .label_style(("roboto-mono", 80))
         .y_desc("Sample pairs")
         .x_desc("Pairwise mismatch rate (%)")
         .x_label_formatter(&|x| format!("{:.0}", x))
@@ -127,7 +136,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .draw_series(std::iter::once(Text::new(
             format!("Median: {:.2}%", median),
             (median + 1.0, filtered_percentages.len() / 3),
-            ("sans-serif", 80).into_font().color(&RED.mix(0.8)),
+            ("roboto-mono", 80).into_font().color(&RED.mix(0.8)),
         )))
         .map_err(|e| CustomError::Plot {
             source: Box::new(e),
