@@ -9,7 +9,13 @@ pub enum Allele {
 
 impl Allele {
     pub fn mismatch(self, other: Self) -> u64 {
-        (self as u8).abs_diff(other as u8) as u64
+        const MISMATCH: [[u64; 4]; 4] = [
+            [0, 1, 2, 0], // Ref vs. *
+            [1, 1, 1, 0], // Het vs. *
+            [2, 1, 0, 0], // Alt vs. *
+            [0, 0, 0, 0], // Missing vs. *
+        ];
+        MISMATCH[self as usize][other as usize]
     }
 }
 
