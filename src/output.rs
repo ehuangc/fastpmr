@@ -2,7 +2,7 @@ use crate::counts::Counts;
 use crate::error::{CustomError, Result};
 use plotters::coord::combinators::IntoLogRange;
 use plotters::prelude::*;
-use plotters::style::{register_font, FontStyle};
+use plotters::style::{FontStyle, register_font};
 
 pub fn write_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
     let n_samples = counts.n_samples();
@@ -71,11 +71,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
     }
 
     const ROBOTO_MONO: &[u8] = include_bytes!("../assets/fonts/roboto-mono/RobotoMono-Regular.ttf");
-    register_font(
-        "roboto-mono",
-        FontStyle::Normal,
-        ROBOTO_MONO,
-    ).map_err(|_| CustomError::Font)?;
+    register_font("roboto-mono", FontStyle::Normal, ROBOTO_MONO).map_err(|_| CustomError::Font)?;
 
     let root_area = BitMapBackend::new(path, (3840, 2160)).into_drawing_area();
     root_area.fill(&WHITE).map_err(|e| CustomError::Plot {
