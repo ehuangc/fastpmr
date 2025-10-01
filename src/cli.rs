@@ -65,11 +65,11 @@ pub fn run(reader: &mut impl SiteReader) -> Result<()> {
     }
 
     let output_path = "mismatch_rates.csv";
+    println!("Writing pairwise mismatch rates to {}...", output_path);
     write_mismatch_rates(&counts, output_path)?;
-    println!("Wrote pairwise mismatch rates to {}", output_path);
 
     let plot_path = "mismatch_rates.png";
+    println!("Writing pairwise mismatch rate plot to {}...", plot_path);
     plot_mismatch_rates(&counts, plot_path)?;
-    println!("Wrote mismatch rate plot to {}", plot_path);
     Ok(())
 }
