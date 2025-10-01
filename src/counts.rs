@@ -69,8 +69,12 @@ impl Counts {
             ProgressStyle::with_template("[{elapsed_precise}] {bar:30} {pos}/{len} sites").unwrap(),
         );
 
-        let mismatches: Vec<AtomicU64> = (0..self.n_samples * self.n_samples).map(|_| AtomicU64::new(0)).collect();
-        let totals: Vec<AtomicU64> = (0..self.n_samples * self.n_samples).map(|_| AtomicU64::new(0)).collect();
+        let mismatches: Vec<AtomicU64> = (0..self.n_samples * self.n_samples)
+            .map(|_| AtomicU64::new(0))
+            .collect();
+        let totals: Vec<AtomicU64> = (0..self.n_samples * self.n_samples)
+            .map(|_| AtomicU64::new(0))
+            .collect();
 
         reader.par_bridge().try_for_each(|site| -> Result<()> {
             let site = site?;
