@@ -116,25 +116,27 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
 
     // Draw histogram bar outlines: top + sides only (no bottom)
     chart
-        .draw_series((0..N_BINS)
-            // Draw nothing if bar height is zero
-            .filter(|&i| bin_counts[i] != 0)
-            .flat_map(|i| {
-                let x0 = i as f32 * BIN_SIZE;
-                let x1 = x0 + BIN_SIZE;
-                let y = bin_counts[i];
+        .draw_series(
+            (0..N_BINS)
+                // Draw nothing if bar height is zero
+                .filter(|&i| bin_counts[i] != 0)
+                .flat_map(|i| {
+                    let x0 = i as f32 * BIN_SIZE;
+                    let x1 = x0 + BIN_SIZE;
+                    let y = bin_counts[i];
 
-                let s = BLACK.stroke_width(1);
-                vec![
-                    PathElement::new(vec![(x0, y), (x1, y)], s.clone()), // top
-                    PathElement::new(vec![(x0, 0usize), (x0, y)], s.clone()), // left
-                    PathElement::new(vec![(x1, 0usize), (x1, y)], s),    // right
-                ]
-                .into_iter()
-            }))
-            .map_err(|e| CustomError::Plot {
-                source: Box::new(e),
-            })?;
+                    let s = BLACK.stroke_width(1);
+                    vec![
+                        PathElement::new(vec![(x0, y), (x1, y)], s.clone()), // top
+                        PathElement::new(vec![(x0, 0usize), (x0, y)], s.clone()), // left
+                        PathElement::new(vec![(x1, 0usize), (x1, y)], s),    // right
+                    ]
+                    .into_iter()
+                }),
+        )
+        .map_err(|e| CustomError::Plot {
+            source: Box::new(e),
+        })?;
 
     // Draw vertical median line
     chart
