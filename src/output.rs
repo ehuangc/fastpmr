@@ -108,7 +108,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .draw_series((0..N_BINS).map(|i| {
             let x0 = i as f32 * BIN_SIZE;
             let x1 = x0 + BIN_SIZE;
-            Rectangle::new([(x0, 0usize), (x1, bin_counts[i])], BLUE.mix(0.5).filled())
+            Rectangle::new([(x0, 0usize), (x1, bin_counts[i])], BLUE.mix(0.4).filled())
         }))
         .map_err(|e| CustomError::Plot {
             source: Box::new(e),
