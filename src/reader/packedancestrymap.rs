@@ -25,7 +25,7 @@ struct Header {
     block_size: usize,
 }
 
-// see https://www.cog-genomics.org/plink/2.0/formats#geno for format description
+// See https://www.cog-genomics.org/plink/2.0/formats#geno for format description
 impl PackedAncestryMapReader {
     pub fn open(
         ind_path: &impl AsRef<Path>,
