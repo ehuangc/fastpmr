@@ -70,8 +70,9 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         }
     }
 
-    const ROBOTO_MONO: &[u8] = include_bytes!("../assets/fonts/roboto-mono/RobotoMono-Regular.ttf");
-    register_font("roboto-mono", FontStyle::Normal, ROBOTO_MONO).map_err(|_| CustomError::Font)?;
+    const IBM_PLEX_MONO: &[u8] =
+        include_bytes!("../assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.ttf");
+    register_font("ibm-plex-mono", FontStyle::Normal, IBM_PLEX_MONO).map_err(|_| CustomError::Font)?;
 
     let root_area = BitMapBackend::new(path, (3840, 2160)).into_drawing_area();
     root_area.fill(&WHITE).map_err(|e| CustomError::Plot {
@@ -83,7 +84,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .set_label_area_size(LabelAreaPosition::Bottom, 160)
         .margin(20)
         .margin_right(60)
-        .caption("Pairwise Mismatch Rate Distribution", ("roboto-mono", 96))
+        .caption("Pairwise Mismatch Rate Distribution", ("ibm-plex-mono", 96))
         .build_cartesian_2d(
             BIN_SIZE..(N_BINS as f32) * BIN_SIZE,
             (0usize..filtered_percentages.len()).log_scale(),
@@ -94,7 +95,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
 
     chart
         .configure_mesh()
-        .label_style(("roboto-mono", 80))
+        .label_style(("ibm-plex-mono", 80))
         .y_desc("Sample pairs")
         .x_desc("Pairwise mismatch rate (%)")
         .x_label_formatter(&|x| format!("{:.0}", x))
@@ -157,7 +158,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .draw_series(std::iter::once(Text::new(
             format!("Median: {:.2}%", median),
             (median + 1.0, filtered_percentages.len() / 3),
-            ("roboto-mono", 80).into_font().color(&RED.mix(0.8)),
+            ("ibm-plex-mono", 80).into_font().color(&RED.mix(0.8)),
         )))
         .map_err(|e| CustomError::Plot {
             source: Box::new(e),
