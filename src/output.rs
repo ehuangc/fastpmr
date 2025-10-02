@@ -93,10 +93,45 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
             source: Box::new(e),
         })?;
 
+    fn superscript(n: u32) -> String {
+        let mut out = String::new();
+        for ch in n.to_string().chars() {
+            out.push(match ch {
+                '0' => '⁰',
+                '1' => '¹',
+                '2' => '²',
+                '3' => '³',
+                '4' => '⁴',
+                '5' => '⁵',
+                '6' => '⁶',
+                '7' => '⁷',
+                '8' => '⁸',
+                '9' => '⁹',
+                _ => unreachable!(),
+            });
+        }
+        out
+    }
+
+    fn exponent_label(y: usize) -> String {
+        if y == 1 {
+            return "1".to_string();
+        }
+        if y == 10 {
+            return "10".to_string();
+        }
+        let log_y = (y as f64).log10();
+        if (log_y - log_y.round()).abs() < 1e-8 {
+            return format!("10{}", superscript(log_y.round() as u32));
+        }
+        String::new()
+    }
+
     chart
         .configure_mesh()
         .label_style(("ibm-plex-mono", 80))
         .y_desc("Sample pairs")
+        .y_label_formatter(&|&y| exponent_label(y))
         .x_desc("Pairwise mismatch rate (%)")
         .x_label_formatter(&|x| format!("{:.0}", x))
         .draw()
