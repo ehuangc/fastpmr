@@ -2,9 +2,6 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum CustomError {
-    #[error("expected exactly one argument: input file prefix")]
-    Args,
-
     #[error("could not read {path}")]
     ReadWithPath {
         #[source]

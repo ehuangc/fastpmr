@@ -1,3 +1,4 @@
+use crate::Args;
 use crate::counts::Counts;
 use crate::error::Result;
 use crate::output::{plot_mismatch_rates, write_mismatch_rates};
@@ -45,12 +46,8 @@ impl InputSpec {
     }
 }
 
-pub fn build_input_spec(args: &Vec<String>) -> Result<InputSpec> {
-    if args.len() != 1 {
-        return Err(crate::error::CustomError::Args);
-    }
-    let prefix = &args[0];
-    Ok(InputSpec::from_prefix_packedancestrymap(prefix))
+pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
+    Ok(InputSpec::from_prefix_packedancestrymap(&args.prefix))
 }
 
 pub fn run(reader: &mut impl SiteReader) -> Result<()> {
