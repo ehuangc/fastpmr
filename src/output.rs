@@ -47,8 +47,15 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         })
         .collect();
 
-    const N_BINS: usize = 100;
     const BIN_SIZE: f32 = 0.5;
+    let max_percentage = filtered_percentages.iter().copied().fold(0.0f32, f32::max);
+    let n_bins: usize;
+    if max_percentage < 50.0 {
+        n_bins = 100;
+    } else {
+        let n_bins_unrounded = (max_percentage / BIN_SIZE).ceil() as usize;
+        n_bins = n_bins_unrounded.div_ceil(10) * 10; // Round up to next multiple of 10
+    }
 
     let median: f32;
     let mut sorted = filtered_percentages.clone();
@@ -60,10 +67,10 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         median = sorted[mid];
     }
 
-    let mut bin_counts = vec![0usize; N_BINS];
+    let mut bin_counts = vec![0usize; n_bins];
     for &rate in &filtered_percentages {
         let bin_idx = (rate / BIN_SIZE).floor() as usize;
-        if bin_idx < N_BINS {
+        if bin_idx < n_bins {
             bin_counts[bin_idx] += 1;
         } else {
             unreachable!("rate {rate} out of histogram x-axis range");
@@ -86,7 +93,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .margin_right(60)
         .caption("Pairwise Mismatch Rate Distribution", ("ibm-plex-mono", 96))
         .build_cartesian_2d(
-            BIN_SIZE..(N_BINS as f32) * BIN_SIZE,
+            BIN_SIZE..(n_bins as f32) * BIN_SIZE,
             (0usize..filtered_percentages.len()).log_scale(),
         )
         .map_err(|e| CustomError::Plot {
@@ -141,7 +148,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
 
     // Draw histogram bars
     chart
-        .draw_series((0..N_BINS).map(|i| {
+        .draw_series((0..n_bins).map(|i| {
             let x0 = i as f32 * BIN_SIZE;
             let x1 = x0 + BIN_SIZE;
             Rectangle::new([(x0, 0usize), (x1, bin_counts[i])], BLUE.mix(0.4).filled())
@@ -153,7 +160,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
     // Draw histogram bar outlines: top + sides only (no bottom)
     chart
         .draw_series(
-            (0..N_BINS)
+            (0..n_bins)
                 // Draw nothing if bar height is zero
                 .filter(|&i| bin_counts[i] != 0)
                 .flat_map(|i| {
