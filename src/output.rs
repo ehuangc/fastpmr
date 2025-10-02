@@ -127,7 +127,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
             source: Box::new(e),
         })?;
 
-    // Median label
+    // Write median label
     chart
         .draw_series(std::iter::once(Text::new(
             format!("Median: {:.2}%", median),
