@@ -79,7 +79,8 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
 
     const IBM_PLEX_MONO: &[u8] =
         include_bytes!("../assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.ttf");
-    register_font("ibm-plex-mono", FontStyle::Normal, IBM_PLEX_MONO).map_err(|_| CustomError::Font)?;
+    register_font("ibm-plex-mono", FontStyle::Normal, IBM_PLEX_MONO)
+        .map_err(|_| CustomError::Font)?;
 
     let root_area = BitMapBackend::new(path, (3840, 2160)).into_drawing_area();
     root_area.fill(&WHITE).map_err(|e| CustomError::Plot {
