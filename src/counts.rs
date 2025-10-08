@@ -2,7 +2,6 @@ use crate::error::Result;
 use crate::model::Allele;
 use crate::reader::SiteReader;
 use indicatif::{ProgressBar, ProgressStyle};
-use itertools::Itertools;
 use rayon::prelude::*;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -49,12 +48,12 @@ impl Counts {
                 .filter(|&(_, a)| a != Allele::Missing)
                 .collect();
 
-            for (&(sample_idx_i, genotype_i), &(sample_idx_j, genotype_j)) in
-                present.iter().tuple_combinations()
-            {
-                let counter_idx = self.idx(sample_idx_i, sample_idx_j);
-                self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
-                self.totals[counter_idx] += 2; // Two alleles per site
+            for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
+                for &(sample_idx_j, genotype_j) in &present[i + 1..] {
+                    let counter_idx = self.idx(sample_idx_i, sample_idx_j);
+                    self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
+                    self.totals[counter_idx] += 2; // Two alleles per site
+                }
             }
             pb.inc(1);
         }
@@ -86,13 +85,13 @@ impl Counts {
                 .filter(|&(_, a)| a != Allele::Missing)
                 .collect();
 
-            for (&(sample_idx_i, genotype_i), &(sample_idx_j, genotype_j)) in
-                present.iter().tuple_combinations()
-            {
-                let idx = self.idx(sample_idx_i, sample_idx_j);
-                mismatches[idx]
-                    .fetch_add(genotype_i.mismatch(genotype_j) as u64, Ordering::Relaxed);
-                totals[idx].fetch_add(2, Ordering::Relaxed);
+            for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
+                for &(sample_idx_j, genotype_j) in &present[i + 1..] {
+                    let idx = self.idx(sample_idx_i, sample_idx_j);
+                    mismatches[idx]
+                        .fetch_add(genotype_i.mismatch(genotype_j) as u64, Ordering::Relaxed);
+                    totals[idx].fetch_add(2, Ordering::Relaxed);
+                }
             }
             pb.inc(1);
             Ok(())
