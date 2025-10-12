@@ -94,7 +94,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .margin_right(60)
         .caption("Pairwise Mismatch Rate Distribution", ("ibm-plex-mono", 96))
         .build_cartesian_2d(
-            BIN_SIZE..(n_bins as f32) * BIN_SIZE,
+            0.0..(n_bins as f32) * BIN_SIZE,
             (0usize..filtered_percentages.len()).log_scale(),
         )
         .map_err(|e| CustomError::Plot {
@@ -141,7 +141,13 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         .y_desc("Sample pairs")
         .y_label_formatter(&|&y| exponent_label(y))
         .x_desc("Pairwise mismatch rate (%)")
-        .x_label_formatter(&|x| format!("{:.0}", x))
+        .x_label_formatter(&|x| {
+            if *x == 0.0 {
+                String::new()
+            } else {
+                format!("{:.0}", x)
+            }
+        })
         .draw()
         .map_err(|e| CustomError::Plot {
             source: Box::new(e),
