@@ -176,6 +176,14 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
                     let y = bin_counts[i];
 
                     let s = BLACK.stroke_width(1);
+                    // Don't draw left side for first bar
+                    if i == 0 {
+                        return vec![
+                            PathElement::new(vec![(x0, y), (x1, y)], s.clone()), // top
+                            PathElement::new(vec![(x1, 0usize), (x1, y)], s),    // right
+                        ]
+                        .into_iter();
+                    }
                     vec![
                         PathElement::new(vec![(x0, y), (x1, y)], s.clone()), // top
                         PathElement::new(vec![(x0, 0usize), (x0, y)], s.clone()), // left
