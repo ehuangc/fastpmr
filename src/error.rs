@@ -46,8 +46,14 @@ pub enum CustomError {
         source: std::str::Utf8Error,
     },
 
+    #[error("header block does not start with \"GENO\" or \"TGENO\"")]
+    PackedAncestryMapHeaderPrefix,
+
     #[error("header block does not start with \"GENO\"")]
     PackedAncestryMapHeaderGeno,
+
+    #[error("header block does not start with \"TGENO\"")]
+    PackedAncestryMapHeaderTgeno,
 
     #[error("expected {expected} fields (got {n_fields}) in header")]
     PackedAncestryMapHeaderFields { n_fields: usize, expected: usize },

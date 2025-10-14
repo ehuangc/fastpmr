@@ -4,6 +4,9 @@ use crate::error::Result;
 use crate::output::{plot_mismatch_rates, write_mismatch_rates};
 use crate::reader::SiteReader;
 use crate::reader::packedancestrymap::PackedAncestryMapReader;
+use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapReader;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone)]
@@ -39,8 +42,30 @@ impl InputSpec {
     pub fn open_reader(&self) -> Result<Box<dyn SiteReader>> {
         match self {
             InputSpec::PackedAncestryMap { ind, geno, snp } => {
-                let reader = PackedAncestryMapReader::open(ind, geno, snp)?;
-                Ok(Box::new(reader))
+                // Check .geno header to determine if it's transposed or not
+                let f = File::open(geno).map_err(|e| crate::error::CustomError::ReadWithPath {
+                    source: e,
+                    path: geno.to_path_buf(),
+                })?;
+                let mut reader = BufReader::new(f);
+                let buffer =
+                    reader
+                        .fill_buf()
+                        .map_err(|e| crate::error::CustomError::ReadWithPath {
+                            source: e,
+                            path: geno.to_path_buf(),
+                        })?;
+                let header_prefix = &buffer[..buffer.len().min(5)];
+
+                if header_prefix.starts_with(b"GENO") {
+                    let reader = PackedAncestryMapReader::open(ind, geno, snp)?;
+                    Ok(Box::new(reader))
+                } else if header_prefix.starts_with(b"TGENO") {
+                    let reader = TransposedPackedAncestryMapReader::open(ind, geno, snp)?;
+                    Ok(Box::new(reader))
+                } else {
+                    Err(crate::error::CustomError::PackedAncestryMapHeaderPrefix)
+                }
             }
         }
     }
