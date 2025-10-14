@@ -114,7 +114,11 @@ impl Iterator for PackedAncestryMapReader {
                 self.next_variant_idx += 1;
                 Some(Ok(Site { genotypes }))
             }
-            Err(e) => Some(Err(CustomError::ReadWithoutPath { source: e })),
+            Err(e) => {
+                // Poison iterator to prevent further reads
+                self.next_variant_idx = self.header.n_variants;
+                Some(Err(CustomError::ReadWithoutPath { source: e }))
+            }
         }
     }
 }
