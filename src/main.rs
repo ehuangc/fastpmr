@@ -24,7 +24,7 @@ fn try_main() -> Result<()> {
     input_spec.print_paths();
 
     let mut reader = input_spec.open_reader()?;
-    cli::run(&mut reader)?;
+    cli::run(reader.as_mut())?;
     Ok(())
 }
 

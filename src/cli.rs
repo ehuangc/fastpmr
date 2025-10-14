@@ -36,11 +36,11 @@ impl InputSpec {
     }
 
     // Open the appropriate reader for the given input spec
-    pub fn open_reader(&self) -> Result<impl SiteReader> {
+    pub fn open_reader(&self) -> Result<Box<dyn SiteReader>> {
         match self {
             InputSpec::PackedAncestryMap { ind, geno, snp } => {
                 let reader = PackedAncestryMapReader::open(ind, geno, snp)?;
-                Ok(reader)
+                Ok(Box::new(reader))
             }
         }
     }
@@ -50,7 +50,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
     Ok(InputSpec::from_prefix_packedancestrymap(&args.prefix))
 }
 
-pub fn run(reader: &mut impl SiteReader) -> Result<()> {
+pub fn run(reader: &mut dyn SiteReader) -> Result<()> {
     const PARALLEL_THRESHOLD: usize = 500;
     let samples: Vec<String> = reader.samples().to_vec();
 
