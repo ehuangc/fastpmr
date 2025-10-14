@@ -22,7 +22,6 @@ pub struct PackedAncestryMapReader {
 struct Header {
     n_samples: usize,
     n_variants: usize,
-    block_size: usize,
 }
 
 // See https://www.cog-genomics.org/plink/2.0/formats#geno for format description
@@ -32,35 +31,30 @@ impl PackedAncestryMapReader {
         geno_path: &impl AsRef<Path>,
         snp_path: &impl AsRef<Path>,
     ) -> Result<Self> {
+        let samples = read_ind(ind_path)?;
+        let variants = read_snp(snp_path)?;
+        let block_size = MIN_BLOCK_BYTES.max(samples.len().div_ceil(4));
+
         let f = File::open(geno_path).map_err(|e| CustomError::ReadWithPath {
             source: e,
             path: geno_path.as_ref().to_path_buf(),
         })?;
         let mut reader = BufReader::new(f);
 
-        // Read header block by using the whole file
+        // Read header block
         let buffer = reader.fill_buf().map_err(|e| CustomError::ReadWithPath {
             source: e,
             path: geno_path.as_ref().to_path_buf(),
         })?;
-        if buffer.len() < MIN_BLOCK_BYTES {
+        let header_block = &buffer[..block_size];
+        if header_block.len() < MIN_BLOCK_BYTES {
             return Err(CustomError::PackedAncestryMapFileSize);
         }
         let header = parse_header_block(buffer)?;
-
-        // Use the actual block size after reading header
-        let block_size = header.block_size;
-        if block_size < MIN_BLOCK_BYTES {
-            return Err(CustomError::PackedAncestryMapFileSize);
-        }
-        if block_size > buffer.len() {
-            return Err(CustomError::PackedAncestryMapFileSize);
-        }
         // Consume header block
         reader.consume(block_size);
 
-        // Load samples and sanity-check
-        let samples = read_ind(ind_path)?;
+        // Sanity-check samples
         if samples.len() != header.n_samples {
             return Err(CustomError::PackedAncestryMapNAgreement {
                 n_header: header.n_samples,
@@ -73,8 +67,7 @@ impl PackedAncestryMapReader {
             });
         }
 
-        // Load variants and sanity-check
-        let variants = read_snp(snp_path)?;
+        // Sanity-check variants
         if variants.len() != header.n_variants {
             return Err(CustomError::PackedAncestryMapVAgreement {
                 n_header: header.n_variants,
@@ -216,12 +209,9 @@ fn parse_header_block(block: &[u8]) -> Result<Header> {
     // let hash_variants = fields[4].parse::<u32>()
     //     .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("invalid variant hash: {e}")))?;
 
-    let block_size = MIN_BLOCK_BYTES.max(n_samples.div_ceil(4));
-
     Ok(Header {
         n_samples,
         n_variants,
-        block_size,
     })
 }
 
