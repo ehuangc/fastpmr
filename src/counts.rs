@@ -32,7 +32,7 @@ impl Counts {
         }
     }
 
-    pub fn consume_reader(mut self, reader: &mut impl SiteReader) -> Result<Self> {
+    pub fn consume_reader(mut self, reader: &mut dyn SiteReader) -> Result<Self> {
         let pb = ProgressBar::new(reader.n_sites() as u64);
         pb.set_style(
             ProgressStyle::with_template("[{elapsed_precise}] {bar:30} {pos}/{len} sites").unwrap(),
@@ -61,7 +61,7 @@ impl Counts {
         Ok(self)
     }
 
-    pub fn consume_reader_parallel(mut self, reader: &mut impl SiteReader) -> Result<Self> {
+    pub fn consume_reader_parallel(mut self, reader: &mut dyn SiteReader) -> Result<Self> {
         let n_sites = reader.n_sites();
         let pb = ProgressBar::new(n_sites as u64);
         pb.set_style(
