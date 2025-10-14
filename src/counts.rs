@@ -127,7 +127,7 @@ impl Counts {
                 let idx = self.idx(i, j);
                 pairs[idx] = (self.samples[i].clone(), self.samples[j].clone());
                 if self.totals[idx] == 0 {
-                    rates[idx] = -1.0;
+                    rates[idx] = f32::NAN;
                 } else {
                     rates[idx] = self.mismatches[idx] as f32 / self.totals[idx] as f32;
                 }
