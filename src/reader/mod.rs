@@ -1,4 +1,5 @@
 pub mod packedancestrymap;
+pub mod transposed_packedancestrymap;
 
 use crate::error::Result;
 use crate::model::Site;
