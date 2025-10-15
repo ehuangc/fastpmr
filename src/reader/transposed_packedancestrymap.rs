@@ -160,7 +160,11 @@ impl SiteReader for TransposedPackedAncestryMapReader {
         &self.samples
     }
     fn n_sites(&self) -> usize {
-        self.header.n_variants
+        if let Some(set) = &self.variant_indices_to_keep {
+            set.len()
+        } else {
+            self.header.n_variants
+        }
     }
 }
 
