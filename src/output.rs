@@ -57,15 +57,17 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
         n_bins = n_bins_unrounded.div_ceil(10) * 10; // Round up to next multiple of 10
     }
 
-    let median: f32;
     let mut sorted = filtered_percentages.clone();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     let mid = sorted.len() / 2;
-    if sorted.len() % 2 == 0 {
-        median = (sorted[mid - 1] + sorted[mid]) / 2.0;
+
+    let median: Option<f32> = if sorted.is_empty() {
+        None
+    } else if sorted.len() % 2 == 0 {
+        Some((sorted[mid - 1] + sorted[mid]) / 2.0)
     } else {
-        median = sorted[mid];
-    }
+        Some(sorted[mid])
+    };
 
     let mut bin_counts = vec![0usize; n_bins];
     for &rate in &filtered_percentages {
@@ -196,30 +198,32 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
             source: Box::new(e),
         })?;
 
-    // Draw vertical median line
-    chart
-        .draw_series(std::iter::once(PathElement::new(
-            vec![(median, 0usize), (median, filtered_percentages.len())],
-            ShapeStyle {
-                color: RED.mix(0.8).to_rgba(),
-                filled: true,
-                stroke_width: 6,
-            },
-        )))
-        .map_err(|e| CustomError::Plot {
-            source: Box::new(e),
-        })?;
+    if let Some(median) = median {
+        // Draw vertical median line
+        chart
+            .draw_series(std::iter::once(PathElement::new(
+                vec![(median, 0usize), (median, filtered_percentages.len())],
+                ShapeStyle {
+                    color: RED.mix(0.8).to_rgba(),
+                    filled: true,
+                    stroke_width: 6,
+                },
+            )))
+            .map_err(|e| CustomError::Plot {
+                source: Box::new(e),
+            })?;
 
-    // Write median label
-    chart
-        .draw_series(std::iter::once(Text::new(
-            format!("Median: {:.2}%", median),
-            (median + 1.0, filtered_percentages.len() / 3),
-            ("ibm-plex-mono", 80).into_font().color(&RED.mix(0.8)),
-        )))
-        .map_err(|e| CustomError::Plot {
-            source: Box::new(e),
-        })?;
+        // Write median label
+        chart
+            .draw_series(std::iter::once(Text::new(
+                format!("Median: {:.2}%", median),
+                (median + 1.0, filtered_percentages.len() / 3),
+                ("ibm-plex-mono", 80).into_font().color(&RED.mix(0.8)),
+            )))
+            .map_err(|e| CustomError::Plot {
+                source: Box::new(e),
+            })?;
+    }
 
     root_area.present().map_err(|e| CustomError::Plot {
         source: Box::new(e),
