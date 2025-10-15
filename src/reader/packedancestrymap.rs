@@ -50,7 +50,7 @@ impl PackedAncestryMapReader {
         if header_block.len() < MIN_BLOCK_BYTES {
             return Err(CustomError::PackedAncestryMapFileSize);
         }
-        let header = parse_header_block(buffer)?;
+        let header = parse_header_block(header_block)?;
         // Consume header block
         reader.consume(block_size);
 
