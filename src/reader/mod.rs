@@ -1,3 +1,4 @@
+pub mod eigenstrat;
 pub mod packedancestrymap;
 pub mod transposed_packedancestrymap;
 

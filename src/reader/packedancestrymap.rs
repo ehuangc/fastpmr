@@ -7,11 +7,10 @@ use std::path::Path;
 use crate::error::{CustomError, Result};
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
+use crate::reader::eigenstrat::{read_eigenstrat_ind, read_eigenstrat_snp};
 
 const MIN_BLOCK_BYTES: usize = 48;
 const GENO_HEADER_FIELDS: usize = 5;
-const IND_FIELDS: usize = 3;
-const SNP_FIELDS: usize = 6;
 
 pub struct PackedAncestryMapReader {
     reader: BufReader<File>,
@@ -35,8 +34,8 @@ impl PackedAncestryMapReader {
         snp_path: &impl AsRef<Path>,
         variant_indices_to_keep: Option<HashSet<usize>>,
     ) -> Result<Self> {
-        let samples = read_ind(ind_path)?;
-        let variants = read_snp(snp_path)?;
+        let samples = read_eigenstrat_ind(ind_path)?;
+        let variants = read_eigenstrat_snp(snp_path)?;
         let block_size = MIN_BLOCK_BYTES.max(samples.len().div_ceil(4));
 
         let f = File::open(geno_path).map_err(|e| CustomError::ReadWithPath {
@@ -143,63 +142,6 @@ impl Iterator for PackedAncestryMapReader {
         }
         None
     }
-}
-
-fn read_ind(path: &impl AsRef<Path>) -> Result<Vec<String>> {
-    let f = File::open(path).map_err(|e| CustomError::ReadWithPath {
-        source: e,
-        path: path.as_ref().to_path_buf(),
-    })?;
-    let f = BufReader::new(f);
-    let mut sample_ids: Vec<String> = Vec::new();
-
-    for (line_idx, line) in f.lines().enumerate() {
-        let line = line.map_err(|e| CustomError::ReadWithPath {
-            source: e,
-            path: path.as_ref().to_path_buf(),
-        })?;
-        let line = line.trim();
-        let fields: Vec<&str> = line.split_whitespace().collect();
-        if fields.len() != IND_FIELDS {
-            return Err(CustomError::EigenstratIndFields {
-                line_num: line_idx + 1,
-                n_fields: fields.len(),
-                expected: IND_FIELDS,
-            });
-        }
-        let sample_id = fields[0].to_string();
-        sample_ids.push(sample_id);
-    }
-    Ok(sample_ids)
-}
-
-fn read_snp(path: &impl AsRef<Path>) -> Result<Vec<String>> {
-    let f = File::open(path).map_err(|e| CustomError::ReadWithPath {
-        source: e,
-        path: path.as_ref().to_path_buf(),
-    })?;
-    let f = BufReader::new(f);
-    let mut variant_ids: Vec<String> = Vec::new();
-
-    for (line_idx, line) in f.lines().enumerate() {
-        let line = line.map_err(|e| CustomError::ReadWithPath {
-            source: e,
-            path: path.as_ref().to_path_buf(),
-        })?;
-        let line = line.trim();
-        let fields: Vec<&str> = line.split_whitespace().collect();
-        if fields.len() != SNP_FIELDS {
-            return Err(CustomError::EigenstratSnpFields {
-                line_num: line_idx + 1,
-                n_fields: fields.len(),
-                expected: SNP_FIELDS,
-            });
-        }
-        let snp_id = fields[0].to_string();
-        let chr = fields[1].to_string();
-        variant_ids.push(format!("{}:{}:", chr, snp_id));
-    }
-    Ok(variant_ids)
 }
 
 fn parse_header_block(block: &[u8]) -> Result<Header> {
