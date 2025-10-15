@@ -18,7 +18,7 @@ pub struct Args {
     prefix: String,
 
     /// 1-based, inclusive range(s) of variant indices to keep.
-    /// Examples: "1-5000,10000-20000", "1, 2, 3000-4000".
+    /// Examples: "1-5000,10000-20000", "1,2,3000-4000".
     #[arg(short, long = "variant-indices")]
     variant_indices_spec: Option<String>,
 }
