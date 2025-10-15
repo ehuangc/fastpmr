@@ -9,20 +9,16 @@ use crate::error::Result;
 use clap::Parser;
 use miette::IntoDiagnostic;
 
-/// Compute pairwise mismatch rates between genomes
+/// Compute pairwise mismatch rates between genetic sequences.
 #[derive(Parser, Debug)]
 #[command(version, about)]
 pub struct Args {
-    /// Input file prefix
+    /// Input file prefix.
     #[arg(short, long)]
     prefix: String,
 
-    /// 1-based, inclusive range of variant indices to keep.
-    /// Examples: "1-5000", "100000-199999"
-    ///
-    /// Notes:
-    /// - Indices are 1-based in the CLI; they’re converted to 0-based internally.
-    /// - Ranges are inclusive; whitespace is ignored.
+    /// 1-based, inclusive range(s) of variant indices to keep.
+    /// Examples: "1-5000,10000-20000", "1, 2, 3000-4000".
     #[arg(short, long = "variant-indices")]
     variant_indices_spec: Option<String>,
 }
