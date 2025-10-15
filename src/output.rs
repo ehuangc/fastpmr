@@ -3,8 +3,9 @@ use crate::error::{CustomError, Result};
 use plotters::coord::combinators::IntoLogRange;
 use plotters::prelude::*;
 use plotters::style::{FontStyle, register_font};
+use std::path::Path;
 
-pub fn write_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
+pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let n_samples = counts.n_samples();
     let overlaps = counts.overlaps();
     let (pairs, rates) = counts.mismatch_rates();
@@ -27,12 +28,12 @@ pub fn write_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
     }
     wtr.flush().map_err(|e| CustomError::Write {
         source: e,
-        path: path.into(),
+        path: path.as_ref().into(),
     })?;
     Ok(())
 }
 
-pub fn plot_mismatch_rates(counts: &Counts, path: &str) -> Result<()> {
+pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let (_pairs, rates) = counts.mismatch_rates();
     let overlaps = counts.overlaps();
     let filtered_percentages: Vec<f32> = rates

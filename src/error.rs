@@ -2,6 +2,12 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum CustomError {
+    #[error("could not create output directory")]
+    OutputDir {
+        #[source]
+        source: std::io::Error,
+    },
+
     #[error("could not parse variant index: {arg}")]
     VariantIndexInt {
         #[source]

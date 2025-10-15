@@ -8,7 +8,7 @@ use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapRead
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone)]
 pub enum InputSpec {
@@ -18,6 +18,7 @@ pub enum InputSpec {
         snp: PathBuf,
         // Parsed 0-based indices of variants to keep
         variant_indices: Option<HashSet<usize>>,
+        output_dir: PathBuf,
     },
 }
 
@@ -25,12 +26,14 @@ impl InputSpec {
     pub fn from_prefix_packedancestrymap(
         prefix: &str,
         variant_indices: Option<HashSet<usize>>,
+        output_dir: &str,
     ) -> Self {
         Self::PackedAncestryMap {
             ind: PathBuf::from(prefix.to_string() + ".ind"),
             geno: PathBuf::from(prefix.to_string() + ".geno"),
             snp: PathBuf::from(prefix.to_string() + ".snp"),
             variant_indices,
+            output_dir: PathBuf::from(output_dir.to_string()),
         }
     }
 
@@ -46,13 +49,14 @@ impl InputSpec {
     }
 
     // Open the appropriate reader for the given input spec
-    pub fn open_reader(self) -> Result<Box<dyn SiteReader>> {
+    pub fn open_reader(&self) -> Result<Box<dyn SiteReader>> {
         match self {
             InputSpec::PackedAncestryMap {
                 ind,
                 geno,
                 snp,
                 variant_indices,
+                ..
             } => {
                 // Check .geno header to determine if it's transposed or not
                 let f = File::open(&geno).map_err(|e| crate::error::CustomError::ReadWithPath {
@@ -70,20 +74,27 @@ impl InputSpec {
                 let header_prefix = &buffer[..buffer.len().min(5)];
 
                 if header_prefix.starts_with(b"GENO") {
-                    let reader = PackedAncestryMapReader::open(&ind, &geno, &snp, variant_indices)?;
+                    let reader =
+                        PackedAncestryMapReader::open(ind, geno, snp, variant_indices.clone())?;
                     Ok(Box::new(reader))
                 } else if header_prefix.starts_with(b"TGENO") {
                     let reader = TransposedPackedAncestryMapReader::open(
-                        &ind,
-                        &geno,
-                        &snp,
-                        variant_indices,
+                        ind,
+                        geno,
+                        snp,
+                        variant_indices.clone(),
                     )?;
                     Ok(Box::new(reader))
                 } else {
                     Err(crate::error::CustomError::PackedAncestryMapHeaderPrefix)
                 }
             }
+        }
+    }
+
+    pub fn output_dir(&self) -> &Path {
+        match self {
+            InputSpec::PackedAncestryMap { output_dir, .. } => output_dir.as_path(),
         }
     }
 }
@@ -136,10 +147,11 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
     Ok(InputSpec::from_prefix_packedancestrymap(
         &args.prefix,
         variant_indices,
+        &args.output_directory,
     ))
 }
 
-pub fn run(reader: &mut dyn SiteReader) -> Result<()> {
+pub fn run(reader: &mut dyn SiteReader, output_dir: impl AsRef<Path>) -> Result<()> {
     const PARALLEL_THRESHOLD: usize = 500;
     let samples: Vec<String> = reader.samples().to_vec();
 
@@ -150,12 +162,18 @@ pub fn run(reader: &mut dyn SiteReader) -> Result<()> {
         counts = counts.consume_reader_parallel(reader)?;
     }
 
-    let output_path = "mismatch_rates.csv";
-    println!("Writing pairwise mismatch rates to {}...", output_path);
-    write_mismatch_rates(&counts, output_path)?;
+    let output_path = output_dir.as_ref().join("mismatch_rates.txt");
+    println!(
+        "Writing pairwise mismatch rates to {}...",
+        output_path.display()
+    );
+    write_mismatch_rates(&counts, &output_path)?;
 
-    let plot_path = "mismatch_rates.png";
-    println!("Writing pairwise mismatch rate plot to {}...", plot_path);
-    plot_mismatch_rates(&counts, plot_path)?;
+    let plot_path = output_dir.as_ref().join("mismatch_rates.png");
+    println!(
+        "Writing pairwise mismatch rate plot to {}...",
+        plot_path.display()
+    );
+    plot_mismatch_rates(&counts, &plot_path)?;
     Ok(())
 }
