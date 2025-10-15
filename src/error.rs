@@ -2,6 +2,19 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum CustomError {
+    #[error("could not parse variant index: {arg}")]
+    VariantIndexInt {
+        #[source]
+        source: std::num::ParseIntError,
+        arg: String,
+    },
+
+    #[error("variant index out-of-bounds: {idx} > {n_variants}")]
+    VariantIndexHigh { idx: usize, n_variants: usize },
+
+    #[error("variant indices are 1-based and must be positive")]
+    VariantIndexLow,
+
     #[error("could not read {path}")]
     ReadWithPath {
         #[source]

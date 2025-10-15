@@ -1,3 +1,5 @@
+use itertools::Itertools;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
@@ -15,9 +17,10 @@ pub struct TransposedPackedAncestryMapReader {
     header: Header,
     samples: Vec<String>,
     sample_block_size: usize,
+    variant_indices_to_keep: Option<HashSet<usize>>,
+    next_variant_idx: usize,
     // Entire TGENO matrix (w/o header); length = n_samples * sample_block_size
     genotype_matrix: Vec<u8>,
-    next_variant_idx: usize,
 }
 
 struct Header {
@@ -31,6 +34,7 @@ impl TransposedPackedAncestryMapReader {
         ind_path: &impl AsRef<Path>,
         geno_path: &impl AsRef<Path>,
         snp_path: &impl AsRef<Path>,
+        variant_indices_to_keep: Option<HashSet<usize>>,
     ) -> Result<Self> {
         let samples = read_ind(ind_path)?;
         let variants = read_snp(snp_path)?;
@@ -81,6 +85,16 @@ impl TransposedPackedAncestryMapReader {
             });
         }
 
+        // Sanity-check variant indices to keep
+        if let Some(set) = &variant_indices_to_keep {
+            if let Some(&bad_idx) = set.iter().sorted().find(|&&idx| idx >= header.n_variants) {
+                return Err(CustomError::VariantIndexHigh {
+                    idx: bad_idx + 1,
+                    n_variants: header.n_variants,
+                });
+            }
+        }
+
         // Read entire matrix so we can iterate over sites efficiently
         let expected_bytes = header.n_samples * sample_block_size;
         let mut genotype_matrix = vec![0u8; expected_bytes];
@@ -108,8 +122,9 @@ impl TransposedPackedAncestryMapReader {
             header,
             samples,
             sample_block_size,
-            genotype_matrix,
+            variant_indices_to_keep,
             next_variant_idx: 0,
+            genotype_matrix,
         })
     }
 
@@ -153,12 +168,20 @@ impl Iterator for TransposedPackedAncestryMapReader {
     type Item = Result<Site>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.next_variant_idx >= self.header.n_variants {
-            return None;
+        while self.next_variant_idx < self.header.n_variants {
+            let keep = match &self.variant_indices_to_keep {
+                Some(set) => set.contains(&self.next_variant_idx),
+                None => true,
+            };
+
+            let genotypes = self.genotypes_for_variant(self.next_variant_idx);
+            self.next_variant_idx += 1;
+
+            if keep {
+                return Some(Ok(Site { genotypes }));
+            }
         }
-        let genotypes = self.genotypes_for_variant(self.next_variant_idx);
-        self.next_variant_idx += 1;
-        Some(Ok(Site { genotypes }))
+        None
     }
 }
 

@@ -1,3 +1,5 @@
+use itertools::Itertools;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
@@ -15,6 +17,7 @@ pub struct PackedAncestryMapReader {
     reader: BufReader<File>,
     header: Header,
     samples: Vec<String>,
+    variant_indices_to_keep: Option<HashSet<usize>>,
     next_variant_idx: usize,
     block_buf: Vec<u8>,
 }
@@ -30,6 +33,7 @@ impl PackedAncestryMapReader {
         ind_path: &impl AsRef<Path>,
         geno_path: &impl AsRef<Path>,
         snp_path: &impl AsRef<Path>,
+        variant_indices_to_keep: Option<HashSet<usize>>,
     ) -> Result<Self> {
         let samples = read_ind(ind_path)?;
         let variants = read_snp(snp_path)?;
@@ -80,10 +84,21 @@ impl PackedAncestryMapReader {
             });
         }
 
+        // Sanity-check variant indices to keep
+        if let Some(set) = &variant_indices_to_keep {
+            if let Some(&bad_idx) = set.iter().sorted().find(|&&idx| idx >= header.n_variants) {
+                return Err(CustomError::VariantIndexHigh {
+                    idx: bad_idx + 1,
+                    n_variants: header.n_variants,
+                });
+            }
+        }
+
         Ok(Self {
             reader,
             header,
             samples,
+            variant_indices_to_keep,
             next_variant_idx: 0,
             block_buf: vec![0u8; block_size],
         })
@@ -96,7 +111,11 @@ impl SiteReader for PackedAncestryMapReader {
     }
 
     fn n_sites(&self) -> usize {
-        self.header.n_variants
+        if let Some(set) = &self.variant_indices_to_keep {
+            set.len()
+        } else {
+            self.header.n_variants
+        }
     }
 }
 
@@ -104,22 +123,25 @@ impl Iterator for PackedAncestryMapReader {
     type Item = Result<Site>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.next_variant_idx >= self.header.n_variants {
-            return None;
-        }
+        while self.next_variant_idx < self.header.n_variants {
+            let keep = match &self.variant_indices_to_keep {
+                Some(set) => set.contains(&self.next_variant_idx),
+                None => true,
+            };
 
-        match self.reader.read_exact(&mut self.block_buf) {
-            Ok(()) => {
-                let genotypes = parse_variant_block(&self.block_buf, self.header.n_samples);
-                self.next_variant_idx += 1;
-                Some(Ok(Site { genotypes }))
-            }
-            Err(e) => {
+            if let Err(e) = self.reader.read_exact(&mut self.block_buf) {
                 // Poison iterator to prevent further reads
                 self.next_variant_idx = self.header.n_variants;
-                Some(Err(CustomError::ReadWithoutPath { source: e }))
+                return Some(Err(CustomError::ReadWithoutPath { source: e }));
+            }
+
+            self.next_variant_idx += 1;
+            if keep {
+                let genotypes = parse_variant_block(&self.block_buf, self.header.n_samples);
+                return Some(Ok(Site { genotypes }));
             }
         }
+        None
     }
 }
 
