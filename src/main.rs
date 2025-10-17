@@ -31,6 +31,12 @@ pub struct Args {
     /// Examples: "1-5000,10000-20000", "1,2,3000-4000".
     #[arg(short, long = "variant-indices")]
     variant_indices_spec: Option<String>,
+
+    /// Number of threads to use. When not provided, defaults to 1 (single-threaded) when run
+    /// with fewer than 500 samples and the number of logical cores when run with 500 or more
+    /// samples.
+    #[arg(short, long)]
+    threads: Option<usize>,
 }
 
 fn try_main() -> Result<()> {
@@ -42,7 +48,11 @@ fn try_main() -> Result<()> {
     input_spec.print_paths();
 
     let mut reader = input_spec.open_reader()?;
-    cli::run(reader.as_mut(), input_spec.output_dir())?;
+    cli::run(
+        reader.as_mut(),
+        input_spec.output_dir(),
+        input_spec.threads(),
+    )?;
     Ok(())
 }
 

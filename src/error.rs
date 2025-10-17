@@ -21,6 +21,9 @@ pub enum CustomError {
     #[error("variant indices are 1-based and must be positive")]
     VariantIndexLow,
 
+    #[error("could not build thread pool")]
+    ThreadPoolBuild(#[from] rayon::ThreadPoolBuildError),
+
     #[error("could not read {path}")]
     ReadWithPath {
         #[source]

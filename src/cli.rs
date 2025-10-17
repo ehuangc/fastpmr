@@ -5,6 +5,7 @@ use crate::output::{plot_mismatch_rates, write_mismatch_rates};
 use crate::reader::SiteReader;
 use crate::reader::packedancestrymap::PackedAncestryMapReader;
 use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapReader;
+use rayon::ThreadPoolBuilder;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -16,24 +17,27 @@ pub enum InputSpec {
         ind: PathBuf,
         geno: PathBuf,
         snp: PathBuf,
+        output_dir: PathBuf,
         // Parsed 0-based indices of variants to keep
         variant_indices: Option<HashSet<usize>>,
-        output_dir: PathBuf,
+        threads: Option<usize>,
     },
 }
 
 impl InputSpec {
     pub fn from_prefix_packedancestrymap(
         prefix: &str,
-        variant_indices: Option<HashSet<usize>>,
         output_dir: &str,
+        variant_indices: Option<HashSet<usize>>,
+        threads: Option<usize>,
     ) -> Self {
         Self::PackedAncestryMap {
             ind: PathBuf::from(prefix.to_string() + ".ind"),
             geno: PathBuf::from(prefix.to_string() + ".geno"),
             snp: PathBuf::from(prefix.to_string() + ".snp"),
-            variant_indices,
             output_dir: PathBuf::from(output_dir.to_string()),
+            variant_indices,
+            threads,
         }
     }
 
@@ -97,6 +101,12 @@ impl InputSpec {
             InputSpec::PackedAncestryMap { output_dir, .. } => output_dir.as_path(),
         }
     }
+
+    pub fn threads(&self) -> Option<usize> {
+        match self {
+            InputSpec::PackedAncestryMap { threads, .. } => *threads,
+        }
+    }
 }
 
 pub fn parse_indices(spec: &str) -> Result<HashSet<usize>> {
@@ -146,18 +156,27 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
     };
     Ok(InputSpec::from_prefix_packedancestrymap(
         &args.prefix,
-        variant_indices,
         &args.output_directory,
+        variant_indices,
+        args.threads,
     ))
 }
 
-pub fn run(reader: &mut dyn SiteReader, output_dir: impl AsRef<Path>) -> Result<()> {
+pub fn run(
+    reader: &mut dyn SiteReader,
+    output_dir: impl AsRef<Path>,
+    threads: Option<usize>,
+) -> Result<()> {
     const PARALLEL_THRESHOLD: usize = 500;
     let samples: Vec<String> = reader.samples().to_vec();
 
     let mut counts = Counts::new(samples);
-    if counts.n_samples() < PARALLEL_THRESHOLD {
+    if (threads.is_none() && counts.n_samples() < PARALLEL_THRESHOLD) || threads == Some(1) {
         counts = counts.consume_reader(reader)?;
+    } else if let Some(n) = threads {
+        println!("Using {} threads", n);
+        let pool = ThreadPoolBuilder::new().num_threads(n).build()?;
+        counts = pool.install(|| counts.consume_reader_parallel(reader))?;
     } else {
         counts = counts.consume_reader_parallel(reader)?;
     }
