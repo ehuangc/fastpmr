@@ -100,6 +100,12 @@ pub enum CustomError {
     )]
     PackedAncestryMapVAgreement { n_header: usize, n_snp: usize },
 
+    #[error("header sample hash does not match (expected: {expected}, found: {found})")]
+    PackedAncestryMapSampleHash { expected: String, found: String },
+
+    #[error("header variant hash does not match (expected: {expected}, found: {found})")]
+    PackedAncestryMapVariantHash { expected: String, found: String },
+
     #[error("expected {expected} fields (got {n_fields}) in line {line_num} of .ind file")]
     EigenstratIndFields {
         line_num: usize,

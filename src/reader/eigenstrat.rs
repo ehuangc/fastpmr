@@ -62,3 +62,31 @@ pub(super) fn read_eigenstrat_snp(path: &impl AsRef<Path>) -> Result<Vec<String>
     }
     Ok(variant_ids)
 }
+
+pub(super) fn header_hash(sample_ids: &[String], variant_ids: &[String]) -> (String, String) {
+    fn hashone(id: &str) -> u32 {
+        let mut hash: u32 = 0;
+        for &b in id.as_bytes() {
+            if b == b'\0' {
+                break;
+            }
+            hash = hash.wrapping_mul(23).wrapping_add(b as u32);
+        }
+        hash
+    }
+
+    fn hasharr(ids: &[String]) -> u32 {
+        let mut hash: u32 = 0;
+        for id in ids {
+            hash = hash.wrapping_mul(17) ^ hashone(id);
+        }
+        hash
+    }
+
+    let sample_hash = hasharr(sample_ids);
+    let variant_hash = hasharr(variant_ids);
+    (
+        format!("{:08x}", sample_hash),
+        format!("{:08x}", variant_hash),
+    )
+}

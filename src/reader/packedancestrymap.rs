@@ -7,7 +7,7 @@ use std::path::Path;
 use crate::error::{CustomError, Result};
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
-use crate::reader::eigenstrat::{read_eigenstrat_ind, read_eigenstrat_snp};
+use crate::reader::eigenstrat::{header_hash, read_eigenstrat_ind, read_eigenstrat_snp};
 
 const MIN_BLOCK_BYTES: usize = 48;
 const GENO_HEADER_FIELDS: usize = 5;
@@ -24,6 +24,8 @@ pub struct PackedAncestryMapReader {
 struct Header {
     n_samples: usize,
     n_variants: usize,
+    sample_hash: String,
+    variant_hash: String,
 }
 
 // See https://www.cog-genomics.org/plink/2.0/formats#geno for format description
@@ -80,6 +82,21 @@ impl PackedAncestryMapReader {
         if header.n_variants < 1 {
             return Err(CustomError::VariantCount {
                 n_variants: header.n_variants,
+            });
+        }
+
+        // Sanity-check header hashes
+        let (expected_sample_hash, expected_variant_hash) = header_hash(&samples, &variants);
+        if header.sample_hash != expected_sample_hash {
+            return Err(CustomError::PackedAncestryMapSampleHash {
+                expected: expected_sample_hash,
+                found: header.sample_hash,
+            });
+        }
+        if header.variant_hash != expected_variant_hash {
+            return Err(CustomError::PackedAncestryMapVariantHash {
+                expected: expected_variant_hash,
+                found: header.variant_hash,
             });
         }
 
@@ -171,15 +188,14 @@ fn parse_header_block(block: &[u8]) -> Result<Header> {
         .parse::<usize>()
         .map_err(|e| CustomError::PackedAncestryMapHeaderV { source: e })?;
 
-    // TO-DO: Verify hashes
-    // let hash_samples = fields[3].parse::<u32>()
-    //     .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("invalid sample hash: {e}")))?;
-    // let hash_variants = fields[4].parse::<u32>()
-    //     .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("invalid variant hash: {e}")))?;
+    let sample_hash = fields[3].to_string();
+    let variant_hash = fields[4].to_string();
 
     Ok(Header {
         n_samples,
         n_variants,
+        sample_hash,
+        variant_hash,
     })
 }
 

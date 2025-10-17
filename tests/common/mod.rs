@@ -41,12 +41,24 @@ pub fn create_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
     let prefix = base_dir.join("dataset");
     let output_dir = base_dir.join("output");
 
-    write_ind(prefix.with_extension("ind"))?;
-    write_snp(prefix.with_extension("snp"))?;
     let variants = build_variants();
+    let sample_ids = sample_ids();
+    let variant_ids = variant_ids();
+    write_ind(prefix.with_extension("ind"), &sample_ids)?;
+    write_snp(prefix.with_extension("snp"))?;
     match format {
-        GenoFormat::Packed => write_geno(prefix.with_extension("geno"), &variants)?,
-        GenoFormat::Transposed => write_tgeno(prefix.with_extension("geno"), &variants)?,
+        GenoFormat::Packed => write_geno(
+            prefix.with_extension("geno"),
+            &variants,
+            &sample_ids,
+            &variant_ids,
+        )?,
+        GenoFormat::Transposed => write_tgeno(
+            prefix.with_extension("geno"),
+            &variants,
+            &sample_ids,
+            &variant_ids,
+        )?,
     }
 
     Ok(Dataset { prefix, output_dir })
@@ -75,6 +87,22 @@ pub fn expected_rate_filtered() -> f32 {
     mismatches / totals
 }
 
+fn sample_ids() -> Vec<String> {
+    let mut samples = Vec::new();
+    for i in 0..N_SAMPLES {
+        samples.push(format!("Sample{}", i + 1));
+    }
+    samples
+}
+
+fn variant_ids() -> Vec<String> {
+    let mut variants = Vec::new();
+    for i in 0..TOTAL_VARIANTS {
+        variants.push(format!("rs{}", i + 1));
+    }
+    variants
+}
+
 fn build_variants() -> Vec<[u8; N_SAMPLES]> {
     let mut variants = Vec::with_capacity(TOTAL_VARIANTS);
     for _ in 0..HIGH_MISMATCH_VARIANTS {
@@ -88,10 +116,11 @@ fn build_variants() -> Vec<[u8; N_SAMPLES]> {
     variants
 }
 
-fn write_ind(path: impl AsRef<Path>) -> io::Result<()> {
+fn write_ind(path: impl AsRef<Path>, samples: &[String]) -> io::Result<()> {
     let mut file = File::create(path)?;
-    writeln!(file, "Sample1 M 0")?;
-    writeln!(file, "Sample2 F 0")?;
+    for sample in samples {
+        writeln!(file, "{} M 0", sample)?;
+    }
     Ok(())
 }
 
@@ -103,10 +132,23 @@ fn write_snp(path: impl AsRef<Path>) -> io::Result<()> {
     Ok(())
 }
 
-fn write_geno(path: impl AsRef<Path>, variants: &[[u8; N_SAMPLES]]) -> io::Result<()> {
+fn write_geno(
+    path: impl AsRef<Path>,
+    variants: &[[u8; N_SAMPLES]],
+    sample_ids: &[String],
+    variant_ids: &[String],
+) -> io::Result<()> {
     let mut file = File::create(path)?;
     let block_size = 48usize.max(N_SAMPLES.div_ceil(4));
-    let header_str = format!("GENO {} {} 0 0", N_SAMPLES, variants.len());
+
+    let (sample_hash, variant_hash) = header_hash(sample_ids, variant_ids);
+    let header_str = format!(
+        "GENO {} {} {} {}",
+        N_SAMPLES,
+        variants.len(),
+        sample_hash,
+        variant_hash
+    );
     let mut header_block = vec![0u8; block_size];
     header_block[..header_str.len()].copy_from_slice(header_str.as_bytes());
     header_block[header_str.len()] = 0;
@@ -133,9 +175,22 @@ fn write_geno(path: impl AsRef<Path>, variants: &[[u8; N_SAMPLES]]) -> io::Resul
     Ok(())
 }
 
-fn write_tgeno(path: impl AsRef<Path>, variants: &[[u8; N_SAMPLES]]) -> io::Result<()> {
+fn write_tgeno(
+    path: impl AsRef<Path>,
+    variants: &[[u8; N_SAMPLES]],
+    sample_ids: &[String],
+    variant_ids: &[String],
+) -> io::Result<()> {
     let mut file = File::create(path)?;
-    let header_str = format!("TGENO {} {} 0 0", N_SAMPLES, variants.len());
+
+    let (sample_hash, variant_hash) = header_hash(sample_ids, variant_ids);
+    let header_str = format!(
+        "TGENO {} {} {} {}",
+        N_SAMPLES,
+        variants.len(),
+        sample_hash,
+        variant_hash
+    );
     let mut header_block = vec![0u8; 48];
     header_block[..header_str.len()].copy_from_slice(header_str.as_bytes());
     header_block[header_str.len()] = 0;
@@ -154,4 +209,32 @@ fn write_tgeno(path: impl AsRef<Path>, variants: &[[u8; N_SAMPLES]]) -> io::Resu
         file.write_all(&block)?;
     }
     Ok(())
+}
+
+fn header_hash(sample_ids: &[String], variant_ids: &[String]) -> (String, String) {
+    fn hashone(id: &str) -> u32 {
+        let mut hash: u32 = 0;
+        for &b in id.as_bytes() {
+            if b == b'\0' {
+                break;
+            }
+            hash = hash.wrapping_mul(23).wrapping_add(b as u32);
+        }
+        hash
+    }
+
+    fn hasharr(ids: &[String]) -> u32 {
+        let mut hash: u32 = 0;
+        for id in ids {
+            hash = hash.wrapping_mul(17) ^ hashone(id);
+        }
+        hash
+    }
+
+    let sample_hash = hasharr(sample_ids);
+    let variant_hash = hasharr(variant_ids);
+    (
+        format!("{:08x}", sample_hash),
+        format!("{:08x}", variant_hash),
+    )
 }
