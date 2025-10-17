@@ -13,3 +13,10 @@ repos:
       language: system
       pass_filenames: false
       types: [rust]
+
+    - id: cargo-test
+      name: cargo test
+      entry: cargo test --workspace --all-targets -q
+      language: system
+      pass_filenames: false
+      types: [rust]
