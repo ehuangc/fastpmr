@@ -18,7 +18,7 @@ pub struct Args {
     #[arg(short, long)]
     prefix: String,
 
-    /// Output directory.
+    /// Output directory. Defaults to "./fastpmr_output_<timestamp>".
     #[arg(
         short,
         long,
@@ -32,9 +32,8 @@ pub struct Args {
     #[arg(short, long = "variant-indices")]
     variant_indices_spec: Option<String>,
 
-    /// Number of threads to use. When not provided, defaults to 1 (single-threaded) when run
-    /// with fewer than 500 samples and the number of logical cores when run with 500 or more
-    /// samples.
+    /// Number of threads to use. When run with fewer than 500 samples, defaults to 1.
+    /// When run with 500 or more samples, defaults to the number of logical cores.
     #[arg(short, long)]
     threads: Option<usize>,
 }
