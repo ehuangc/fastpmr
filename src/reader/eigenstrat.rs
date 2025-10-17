@@ -57,9 +57,8 @@ pub(super) fn read_eigenstrat_snp(path: &impl AsRef<Path>) -> Result<Vec<String>
                 expected: SNP_FIELDS,
             });
         }
-        let snp_id = fields[0].to_string();
-        let chr = fields[1].to_string();
-        variant_ids.push(format!("{}:{}:", chr, snp_id));
+        let variant_id = fields[0].to_string();
+        variant_ids.push(variant_id);
     }
     Ok(variant_ids)
 }
