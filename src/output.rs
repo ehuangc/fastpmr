@@ -38,12 +38,13 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
 }
 
 pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
-    let mut npz = ndarray_npy::NpzWriter::new(std::fs::File::create(path).map_err(|e| {
-        CustomError::Write {
-            source: e,
-            path: path.as_ref().into(),
-        }
-    })?);
+    let mut npz =
+        ndarray_npy::NpzWriter::new_compressed(std::fs::File::create(path).map_err(|e| {
+            CustomError::Write {
+                source: e,
+                path: path.as_ref().into(),
+            }
+        })?);
     // Write one array at a time and free it immediately
     {
         let mismatches = counts.mismatches_2d();
