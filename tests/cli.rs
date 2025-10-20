@@ -84,7 +84,7 @@ fn run_fastpmr(dataset: &common::Dataset, variant_spec: Option<&str>) -> std::pr
 }
 
 fn assert_outputs(output_dir: &Path, expected_overlap: u64, expected_rate: f32) {
-    let csv_path = output_dir.join("mismatch_rates.txt");
+    let csv_path = output_dir.join("mismatch_rates.csv");
     let record = read_single_record(&csv_path);
     assert_eq!(record[0], "Sample1");
     assert_eq!(record[1], "Sample2");

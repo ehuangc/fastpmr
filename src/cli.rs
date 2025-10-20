@@ -181,12 +181,12 @@ pub fn run(
         counts = counts.consume_reader_parallel(reader)?;
     }
 
-    let output_path = output_dir.as_ref().join("mismatch_rates.txt");
+    let rates_path = output_dir.as_ref().join("mismatch_rates.csv");
     println!(
         "Writing pairwise mismatch rates to {}...",
-        output_path.display()
+        rates_path.display()
     );
-    write_mismatch_rates(&counts, &output_path)?;
+    write_mismatch_rates(&counts, &rates_path)?;
 
     let plot_path = output_dir.as_ref().join("mismatch_rates.png");
     println!(
