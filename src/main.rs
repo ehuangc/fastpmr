@@ -27,9 +27,9 @@ pub struct Args {
     )]
     output_directory: String,
 
-    /// Whether to write outputs in compressed .npz format.
-    /// If true, skips writing plain-text mismatch_rates.csv.
-    /// Defaults to false.
+    /// Flag to write outputs in compressed .npz format. If true, skips writing plain-text
+    /// mismatch_rates.csv and instead writes count matrices (and a samples.json) to
+    /// mismatch_counts.npz. Recommended true for large sample sizes. Defaults to false.
     #[arg(short, long, default_value_t = false)]
     npz: bool,
 
