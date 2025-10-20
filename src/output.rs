@@ -7,11 +7,11 @@ use std::path::Path;
 
 pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let n_samples = counts.n_samples();
-    let overlaps = counts.overlaps();
+    let overlaps = counts.site_overlaps();
     let (pairs, rates) = counts.mismatch_rates();
 
     let mut wtr = csv::Writer::from_path(path)?;
-    wtr.write_record(&["id1", "id2", "n_overlap", "mismatch_rate"])?;
+    wtr.write_record(&["id1", "id2", "n_site_overlaps", "mismatch_rate"])?;
 
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
@@ -35,7 +35,7 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
 
 pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let (_pairs, rates) = counts.mismatch_rates();
-    let overlaps = counts.overlaps();
+    let overlaps = counts.site_overlaps();
     let filtered_percentages: Vec<f32> = rates
         .iter()
         .zip(overlaps.iter())

@@ -115,7 +115,7 @@ impl Counts {
         self.n_samples
     }
 
-    pub fn overlaps(&self) -> Vec<u64> {
+    pub fn site_overlaps(&self) -> Vec<u64> {
         self.totals.iter().map(|x| x / 2).collect()
     }
 

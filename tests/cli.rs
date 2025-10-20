@@ -108,7 +108,7 @@ fn read_single_record(path: &Path) -> [String; 4] {
     let mut lines = content.lines();
 
     let header = lines.next().expect("missing header").trim_end_matches('\r');
-    assert_eq!(header, "id1,id2,n_overlap,mismatch_rate");
+    assert_eq!(header, "id1,id2,n_site_overlaps,mismatch_rate");
 
     let record_line = lines
         .next()
@@ -119,7 +119,7 @@ fn read_single_record(path: &Path) -> [String; 4] {
     let mut fields = record_line.split(',').map(|s| s.to_string());
     let id1 = fields.next().expect("missing id1");
     let id2 = fields.next().expect("missing id2");
-    let overlap = fields.next().expect("missing overlap");
+    let overlap = fields.next().expect("missing site overlap");
     let rate = fields.next().expect("missing rate");
     assert!(fields.next().is_none(), "unexpected extra columns");
 
