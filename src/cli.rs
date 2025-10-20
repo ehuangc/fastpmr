@@ -1,7 +1,7 @@
 use crate::Args;
 use crate::counts::Counts;
 use crate::error::{CustomError, Result};
-use crate::output::{plot_mismatch_rates, write_mismatch_rates};
+use crate::output::{plot_mismatch_rates, write_counts_npz, write_mismatch_rates};
 use crate::reader::SiteReader;
 use crate::reader::packedancestrymap::PackedAncestryMapReader;
 use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapReader;
@@ -18,6 +18,7 @@ pub enum InputSpec {
         geno: PathBuf,
         snp: PathBuf,
         output_dir: PathBuf,
+        npz: bool,
         // Parsed 0-based indices of variants to keep
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
@@ -28,6 +29,7 @@ impl InputSpec {
     pub fn from_prefix_packedancestrymap(
         prefix: &str,
         output_dir: &str,
+        npz: bool,
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
     ) -> Self {
@@ -36,6 +38,7 @@ impl InputSpec {
             geno: PathBuf::from(prefix.to_string() + ".geno"),
             snp: PathBuf::from(prefix.to_string() + ".snp"),
             output_dir: PathBuf::from(output_dir.to_string()),
+            npz,
             variant_indices,
             threads,
         }
@@ -102,6 +105,12 @@ impl InputSpec {
         }
     }
 
+    pub fn npz(&self) -> bool {
+        match self {
+            InputSpec::PackedAncestryMap { npz, .. } => *npz,
+        }
+    }
+
     pub fn threads(&self) -> Option<usize> {
         match self {
             InputSpec::PackedAncestryMap { threads, .. } => *threads,
@@ -157,6 +166,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
     Ok(InputSpec::from_prefix_packedancestrymap(
         &args.prefix,
         &args.output_directory,
+        args.npz,
         variant_indices,
         args.threads,
     ))
@@ -165,6 +175,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
 pub fn run(
     reader: &mut dyn SiteReader,
     output_dir: impl AsRef<Path>,
+    npz: bool,
     threads: Option<usize>,
 ) -> Result<()> {
     const PARALLEL_THRESHOLD: usize = 500;
@@ -181,12 +192,21 @@ pub fn run(
         counts = counts.consume_reader_parallel(reader)?;
     }
 
-    let rates_path = output_dir.as_ref().join("mismatch_rates.csv");
-    println!(
-        "Writing pairwise mismatch rates to {}...",
-        rates_path.display()
-    );
-    write_mismatch_rates(&counts, &rates_path)?;
+    if npz {
+        let npz_path = output_dir.as_ref().join("mismatch_counts.npz");
+        println!(
+            "Writing pairwise mismatch counts to {}...",
+            npz_path.display()
+        );
+        write_counts_npz(&counts, &npz_path)?;
+    } else {
+        let rates_path = output_dir.as_ref().join("mismatch_rates.csv");
+        println!(
+            "Writing pairwise mismatch rates to {}...",
+            rates_path.display()
+        );
+        write_mismatch_rates(&counts, &rates_path)?;
+    }
 
     let plot_path = output_dir.as_ref().join("mismatch_rates.png");
     println!(

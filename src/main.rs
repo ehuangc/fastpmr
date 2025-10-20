@@ -27,6 +27,12 @@ pub struct Args {
     )]
     output_directory: String,
 
+    /// Whether to write outputs in compressed .npz format.
+    /// If true, skips writing plain-text mismatch_rates.csv.
+    /// Defaults to false.
+    #[arg(short, long, default_value_t = false)]
+    npz: bool,
+
     /// 1-based, inclusive range(s) of variant indices to keep.
     /// Examples: "1-5000,10000-20000", "1,2,3000-4000".
     #[arg(short, long = "variant-indices")]
@@ -50,6 +56,7 @@ fn try_main() -> Result<()> {
     cli::run(
         reader.as_mut(),
         input_spec.output_dir(),
+        input_spec.npz(),
         input_spec.threads(),
     )?;
     Ok(())

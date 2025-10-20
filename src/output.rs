@@ -3,7 +3,11 @@ use crate::error::{CustomError, Result};
 use plotters::coord::combinators::IntoLogRange;
 use plotters::prelude::*;
 use plotters::style::{FontStyle, register_font};
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::Path;
+use zip::ZipWriter;
+use zip::write::SimpleFileOptions;
 
 pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let n_samples = counts.n_samples();
@@ -30,6 +34,49 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
         source: e,
         path: path.as_ref().into(),
     })?;
+    Ok(())
+}
+
+pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
+    let mut npz = ndarray_npy::NpzWriter::new(std::fs::File::create(path).map_err(|e| {
+        CustomError::Write {
+            source: e,
+            path: path.as_ref().into(),
+        }
+    })?);
+    // Write one array at a time and free it immediately
+    {
+        let mismatches = counts.mismatches_2d();
+        npz.add_array("mismatches", &mismatches)?;
+    }
+    {
+        let totals = counts.totals_2d();
+        npz.add_array("totals", &totals)?;
+    }
+    {
+        let site_overlaps = counts.site_overlaps_2d();
+        npz.add_array("site_overlaps", &site_overlaps)?;
+    }
+    npz.finish()?;
+
+    // Reopen file and append JSON with sample IDs
+    let samples = counts.samples();
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(path)
+        .map_err(|e| CustomError::Write {
+            source: e,
+            path: path.as_ref().into(),
+        })?;
+    let mut zip = ZipWriter::new_append(file)?;
+    zip.start_file("samples.json", SimpleFileOptions::default())?;
+    zip.write_all(serde_json::to_string(&samples)?.as_bytes())
+        .map_err(|e| CustomError::Write {
+            source: e,
+            path: path.as_ref().into(),
+        })?;
+    zip.finish()?;
     Ok(())
 }
 

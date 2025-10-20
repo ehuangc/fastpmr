@@ -1,8 +1,12 @@
 mod common;
 
-use std::fs;
+use ndarray::Array2;
+use ndarray_npy::NpzReader;
+use std::fs::{self, File};
+use std::io::Read;
 use std::path::Path;
 use std::process::Command;
+use zip::ZipArchive;
 
 #[test]
 fn packedancestrymap_cli_generates_outputs() {
@@ -11,7 +15,7 @@ fn packedancestrymap_cli_generates_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, None);
+    let output = run_fastpmr(&dataset, None, false);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -33,7 +37,7 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, None);
+    let output = run_fastpmr(&dataset, None, false);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -49,13 +53,36 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
 }
 
 #[test]
+fn packedancestrymap_cli_generates_npz_outputs() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-npz").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let output = run_fastpmr(&dataset, None, true);
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    assert_npz_outputs(
+        &dataset.output_dir,
+        common::expected_mismatches_all(),
+        common::expected_totals_all(),
+        common::expected_overlap_all(),
+    );
+}
+
+#[test]
 fn variant_indices_limit_sites() {
     let dataset = common::create_dataset(common::GenoFormat::Packed, "filtered").unwrap();
     if dataset.output_dir.exists() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, Some("1-30000"));
+    let output = run_fastpmr(&dataset, Some("1-30000"), false);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -70,7 +97,11 @@ fn variant_indices_limit_sites() {
     );
 }
 
-fn run_fastpmr(dataset: &common::Dataset, variant_spec: Option<&str>) -> std::process::Output {
+fn run_fastpmr(
+    dataset: &common::Dataset,
+    variant_spec: Option<&str>,
+    npz: bool,
+) -> std::process::Output {
     let mut command = Command::new(env!("CARGO_BIN_EXE_fastpmr"));
     command
         .arg("--prefix")
@@ -79,6 +110,9 @@ fn run_fastpmr(dataset: &common::Dataset, variant_spec: Option<&str>) -> std::pr
         .arg(dataset.output_dir.as_os_str());
     if let Some(spec) = variant_spec {
         command.arg("--variant-indices").arg(spec);
+    }
+    if npz {
+        command.arg("--npz");
     }
     command.output().expect("failed to run fastpmr")
 }
@@ -97,6 +131,72 @@ fn assert_outputs(output_dir: &Path, expected_overlap: u64, expected_rate: f32) 
         (rate - expected_rate).abs() < 1e-6,
         "unexpected mismatch rate: got {rate}, expected {expected_rate}"
     );
+
+    let plot_path = output_dir.join("mismatch_rates.png");
+    let metadata = fs::metadata(plot_path).expect("missing plot output");
+    assert!(metadata.len() > 0, "plot output is empty");
+}
+
+fn assert_npz_outputs(
+    output_dir: &Path,
+    expected_mismatches: u64,
+    expected_totals: u64,
+    expected_overlap: u64,
+) {
+    let csv_path = output_dir.join("mismatch_rates.csv");
+    assert!(
+        !csv_path.exists(),
+        "unexpected mismatch_rates.csv output alongside npz"
+    );
+
+    let npz_path = output_dir.join("mismatch_counts.npz");
+    assert!(
+        npz_path.exists(),
+        "missing mismatch_counts.npz output: looked at {}",
+        npz_path.display()
+    );
+
+    let mut npz =
+        NpzReader::new(File::open(&npz_path).expect("could not open mismatch_counts.npz"))
+            .expect("invalid npz archive");
+    let mismatches: Array2<u64> = npz.by_name("mismatches").expect("missing mismatches array");
+    let totals: Array2<u64> = npz.by_name("totals").expect("missing totals array");
+    let overlaps: Array2<u64> = npz
+        .by_name("site_overlaps")
+        .expect("missing site_overlaps array");
+    assert_eq!(mismatches.shape(), &[2, 2]);
+    assert_eq!(totals.shape(), &[2, 2]);
+    assert_eq!(overlaps.shape(), &[2, 2]);
+
+    assert_eq!(mismatches[[0, 0]], 0);
+    assert_eq!(mismatches[[1, 1]], 0);
+    assert_eq!(mismatches[[0, 1]], expected_mismatches);
+    assert_eq!(mismatches[[1, 0]], expected_mismatches);
+
+    assert_eq!(totals[[0, 0]], 0);
+    assert_eq!(totals[[1, 1]], 0);
+    assert_eq!(totals[[0, 1]], expected_totals);
+    assert_eq!(totals[[1, 0]], expected_totals);
+
+    assert_eq!(overlaps[[0, 0]], 0);
+    assert_eq!(overlaps[[1, 1]], 0);
+    assert_eq!(overlaps[[0, 1]], expected_overlap);
+    assert_eq!(overlaps[[1, 0]], expected_overlap);
+
+    drop(npz);
+
+    let mut archive = ZipArchive::new(File::open(&npz_path).expect("could not reopen npz archive"))
+        .expect("failed to read npz as zip");
+    let mut samples_file = archive
+        .by_name("samples.json")
+        .expect("missing samples.json in npz");
+    let mut json = String::new();
+    samples_file
+        .read_to_string(&mut json)
+        .expect("failed to read samples.json");
+    let samples: Vec<String> =
+        serde_json::from_str(&json).expect("invalid JSON in samples.json inside npz");
+    assert_eq!(samples, common::expected_sample_ids());
 
     let plot_path = output_dir.join("mismatch_rates.png");
     let metadata = fs::metadata(plot_path).expect("missing plot output");

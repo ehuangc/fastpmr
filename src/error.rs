@@ -47,6 +47,15 @@ pub enum CustomError {
     #[error("could not write to CSV")]
     CsvWrite(#[from] csv::Error),
 
+    #[error("could not write to NPZ")]
+    NpzWrite(#[from] ndarray_npy::WriteNpzError),
+
+    #[error("could not write to ZIP")]
+    ZipWrite(#[from] zip::result::ZipError),
+
+    #[error("could not write to sample JSON")]
+    JsonWrite(#[from] serde_json::Error),
+
     #[error("could not plot mismatch distribution")]
     Plot {
         #[source]

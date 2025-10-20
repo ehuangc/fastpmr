@@ -87,6 +87,18 @@ pub fn expected_rate_filtered() -> f32 {
     mismatches / totals
 }
 
+pub fn expected_sample_ids() -> Vec<String> {
+    sample_ids()
+}
+
+pub fn expected_mismatches_all() -> u64 {
+    (HIGH_MISMATCH_VARIANTS * 2 + (CORE_VARIANTS - HIGH_MISMATCH_VARIANTS)) as u64
+}
+
+pub fn expected_totals_all() -> u64 {
+    ((CORE_VARIANTS + EXTRA_IDENTICAL_VARIANTS) * 2) as u64
+}
+
 fn sample_ids() -> Vec<String> {
     let mut samples = Vec::new();
     for i in 0..N_SAMPLES {

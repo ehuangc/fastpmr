@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::model::Allele;
 use crate::reader::SiteReader;
 use indicatif::{ProgressBar, ProgressStyle};
+use ndarray::Array2;
 use rayon::prelude::*;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -111,6 +112,10 @@ impl Counts {
         Ok(self)
     }
 
+    pub fn samples(&self) -> Vec<String> {
+        self.samples.clone()
+    }
+
     pub fn n_samples(&self) -> usize {
         self.n_samples
     }
@@ -134,5 +139,41 @@ impl Counts {
             }
         }
         (pairs, rates)
+    }
+
+    pub fn mismatches_2d(&self) -> Array2<u64> {
+        let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                let idx = self.idx(i, j);
+                matrix[(i, j)] = self.mismatches[idx];
+                matrix[(j, i)] = self.mismatches[idx];
+            }
+        }
+        matrix
+    }
+
+    pub fn totals_2d(&self) -> Array2<u64> {
+        let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                let idx = self.idx(i, j);
+                matrix[(i, j)] = self.totals[idx];
+                matrix[(j, i)] = self.totals[idx];
+            }
+        }
+        matrix
+    }
+
+    pub fn site_overlaps_2d(&self) -> Array2<u64> {
+        let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                let idx = self.idx(i, j);
+                matrix[(i, j)] = self.totals[idx] / 2;
+                matrix[(j, i)] = self.totals[idx] / 2;
+            }
+        }
+        matrix
     }
 }
