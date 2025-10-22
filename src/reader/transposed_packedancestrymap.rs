@@ -1,7 +1,7 @@
 use itertools::Itertools;
+use memmap2::{Mmap, MmapOptions};
 use std::collections::HashSet;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
 
 use crate::error::{CustomError, Result};
@@ -18,8 +18,8 @@ pub struct TransposedPackedAncestryMapReader {
     sample_block_size: usize,
     variant_indices_to_keep: Option<HashSet<usize>>,
     next_variant_idx: usize,
-    // Entire TGENO matrix (w/o header); length = n_samples * sample_block_size
-    genotype_matrix: Vec<u8>,
+    // Entire TGENO file mapped into memory
+    genotype_mmap: Mmap,
 }
 
 struct Header {
@@ -41,24 +41,24 @@ impl TransposedPackedAncestryMapReader {
         let variants = read_eigenstrat_snp(snp_path)?;
         let sample_block_size = HEADER_BLOCK_SIZE.max(variants.len().div_ceil(4));
 
-        let f = File::open(geno_path).map_err(|e| CustomError::ReadWithPath {
+        let geno_file = File::open(geno_path).map_err(|e| CustomError::ReadWithPath {
             source: e,
             path: geno_path.as_ref().to_path_buf(),
         })?;
-        let mut reader = BufReader::new(f);
-
-        // Read header block
-        let buffer = reader.fill_buf().map_err(|e| CustomError::ReadWithPath {
-            source: e,
-            path: geno_path.as_ref().to_path_buf(),
-        })?;
-        let header_block = &buffer[..HEADER_BLOCK_SIZE];
-        if header_block.len() < HEADER_BLOCK_SIZE {
+        // Memory-map the genotype file to avoid loading it into memory all at once
+        let genotype_mmap = unsafe {
+            MmapOptions::new()
+                .map(&geno_file)
+                .map_err(|e| CustomError::ReadWithPath {
+                    source: e,
+                    path: geno_path.as_ref().to_path_buf(),
+                })?
+        };
+        if genotype_mmap.len() < HEADER_BLOCK_SIZE {
             return Err(CustomError::PackedAncestryMapFileSize);
         }
+        let header_block = &genotype_mmap[..HEADER_BLOCK_SIZE];
         let header = parse_header_block(header_block)?;
-        // Consume header block
-        reader.consume(HEADER_BLOCK_SIZE);
 
         // Sanity-check samples
         if samples.len() != header.n_samples {
@@ -111,27 +111,10 @@ impl TransposedPackedAncestryMapReader {
             }
         }
 
-        // Read entire matrix so we can iterate over sites efficiently
         let expected_bytes = header.n_samples * sample_block_size;
-        let mut genotype_matrix = vec![0u8; expected_bytes];
-        reader
-            .read_exact(&mut genotype_matrix)
-            .map_err(|e| CustomError::ReadWithPath {
-                source: e,
-                path: geno_path.as_ref().to_path_buf(),
-            })?;
-
-        // Ensure no trailing bytes
-        let mut tmp = [0u8; 1];
-        match reader.read(&mut tmp) {
-            Ok(0) => {}
-            Ok(_) => return Err(CustomError::PackedAncestryMapFileSize),
-            Err(e) => {
-                return Err(CustomError::ReadWithPath {
-                    source: e,
-                    path: geno_path.as_ref().to_path_buf(),
-                });
-            }
+        let expected_file_size = HEADER_BLOCK_SIZE + expected_bytes;
+        if genotype_mmap.len() != expected_file_size {
+            return Err(CustomError::PackedAncestryMapFileSize);
         }
 
         Ok(Self {
@@ -140,7 +123,7 @@ impl TransposedPackedAncestryMapReader {
             sample_block_size,
             variant_indices_to_keep,
             next_variant_idx: 0,
-            genotype_matrix,
+            genotype_mmap,
         })
     }
 
@@ -153,11 +136,12 @@ impl TransposedPackedAncestryMapReader {
         let n_samples = self.header.n_samples;
         let mut genotypes = Vec::with_capacity(n_samples);
 
-        // Decode directly from the in-memory matrix
+        // Decode directly from the memory-mapped genotype matrix
+        let genotype_matrix = &self.genotype_mmap[HEADER_BLOCK_SIZE..];
         for s in 0..n_samples {
             let sample_block_start = s * self.sample_block_size;
-            let matrix_idx = sample_block_start + byte_idx;
-            let byte = self.genotype_matrix[matrix_idx];
+            let genotype_matrix_idx = sample_block_start + byte_idx;
+            let byte = genotype_matrix[genotype_matrix_idx];
             let code = (byte >> shift) & 0b11;
             genotypes.push(match code {
                 0b00 => Allele::Alt,
