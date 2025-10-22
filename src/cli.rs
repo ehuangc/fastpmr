@@ -185,7 +185,6 @@ pub fn run(
     if (threads.is_none() && counts.n_samples() < PARALLEL_THRESHOLD) || threads == Some(1) {
         counts = counts.consume_reader(reader)?;
     } else if let Some(n) = threads {
-        println!("Using {} threads", n);
         let pool = ThreadPoolBuilder::new().num_threads(n).build()?;
         counts = pool.install(|| counts.consume_reader_parallel(reader))?;
     } else {
