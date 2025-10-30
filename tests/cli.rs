@@ -2,6 +2,7 @@ mod common;
 
 use ndarray::Array2;
 use ndarray_npy::NpzReader;
+use std::collections::BTreeMap;
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::Path;
@@ -15,6 +16,7 @@ fn packedancestrymap_cli_generates_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
+    let expected_pairs = common::expected_pair_stats_all_variants();
     let output = run_fastpmr(&dataset, None, false, None);
     assert!(
         output.status.success(),
@@ -23,10 +25,11 @@ fn packedancestrymap_cli_generates_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_outputs(
-        &dataset.output_dir,
-        common::expected_overlap_all(),
-        common::expected_rate_all(),
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records"
     );
 }
 
@@ -37,6 +40,7 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
+    let expected_pairs = common::expected_pair_stats_all_variants();
     let output = run_fastpmr(&dataset, None, false, None);
     assert!(
         output.status.success(),
@@ -45,10 +49,11 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_outputs(
-        &dataset.output_dir,
-        common::expected_overlap_all(),
-        common::expected_rate_all(),
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records"
     );
 }
 
@@ -59,6 +64,7 @@ fn packedancestrymap_cli_generates_npz_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
+    let expected_pairs = common::expected_pair_stats_all_variants();
     let output = run_fastpmr(&dataset, None, true, None);
     assert!(
         output.status.success(),
@@ -67,12 +73,7 @@ fn packedancestrymap_cli_generates_npz_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_npz_outputs(
-        &dataset.output_dir,
-        common::expected_mismatches_all(),
-        common::expected_totals_all(),
-        common::expected_overlap_all(),
-    );
+    assert_npz_outputs(&dataset.output_dir, &expected_pairs);
 }
 
 #[test]
@@ -82,6 +83,7 @@ fn variant_indices_limit_sites() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
+    let expected_pairs = common::expected_pair_stats_filtered_variants();
     let output = run_fastpmr(&dataset, Some("1-30000"), false, None);
     assert!(
         output.status.success(),
@@ -90,10 +92,11 @@ fn variant_indices_limit_sites() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_outputs(
-        &dataset.output_dir,
-        common::expected_overlap_filtered(),
-        common::expected_rate_filtered(),
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records after filtering"
     );
 }
 
@@ -104,7 +107,11 @@ fn sample_pairs_csv_runs_successfully() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
     let csv_path = dataset.prefix.with_extension("pairs.csv");
-    fs::write(&csv_path, "Sample1,Sample2\n").unwrap();
+    fs::write(
+        &csv_path,
+        "id1,id2\nSample1,Sample2\nSample3,Sample1\nSample4,Sample2\n",
+    )
+    .unwrap();
 
     let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
     assert!(
@@ -114,11 +121,30 @@ fn sample_pairs_csv_runs_successfully() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_outputs(
-        &dataset.output_dir,
-        common::expected_overlap_all(),
-        common::expected_rate_all(),
-    );
+    let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
+        .into_iter()
+        .filter(|((id1, id2), _)| {
+            matches!(
+                (id1.as_str(), id2.as_str()),
+                ("Sample1", "Sample2") | ("Sample1", "Sample3") | ("Sample2", "Sample4")
+            )
+        })
+        .collect();
+
+    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    assert_eq!(records.len(), 3, "expected exactly three requested pairs");
+    let pairs: std::collections::HashSet<(String, String)> = records
+        .iter()
+        .map(|record| (record.id1.clone(), record.id2.clone()))
+        .collect();
+    let expected_pairs: std::collections::HashSet<(String, String)> = [
+        ("Sample1".to_string(), "Sample2".to_string()),
+        ("Sample1".to_string(), "Sample3".to_string()),
+        ("Sample2".to_string(), "Sample4".to_string()),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(pairs, expected_pairs);
 }
 
 #[test]
@@ -168,31 +194,70 @@ fn run_fastpmr(
     command.output().expect("failed to run fastpmr")
 }
 
-fn assert_outputs(output_dir: &Path, expected_overlap: u64, expected_rate: f32) {
+#[derive(Clone, Debug, PartialEq)]
+struct OutputRecord {
+    id1: String,
+    id2: String,
+    overlap: u64,
+    rate: f32,
+}
+
+fn assert_outputs(
+    output_dir: &Path,
+    expected_pairs: &BTreeMap<(String, String), common::PairStats>,
+) -> Vec<OutputRecord> {
     let csv_path = output_dir.join("mismatch_rates.csv");
-    let record = read_single_record(&csv_path);
-    assert_eq!(record[0], "Sample1");
-    assert_eq!(record[1], "Sample2");
-
-    let overlap: u64 = record[2].parse().expect("invalid overlap");
-    assert_eq!(overlap, expected_overlap);
-
-    let rate: f32 = record[3].parse().expect("invalid mismatch rate");
+    let records = read_records(&csv_path);
     assert!(
-        (rate - expected_rate).abs() < 1e-6,
-        "unexpected mismatch rate: got {rate}, expected {expected_rate}"
+        !records.is_empty(),
+        "expected at least one mismatch rate record in {}",
+        csv_path.display()
+    );
+
+    for record in &records {
+        let key = (record.id1.clone(), record.id2.clone());
+        let expectation = expected_pairs.get(&key).unwrap_or_else(|| {
+            panic!(
+                "unexpected mismatch rate record for {} / {}",
+                record.id1, record.id2
+            )
+        });
+        assert_eq!(
+            record.overlap,
+            expectation.overlap(),
+            "unexpected overlap for {} / {}: got {}, expected {}",
+            record.id1,
+            record.id2,
+            record.overlap,
+            expectation.overlap()
+        );
+        let expected_rate = expectation.mismatch_rate();
+        assert!(
+            (record.rate - expected_rate).abs() < 1e-6,
+            "unexpected mismatch rate for {} / {}: got {}, expected {expected_rate}",
+            record.id1,
+            record.id2,
+            record.rate
+        );
+    }
+
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "mismatch rate file contained {} pairs but expected {}",
+        records.len(),
+        expected_pairs.len()
     );
 
     let plot_path = output_dir.join("mismatch_rates.png");
     let metadata = fs::metadata(plot_path).expect("missing plot output");
     assert!(metadata.len() > 0, "plot output is empty");
+    records
 }
 
 fn assert_npz_outputs(
     output_dir: &Path,
-    expected_mismatches: u64,
-    expected_totals: u64,
-    expected_overlap: u64,
+    expected_pairs: &BTreeMap<(String, String), common::PairStats>,
 ) {
     let csv_path = output_dir.join("mismatch_rates.csv");
     assert!(
@@ -215,24 +280,80 @@ fn assert_npz_outputs(
     let overlaps: Array2<u64> = npz
         .by_name("site_overlaps")
         .expect("missing site_overlaps array");
-    assert_eq!(mismatches.shape(), &[2, 2]);
-    assert_eq!(totals.shape(), &[2, 2]);
-    assert_eq!(overlaps.shape(), &[2, 2]);
+    let expected_shape = &[common::N_SAMPLES, common::N_SAMPLES];
+    assert_eq!(mismatches.shape(), expected_shape);
+    assert_eq!(totals.shape(), expected_shape);
+    assert_eq!(overlaps.shape(), expected_shape);
 
-    assert_eq!(mismatches[[0, 0]], 0);
-    assert_eq!(mismatches[[1, 1]], 0);
-    assert_eq!(mismatches[[0, 1]], expected_mismatches);
-    assert_eq!(mismatches[[1, 0]], expected_mismatches);
+    for idx in 0..common::N_SAMPLES {
+        assert_eq!(mismatches[[idx, idx]], 0);
+        assert_eq!(totals[[idx, idx]], 0);
+        assert_eq!(overlaps[[idx, idx]], 0);
+    }
 
-    assert_eq!(totals[[0, 0]], 0);
-    assert_eq!(totals[[1, 1]], 0);
-    assert_eq!(totals[[0, 1]], expected_totals);
-    assert_eq!(totals[[1, 0]], expected_totals);
-
-    assert_eq!(overlaps[[0, 0]], 0);
-    assert_eq!(overlaps[[1, 1]], 0);
-    assert_eq!(overlaps[[0, 1]], expected_overlap);
-    assert_eq!(overlaps[[1, 0]], expected_overlap);
+    let samples = common::expected_sample_ids();
+    let mut validated_pairs = 0usize;
+    for i in 0..common::N_SAMPLES {
+        for j in (i + 1)..common::N_SAMPLES {
+            let key = (samples[i].clone(), samples[j].clone());
+            let expectation = expected_pairs.get(&key).unwrap_or_else(|| {
+                panic!(
+                    "missing expectation for pair {} / {}",
+                    samples[i], samples[j]
+                )
+            });
+            assert_eq!(
+                mismatches[[i, j]],
+                expectation.mismatches,
+                "unexpected mismatches for {} / {}",
+                samples[i],
+                samples[j]
+            );
+            assert_eq!(
+                mismatches[[j, i]],
+                expectation.mismatches,
+                "unexpected symmetric mismatches for {} / {}",
+                samples[j],
+                samples[i]
+            );
+            assert_eq!(
+                totals[[i, j]],
+                expectation.totals,
+                "unexpected totals for {} / {}",
+                samples[i],
+                samples[j]
+            );
+            assert_eq!(
+                totals[[j, i]],
+                expectation.totals,
+                "unexpected symmetric totals for {} / {}",
+                samples[j],
+                samples[i]
+            );
+            assert_eq!(
+                overlaps[[i, j]],
+                expectation.overlap(),
+                "unexpected overlaps for {} / {}",
+                samples[i],
+                samples[j]
+            );
+            assert_eq!(
+                overlaps[[j, i]],
+                expectation.overlap(),
+                "unexpected symmetric overlaps for {} / {}",
+                samples[j],
+                samples[i]
+            );
+            validated_pairs += 1;
+        }
+    }
+    assert_eq!(
+        validated_pairs,
+        expected_pairs.len(),
+        "validated {} pairs but expected {}",
+        validated_pairs,
+        expected_pairs.len()
+    );
 
     drop(npz);
 
@@ -254,25 +375,41 @@ fn assert_npz_outputs(
     assert!(metadata.len() > 0, "plot output is empty");
 }
 
-fn read_single_record(path: &Path) -> [String; 4] {
+fn read_records(path: &Path) -> Vec<OutputRecord> {
     let content = fs::read_to_string(path).expect("could not read mismatch rates");
     let mut lines = content.lines();
-
     let header = lines.next().expect("missing header").trim_end_matches('\r');
     assert_eq!(header, "id1,id2,n_site_overlaps,mismatch_rate");
 
-    let record_line = lines
-        .next()
-        .expect("missing record line")
-        .trim_end_matches('\r');
-    assert!(lines.next().is_none(), "unexpected extra lines in csv");
-
-    let mut fields = record_line.split(',').map(|s| s.to_string());
-    let id1 = fields.next().expect("missing id1");
-    let id2 = fields.next().expect("missing id2");
-    let overlap = fields.next().expect("missing site overlap");
-    let rate = fields.next().expect("missing rate");
-    assert!(fields.next().is_none(), "unexpected extra columns");
-
-    [id1, id2, overlap, rate]
+    let mut records = Vec::new();
+    for line in lines {
+        let trimmed = line.trim_end_matches('\r');
+        if trimmed.is_empty() {
+            continue;
+        }
+        let mut fields = trimmed.split(',');
+        let id1 = fields.next().expect("missing id1 field").to_string();
+        let id2 = fields.next().expect("missing id2 field").to_string();
+        let overlap: u64 = fields
+            .next()
+            .expect("missing overlap field")
+            .parse()
+            .expect("invalid overlap value");
+        let rate: f32 = fields
+            .next()
+            .expect("missing mismatch rate field")
+            .parse()
+            .expect("invalid mismatch rate value");
+        assert!(
+            fields.next().is_none(),
+            "unexpected extra columns in record: {trimmed}"
+        );
+        records.push(OutputRecord {
+            id1,
+            id2,
+            overlap,
+            rate,
+        });
+    }
+    records
 }

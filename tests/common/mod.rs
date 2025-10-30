@@ -1,9 +1,10 @@
+use std::collections::BTreeMap;
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-const N_SAMPLES: usize = 2;
+pub const N_SAMPLES: usize = 4;
 pub const CORE_VARIANTS: usize = 30_000;
 const HIGH_MISMATCH_VARIANTS: usize = 14_999;
 const EXTRA_IDENTICAL_VARIANTS: usize = 1;
@@ -26,6 +27,26 @@ pub enum GenoFormat {
 pub struct Dataset {
     pub prefix: PathBuf,
     pub output_dir: PathBuf,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct PairStats {
+    pub mismatches: u64,
+    pub totals: u64,
+}
+
+impl PairStats {
+    pub fn overlap(&self) -> u64 {
+        self.totals / 2
+    }
+
+    pub fn mismatch_rate(&self) -> f32 {
+        if self.totals == 0 {
+            f32::NAN
+        } else {
+            self.mismatches as f32 / self.totals as f32
+        }
+    }
 }
 
 pub fn create_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
@@ -64,39 +85,16 @@ pub fn create_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
     Ok(Dataset { prefix, output_dir })
 }
 
-pub fn expected_overlap_all() -> u64 {
-    (CORE_VARIANTS + EXTRA_IDENTICAL_VARIANTS) as u64
+pub fn expected_pair_stats_all_variants() -> BTreeMap<(String, String), PairStats> {
+    build_pair_expectations(true)
 }
 
-pub fn expected_rate_all() -> f32 {
-    let core_mismatches =
-        (HIGH_MISMATCH_VARIANTS * 2 + (CORE_VARIANTS - HIGH_MISMATCH_VARIANTS)) as f32;
-    let extra_mismatches = 0f32;
-    let core_totals = (CORE_VARIANTS * 2) as f32;
-    let extra_totals = (EXTRA_IDENTICAL_VARIANTS * 2) as f32;
-    (core_mismatches + extra_mismatches) / (core_totals + extra_totals)
-}
-
-pub fn expected_overlap_filtered() -> u64 {
-    CORE_VARIANTS as u64
-}
-
-pub fn expected_rate_filtered() -> f32 {
-    let mismatches = (HIGH_MISMATCH_VARIANTS * 2 + (CORE_VARIANTS - HIGH_MISMATCH_VARIANTS)) as f32;
-    let totals = (CORE_VARIANTS * 2) as f32;
-    mismatches / totals
+pub fn expected_pair_stats_filtered_variants() -> BTreeMap<(String, String), PairStats> {
+    build_pair_expectations(false)
 }
 
 pub fn expected_sample_ids() -> Vec<String> {
     sample_ids()
-}
-
-pub fn expected_mismatches_all() -> u64 {
-    (HIGH_MISMATCH_VARIANTS * 2 + (CORE_VARIANTS - HIGH_MISMATCH_VARIANTS)) as u64
-}
-
-pub fn expected_totals_all() -> u64 {
-    ((CORE_VARIANTS + EXTRA_IDENTICAL_VARIANTS) * 2) as u64
 }
 
 fn sample_ids() -> Vec<String> {
@@ -116,15 +114,35 @@ fn variant_ids() -> Vec<String> {
 }
 
 fn build_variants() -> Vec<[u8; N_SAMPLES]> {
+    fn high_mismatch_variant() -> [u8; N_SAMPLES] {
+        let mut variant = [ALT; N_SAMPLES];
+        variant[0] = REF;
+        variant
+    }
+
+    fn heterozygous_variant() -> [u8; N_SAMPLES] {
+        [HET; N_SAMPLES]
+    }
+
+    fn identical_variant() -> [u8; N_SAMPLES] {
+        [ALT; N_SAMPLES]
+    }
+
+    fn missing_variant() -> [u8; N_SAMPLES] {
+        let mut variant = [ALT; N_SAMPLES];
+        variant[0] = MISSING;
+        variant
+    }
+
     let mut variants = Vec::with_capacity(TOTAL_VARIANTS);
     for _ in 0..HIGH_MISMATCH_VARIANTS {
-        variants.push([REF, ALT]);
+        variants.push(high_mismatch_variant());
     }
     for _ in HIGH_MISMATCH_VARIANTS..CORE_VARIANTS {
-        variants.push([HET, HET]);
+        variants.push(heterozygous_variant());
     }
-    variants.push([ALT, ALT]);
-    variants.push([MISSING, ALT]);
+    variants.push(identical_variant());
+    variants.push(missing_variant());
     variants
 }
 
@@ -249,4 +267,39 @@ fn header_hash(sample_ids: &[String], variant_ids: &[String]) -> (String, String
         format!("{:08x}", sample_hash),
         format!("{:08x}", variant_hash),
     )
+}
+
+fn build_pair_expectations(include_extra_variants: bool) -> BTreeMap<(String, String), PairStats> {
+    let samples = sample_ids();
+    let mut expectations = BTreeMap::new();
+
+    let mismatches_with_sample1 =
+        (HIGH_MISMATCH_VARIANTS as u64) * 2 + (CORE_VARIANTS - HIGH_MISMATCH_VARIANTS) as u64;
+    let mismatches_without_sample1 = (CORE_VARIANTS - HIGH_MISMATCH_VARIANTS) as u64;
+
+    let totals_with_sample1 = if include_extra_variants {
+        ((CORE_VARIANTS + EXTRA_IDENTICAL_VARIANTS) * 2) as u64
+    } else {
+        (CORE_VARIANTS * 2) as u64
+    };
+
+    let totals_without_sample1 = if include_extra_variants {
+        ((CORE_VARIANTS + EXTRA_IDENTICAL_VARIANTS + EXTRA_MISSING_VARIANTS) * 2) as u64
+    } else {
+        (CORE_VARIANTS * 2) as u64
+    };
+
+    for i in 0..samples.len() {
+        for j in (i + 1)..samples.len() {
+            let key = (samples[i].clone(), samples[j].clone());
+            let (mismatches, totals) = if i == 0 || j == 0 {
+                (mismatches_with_sample1, totals_with_sample1)
+            } else {
+                (mismatches_without_sample1, totals_without_sample1)
+            };
+            expectations.insert(key, PairStats { mismatches, totals });
+        }
+    }
+
+    expectations
 }
