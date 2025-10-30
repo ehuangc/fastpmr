@@ -15,7 +15,7 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
     let (pairs, rates) = counts.mismatch_rates();
 
     let mut wtr = csv::Writer::from_path(path)?;
-    wtr.write_record(&["id1", "id2", "n_site_overlaps", "mismatch_rate"])?;
+    wtr.write_record(["id1", "id2", "n_site_overlaps", "mismatch_rate"])?;
 
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
@@ -105,13 +105,12 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<(
 
     const BIN_SIZE: f32 = 0.5;
     let max_percentage = filtered_percentages.iter().copied().fold(0.0f32, f32::max);
-    let n_bins: usize;
-    if max_percentage < 50.0 {
-        n_bins = 100;
+    let n_bins: usize = if max_percentage < 50.0 {
+        100
     } else {
         let n_bins_unrounded = (max_percentage / BIN_SIZE).ceil() as usize;
-        n_bins = n_bins_unrounded.div_ceil(10) * 10; // Round up to next multiple of 10
-    }
+        n_bins_unrounded.div_ceil(10) * 10 // Round up to next multiple of 10
+    };
 
     let mut sorted = filtered_percentages.clone();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
@@ -237,15 +236,15 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<(
                     // Don't draw left side for first bar
                     if i == 0 {
                         return vec![
-                            PathElement::new(vec![(x0, y), (x1, y)], s.clone()), // top
-                            PathElement::new(vec![(x1, 0usize), (x1, y)], s),    // right
+                            PathElement::new(vec![(x0, y), (x1, y)], s),      // top
+                            PathElement::new(vec![(x1, 0usize), (x1, y)], s), // right
                         ]
                         .into_iter();
                     }
                     vec![
-                        PathElement::new(vec![(x0, y), (x1, y)], s.clone()), // top
-                        PathElement::new(vec![(x0, 0usize), (x0, y)], s.clone()), // left
-                        PathElement::new(vec![(x1, 0usize), (x1, y)], s),    // right
+                        PathElement::new(vec![(x0, y), (x1, y)], s),      // top
+                        PathElement::new(vec![(x0, 0usize), (x0, y)], s), // left
+                        PathElement::new(vec![(x1, 0usize), (x1, y)], s), // right
                     ]
                     .into_iter()
                 }),

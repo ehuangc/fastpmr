@@ -69,7 +69,7 @@ impl InputSpec {
                 ..
             } => {
                 // Check .geno header to determine if it's transposed or not
-                let f = File::open(&geno).map_err(|e| crate::error::CustomError::ReadWithPath {
+                let f = File::open(geno).map_err(|e| crate::error::CustomError::ReadWithPath {
                     source: e,
                     path: geno.to_path_buf(),
                 })?;

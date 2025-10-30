@@ -187,18 +187,18 @@ fn write_geno(
     let bytes_needed = N_SAMPLES.div_ceil(4);
     for variant in variants {
         let mut block = vec![0u8; block_size];
-        for byte_idx in 0..bytes_needed {
+        for (byte_idx, byte) in block.iter_mut().enumerate().take(bytes_needed) {
             let mut value = 0u8;
             for within in 0..4 {
                 let sample_idx = byte_idx * 4 + within;
                 if sample_idx >= N_SAMPLES {
-                    continue;
+                    break;
                 }
                 let code = variant[sample_idx] & 0b11;
                 let shift = 6 - 2 * within;
                 value |= code << shift;
             }
-            block[byte_idx] = value;
+            *byte = value;
         }
         file.write_all(&block)?;
     }

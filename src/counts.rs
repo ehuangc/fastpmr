@@ -60,7 +60,7 @@ impl Counts {
         }
         self.indices_to_count
             .as_ref()
-            .map_or(true, |mask| mask[self.idx(i, j)])
+            .is_none_or(|mask| mask[self.idx(i, j)])
     }
 
     pub fn consume_reader(mut self, reader: &mut dyn SiteReader) -> Result<Self> {
@@ -85,9 +85,9 @@ impl Counts {
                     if self
                         .indices_to_count
                         .as_ref()
-                        .map_or(true, |mask| mask[counter_idx])
+                        .is_none_or(|mask| mask[counter_idx])
                     {
-                        self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
+                        self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j);
                         self.totals[counter_idx] += 2; // Two alleles per site
                     }
                 }
@@ -129,10 +129,10 @@ impl Counts {
                     if self
                         .indices_to_count
                         .as_ref()
-                        .map_or(true, |mask| mask[counter_idx])
+                        .is_none_or(|mask| mask[counter_idx])
                     {
                         mismatches[counter_idx]
-                            .fetch_add(genotype_i.mismatch(genotype_j) as u64, Ordering::Relaxed);
+                            .fetch_add(genotype_i.mismatch(genotype_j), Ordering::Relaxed);
                         totals[counter_idx].fetch_add(2, Ordering::Relaxed);
                     }
                 }

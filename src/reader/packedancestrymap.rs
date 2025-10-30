@@ -101,13 +101,13 @@ impl PackedAncestryMapReader {
         }
 
         // Sanity-check variant indices to keep
-        if let Some(set) = &variant_indices_to_keep {
-            if let Some(&bad_idx) = set.iter().sorted().find(|&&idx| idx >= header.n_variants) {
-                return Err(CustomError::VariantIndexHigh {
-                    idx: bad_idx + 1,
-                    n_variants: header.n_variants,
-                });
-            }
+        if let Some(set) = &variant_indices_to_keep
+            && let Some(&bad_idx) = set.iter().sorted().find(|&&idx| idx >= header.n_variants)
+        {
+            return Err(CustomError::VariantIndexHigh {
+                idx: bad_idx + 1,
+                n_variants: header.n_variants,
+            });
         }
 
         Ok(Self {
