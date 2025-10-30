@@ -8,6 +8,18 @@ pub enum CustomError {
         source: std::io::Error,
     },
 
+    #[error("sample pairs CSV must contain two columns")]
+    SamplePairsColumns,
+
+    #[error("sample pairs CSV did not contain any pairs")]
+    SamplePairsEmpty,
+
+    #[error("sample pair references unknown sample: {sample}")]
+    SamplePairUnknownSample { sample: String },
+
+    #[error("sample pair cannot include the same sample twice: {sample}")]
+    SamplePairDuplicate { sample: String },
+
     #[error("could not parse variant index: {arg}")]
     VariantIndexInt {
         #[source]
@@ -46,6 +58,13 @@ pub enum CustomError {
 
     #[error("could not write to CSV")]
     CsvWrite(#[from] csv::Error),
+
+    #[error("could not read CSV {path}")]
+    CsvRead {
+        #[source]
+        source: csv::Error,
+        path: std::path::PathBuf,
+    },
 
     #[error("could not write to NPZ")]
     NpzWrite(#[from] ndarray_npy::WriteNpzError),

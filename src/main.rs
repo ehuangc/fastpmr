@@ -33,6 +33,10 @@ pub struct Args {
     #[arg(short, long, default_value_t = false)]
     npz: bool,
 
+    /// Two-column CSV file containing sample pairs (one on each row) for which PMRs will be calculated.
+    #[arg(short, long, value_hint = clap::ValueHint::FilePath)]
+    sample_pairs_csv: Option<String>,
+
     /// 1-based, inclusive range(s) of variant indices to keep.
     /// Examples: "1-5000,10000-20000", "1,2,3000-4000".
     #[arg(short, long = "variant-indices")]
@@ -58,6 +62,7 @@ fn try_main() -> Result<()> {
         input_spec.output_dir(),
         input_spec.npz(),
         input_spec.threads(),
+        input_spec.sample_pairs(),
     )?;
     Ok(())
 }

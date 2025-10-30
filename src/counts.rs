@@ -4,6 +4,7 @@ use crate::reader::SiteReader;
 use indicatif::{ProgressBar, ProgressStyle};
 use ndarray::Array2;
 use rayon::prelude::*;
+use std::collections::HashSet;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 pub struct Counts {
@@ -12,25 +13,54 @@ pub struct Counts {
     // Note that there are up to 2 mismatches per site so totals = 2 * n_sites
     mismatches: Vec<u64>, // Flat (n x n) row-major
     totals: Vec<u64>,
+    // If Some, only calculate PMRs for pairs where indices_to_count[idx(i, j)] is true
+    indices_to_count: Option<Vec<bool>>,
 }
 
 impl Counts {
-    pub fn new(samples: Vec<String>) -> Self {
+    pub fn new(
+        samples: Vec<String>,
+        pairs_to_indices_to_count: Option<HashSet<(usize, usize)>>,
+    ) -> Self {
         let n_samples = samples.len();
+        let indices_to_count = pairs_to_indices_to_count.map(|pairs| {
+            let mut mask = vec![false; n_samples * n_samples];
+            for &(left, right) in &pairs {
+                if left != right {
+                    let idx = Self::idx_from_parts(n_samples, left, right);
+                    mask[idx] = true;
+                }
+            }
+            mask
+        });
         Self {
             samples,
             n_samples,
             mismatches: vec![0; n_samples * n_samples],
             totals: vec![0; n_samples * n_samples],
+            indices_to_count,
         }
     }
 
     pub fn idx(&self, i: usize, j: usize) -> usize {
+        Self::idx_from_parts(self.n_samples, i, j)
+    }
+
+    fn idx_from_parts(n_samples: usize, i: usize, j: usize) -> usize {
         if i < j {
-            return self.n_samples * i + j;
+            n_samples * i + j
         } else {
-            return self.n_samples * j + i;
+            n_samples * j + i
         }
+    }
+
+    pub fn should_count_pair(&self, i: usize, j: usize) -> bool {
+        if i == j {
+            return false;
+        }
+        self.indices_to_count
+            .as_ref()
+            .map_or(true, |mask| mask[self.idx(i, j)])
     }
 
     pub fn consume_reader(mut self, reader: &mut dyn SiteReader) -> Result<Self> {
@@ -52,8 +82,14 @@ impl Counts {
             for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
                 for &(sample_idx_j, genotype_j) in &present[i + 1..] {
                     let counter_idx = self.idx(sample_idx_i, sample_idx_j);
-                    self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
-                    self.totals[counter_idx] += 2; // Two alleles per site
+                    if self
+                        .indices_to_count
+                        .as_ref()
+                        .map_or(true, |mask| mask[counter_idx])
+                    {
+                        self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j) as u64;
+                        self.totals[counter_idx] += 2; // Two alleles per site
+                    }
                 }
             }
             pb.inc(1);
@@ -69,10 +105,11 @@ impl Counts {
             ProgressStyle::with_template("[{elapsed_precise}] {bar:30} {pos}/{len} sites").unwrap(),
         );
 
-        let mismatches: Vec<AtomicU64> = (0..self.n_samples * self.n_samples)
+        let n_samples = self.n_samples;
+        let mismatches: Vec<AtomicU64> = (0..n_samples * n_samples)
             .map(|_| AtomicU64::new(0))
             .collect();
-        let totals: Vec<AtomicU64> = (0..self.n_samples * self.n_samples)
+        let totals: Vec<AtomicU64> = (0..n_samples * n_samples)
             .map(|_| AtomicU64::new(0))
             .collect();
 
@@ -88,10 +125,16 @@ impl Counts {
 
             for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
                 for &(sample_idx_j, genotype_j) in &present[i + 1..] {
-                    let idx = self.idx(sample_idx_i, sample_idx_j);
-                    mismatches[idx]
-                        .fetch_add(genotype_i.mismatch(genotype_j) as u64, Ordering::Relaxed);
-                    totals[idx].fetch_add(2, Ordering::Relaxed);
+                    let counter_idx = self.idx(sample_idx_i, sample_idx_j);
+                    if self
+                        .indices_to_count
+                        .as_ref()
+                        .map_or(true, |mask| mask[counter_idx])
+                    {
+                        mismatches[counter_idx]
+                            .fetch_add(genotype_i.mismatch(genotype_j) as u64, Ordering::Relaxed);
+                        totals[counter_idx].fetch_add(2, Ordering::Relaxed);
+                    }
                 }
             }
             pb.inc(1);
@@ -175,5 +218,33 @@ impl Counts {
             }
         }
         matrix
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashSet;
+
+    #[test]
+    fn should_count_pair_respects_restrictions() {
+        let mut indices_to_count = HashSet::new();
+        indices_to_count.insert((0, 2));
+        let counts = Counts::new(
+            vec!["A".to_string(), "B".to_string(), "C".to_string()],
+            Some(indices_to_count),
+        );
+        assert!(counts.should_count_pair(0, 2));
+        assert!(counts.should_count_pair(2, 0));
+        assert!(!counts.should_count_pair(0, 1));
+        assert!(!counts.should_count_pair(1, 2));
+    }
+
+    #[test]
+    fn should_count_pair_defaults_to_all_pairs() {
+        let counts = Counts::new(vec!["A".to_string(), "B".to_string()], None);
+        assert!(counts.should_count_pair(0, 1));
+        assert!(counts.should_count_pair(1, 0));
+        assert!(!counts.should_count_pair(0, 0));
     }
 }

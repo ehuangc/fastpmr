@@ -20,6 +20,9 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
             let counter_idx = counts.idx(i, j);
+            if !counts.should_count_pair(i, j) {
+                continue;
+            }
             let overlap = overlaps[counter_idx];
             let rate = rates[counter_idx];
             wtr.serialize((
@@ -84,17 +87,21 @@ pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> 
 pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let (_pairs, rates) = counts.mismatch_rates();
     let overlaps = counts.site_overlaps();
-    let filtered_percentages: Vec<f32> = rates
-        .iter()
-        .zip(overlaps.iter())
-        .filter_map(|(&rate, &overlap)| {
-            if overlap >= 30000 && rate.is_finite() {
-                Some(rate * 100.0)
-            } else {
-                None
+    let n_samples = counts.n_samples();
+    let mut filtered_percentages = Vec::new();
+    for i in 0..n_samples {
+        for j in (i + 1)..n_samples {
+            if !counts.should_count_pair(i, j) {
+                continue;
             }
-        })
-        .collect();
+            let idx = counts.idx(i, j);
+            let overlap = overlaps[idx];
+            let rate = rates[idx];
+            if overlap >= 30000 && rate.is_finite() {
+                filtered_percentages.push(rate * 100.0);
+            }
+        }
+    }
 
     const BIN_SIZE: f32 = 0.5;
     let max_percentage = filtered_percentages.iter().copied().fold(0.0f32, f32::max);

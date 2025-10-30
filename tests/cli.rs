@@ -15,7 +15,7 @@ fn packedancestrymap_cli_generates_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, None, false);
+    let output = run_fastpmr(&dataset, None, false, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -37,7 +37,7 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, None, false);
+    let output = run_fastpmr(&dataset, None, false, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -59,7 +59,7 @@ fn packedancestrymap_cli_generates_npz_outputs() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, None, true);
+    let output = run_fastpmr(&dataset, None, true, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -82,7 +82,7 @@ fn variant_indices_limit_sites() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }
 
-    let output = run_fastpmr(&dataset, Some("1-30000"), false);
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -97,10 +97,58 @@ fn variant_indices_limit_sites() {
     );
 }
 
+#[test]
+fn sample_pairs_csv_runs_successfully() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "sample-pairs-ok").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+    let csv_path = dataset.prefix.with_extension("pairs.csv");
+    fs::write(&csv_path, "Sample1,Sample2\n").unwrap();
+
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    assert_outputs(
+        &dataset.output_dir,
+        common::expected_overlap_all(),
+        common::expected_rate_all(),
+    );
+}
+
+#[test]
+fn sample_pairs_csv_with_unknown_sample_fails() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "sample-pairs-err").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+    let csv_path = dataset.prefix.with_extension("pairs.csv");
+    fs::write(&csv_path, "Sample1,Unknown\n").unwrap();
+
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    assert!(
+        !output.status.success(),
+        "fastpmr unexpectedly succeeded: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("Unknown"),
+        "stderr did not contain expected sample name: {stderr}"
+    );
+}
+
 fn run_fastpmr(
     dataset: &common::Dataset,
     variant_spec: Option<&str>,
     npz: bool,
+    sample_pairs_csv: Option<&Path>,
 ) -> std::process::Output {
     let mut command = Command::new(env!("CARGO_BIN_EXE_fastpmr"));
     command
@@ -113,6 +161,9 @@ fn run_fastpmr(
     }
     if npz {
         command.arg("--npz");
+    }
+    if let Some(path) = sample_pairs_csv {
+        command.arg("--sample-pairs-csv").arg(path);
     }
     command.output().expect("failed to run fastpmr")
 }
