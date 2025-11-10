@@ -148,6 +148,47 @@ fn sample_pairs_csv_runs_successfully() {
 }
 
 #[test]
+fn sample_list_csv_runs_successfully() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "sample-list-ok").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+    let csv_path = dataset.prefix.with_extension("pairs.csv");
+    fs::write(&csv_path, "Sample1\nSample3\nSample4\n").unwrap();
+
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
+        .into_iter()
+        .filter(|((id1, id2), _)| {
+            matches!(id1.as_str(), "Sample1" | "Sample3" | "Sample4")
+                && matches!(id2.as_str(), "Sample1" | "Sample3" | "Sample4")
+        })
+        .collect();
+    assert_eq!(expected_subset.len(), 3, "expected exactly three pairs");
+
+    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    let pairs: std::collections::HashSet<(String, String)> = records
+        .iter()
+        .map(|record| (record.id1.clone(), record.id2.clone()))
+        .collect();
+    let expected_pairs: std::collections::HashSet<(String, String)> = [
+        ("Sample1".to_string(), "Sample3".to_string()),
+        ("Sample1".to_string(), "Sample4".to_string()),
+        ("Sample3".to_string(), "Sample4".to_string()),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(pairs, expected_pairs);
+}
+
+#[test]
 fn sample_pairs_csv_with_unknown_sample_fails() {
     let dataset = common::create_dataset(common::GenoFormat::Packed, "sample-pairs-err").unwrap();
     if dataset.output_dir.exists() {

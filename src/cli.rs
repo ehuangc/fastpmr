@@ -196,33 +196,88 @@ fn load_sample_pairs_csv(path: &str) -> Result<Vec<(String, String)>> {
             path: csv_path.clone(),
         })?;
 
+    #[derive(Clone, Copy, PartialEq, Eq)]
+    enum SampleCsvMode {
+        Unknown,
+        PairList,
+        SampleList,
+    }
+
+    let mut mode = SampleCsvMode::Unknown;
     let mut pairs = Vec::new();
+    let mut sample_ids = Vec::new();
+    let mut seen_samples = HashSet::new();
+
     for result in reader.records() {
         let record = result.map_err(|source| CustomError::CsvRead {
             source,
             path: csv_path.clone(),
         })?;
-
         if record.iter().all(|field| field.trim().is_empty()) {
             continue;
         }
 
-        if record.len() != 2 {
-            return Err(CustomError::SamplePairsColumns);
+        match mode {
+            SampleCsvMode::Unknown => match record.len() {
+                1 => mode = SampleCsvMode::SampleList,
+                2 => mode = SampleCsvMode::PairList,
+                _ => return Err(CustomError::SamplePairsColumns),
+            },
+            SampleCsvMode::PairList => {
+                if record.len() != 2 {
+                    return Err(CustomError::SamplePairsColumns);
+                }
+            }
+            SampleCsvMode::SampleList => {
+                if record.len() != 1 {
+                    return Err(CustomError::SamplePairsColumns);
+                }
+            }
         }
 
-        let id1 = record[0].trim();
-        let id2 = record[1].trim();
-        if id1.is_empty() || id2.is_empty() {
-            continue;
+        match mode {
+            SampleCsvMode::PairList => {
+                let id1 = record[0].trim();
+                let id2 = record[1].trim();
+                if id1.is_empty() || id2.is_empty() {
+                    continue;
+                }
+                pairs.push((id1.to_string(), id2.to_string()));
+            }
+            SampleCsvMode::SampleList => {
+                let id = record[0].trim();
+                if id.is_empty() {
+                    continue;
+                }
+                if seen_samples.insert(id.to_string()) {
+                    sample_ids.push(id.to_string());
+                }
+            }
+            SampleCsvMode::Unknown => unreachable!(),
         }
-        pairs.push((id1.to_string(), id2.to_string()));
     }
 
-    if pairs.is_empty() {
-        return Err(CustomError::SamplePairsEmpty);
+    match mode {
+        SampleCsvMode::SampleList => {
+            if sample_ids.len() < 2 {
+                return Err(CustomError::SamplePairsEmpty);
+            }
+            let mut expanded = Vec::new();
+            for i in 0..sample_ids.len() {
+                for j in (i + 1)..sample_ids.len() {
+                    expanded.push((sample_ids[i].to_string(), sample_ids[j].to_string()));
+                }
+            }
+            Ok(expanded)
+        }
+        SampleCsvMode::PairList | SampleCsvMode::Unknown => {
+            if pairs.is_empty() {
+                Err(CustomError::SamplePairsEmpty)
+            } else {
+                Ok(pairs)
+            }
+        }
     }
-    Ok(pairs)
 }
 
 /// Convert sample pairs from a vector of pairs of IDs to a set of pairs of indices

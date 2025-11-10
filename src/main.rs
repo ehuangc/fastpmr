@@ -33,7 +33,8 @@ pub struct Args {
     #[arg(short, long, default_value_t = false)]
     npz: bool,
 
-    /// Two-column CSV file containing sample pairs (one on each row) for which PMRs will be calculated.
+    /// CSV file containing either explicit sample pairs (two columns) or a single
+    /// column of samples for which all pairwise PMRs will be calculated.
     /// No header row is expected.
     #[arg(short, long, value_hint = clap::ValueHint::FilePath)]
     sample_pairs_csv: Option<String>,

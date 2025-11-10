@@ -8,7 +8,9 @@ pub enum CustomError {
         source: std::io::Error,
     },
 
-    #[error("sample pairs CSV must contain two columns")]
+    #[error(
+        "sample pairs CSV must contain either one column of sample IDs or two columns of explicit pairs"
+    )]
     SamplePairsColumns,
 
     #[error("sample pairs CSV did not contain any pairs")]
