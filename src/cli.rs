@@ -213,10 +213,6 @@ fn load_sample_pairs_csv(path: &str) -> Result<Vec<(String, String)>> {
 
         let id1 = record[0].trim();
         let id2 = record[1].trim();
-
-        if pairs.is_empty() && id1.eq_ignore_ascii_case("id1") && id2.eq_ignore_ascii_case("id2") {
-            continue;
-        }
         if id1.is_empty() || id2.is_empty() {
             continue;
         }

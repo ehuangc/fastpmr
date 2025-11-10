@@ -109,7 +109,7 @@ fn sample_pairs_csv_runs_successfully() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(
         &csv_path,
-        "id1,id2\nSample1,Sample2\nSample3,Sample1\nSample4,Sample2\n",
+        "Sample1,Sample2\nSample3,Sample1\nSample4,Sample2\n",
     )
     .unwrap();
 
