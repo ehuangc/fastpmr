@@ -20,10 +20,10 @@ pub struct Counts {
 impl Counts {
     pub fn new(
         samples: Vec<String>,
-        pairs_to_indices_to_count: Option<HashSet<(usize, usize)>>,
+        pair_indices_to_count: Option<HashSet<(usize, usize)>>,
     ) -> Self {
         let n_samples = samples.len();
-        let indices_to_count = pairs_to_indices_to_count.map(|pairs| {
+        let indices_to_count = pair_indices_to_count.map(|pairs| {
             let mut mask = vec![false; n_samples * n_samples];
             for &(left, right) in &pairs {
                 if left != right {
