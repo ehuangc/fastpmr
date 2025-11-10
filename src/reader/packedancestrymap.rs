@@ -8,6 +8,7 @@ use crate::error::{CustomError, Result};
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
 use crate::reader::eigenstrat::{header_hash, read_eigenstrat_ind, read_eigenstrat_snp};
+use crate::reader::sample_filter::select_samples;
 
 const MIN_BLOCK_BYTES: usize = 48;
 const GENO_HEADER_FIELDS: usize = 5;
@@ -15,7 +16,10 @@ const GENO_HEADER_FIELDS: usize = 5;
 pub struct PackedAncestryMapReader {
     reader: BufReader<File>,
     header: Header,
+    // Filtered set of samples, if a sample/sample pair CSV is provided
     samples: Vec<String>,
+    // Indices corresponding to the (filtered) sample set
+    sample_indices_to_keep: Option<Vec<usize>>,
     variant_indices_to_keep: Option<HashSet<usize>>,
     next_variant_idx: usize,
     block_buf: Vec<u8>,
@@ -34,6 +38,7 @@ impl PackedAncestryMapReader {
         ind_path: &impl AsRef<Path>,
         geno_path: &impl AsRef<Path>,
         snp_path: &impl AsRef<Path>,
+        samples_to_keep: Option<HashSet<String>>,
         variant_indices_to_keep: Option<HashSet<usize>>,
     ) -> Result<Self> {
         let samples = read_eigenstrat_ind(ind_path)?;
@@ -109,11 +114,15 @@ impl PackedAncestryMapReader {
                 n_variants: header.n_variants,
             });
         }
+        // Overwrite samples
+        // Also record indices of the kept samples so we can read only the relevant genotypes later
+        let (samples, sample_indices_to_keep) = select_samples(samples, samples_to_keep)?;
 
         Ok(Self {
             reader,
             header,
             samples,
+            sample_indices_to_keep,
             variant_indices_to_keep,
             next_variant_idx: 0,
             block_buf: vec![0u8; block_size],
@@ -153,7 +162,11 @@ impl Iterator for PackedAncestryMapReader {
 
             self.next_variant_idx += 1;
             if keep {
-                let genotypes = parse_variant_block(&self.block_buf, self.header.n_samples);
+                let genotypes = parse_variant_block(
+                    &self.block_buf,
+                    self.header.n_samples,
+                    self.sample_indices_to_keep.as_deref(),
+                );
                 return Some(Ok(Site { genotypes }));
             }
         }
@@ -199,23 +212,42 @@ fn parse_header_block(block: &[u8]) -> Result<Header> {
     })
 }
 
-fn parse_variant_block(block: &[u8], n_samples: usize) -> Vec<Allele> {
+fn parse_variant_block(
+    block: &[u8],
+    n_samples: usize,
+    indices_to_keep: Option<&[usize]>,
+) -> Vec<Allele> {
     let bytes_needed = n_samples.div_ceil(4);
     let bytes = &block[..bytes_needed];
-    let mut genotypes = Vec::with_capacity(n_samples);
 
-    for i in 0..n_samples {
-        let byte = bytes[i / 4];
-        // Extract the two bits of the i-th sample
-        let shift = 6 - 2 * (i % 4);
-        let code = (byte >> shift) & 0b11;
-        genotypes.push(match code {
-            0b00 => Allele::Alt,
-            0b01 => Allele::Het,
-            0b10 => Allele::Ref,
-            0b11 => Allele::Missing,
-            _ => unreachable!(),
-        });
+    match indices_to_keep {
+        Some(indices) => {
+            let mut genotypes = Vec::with_capacity(indices.len());
+            for &sample_idx in indices {
+                genotypes.push(decode_sample(bytes, sample_idx));
+            }
+            genotypes
+        }
+        None => {
+            let mut genotypes = Vec::with_capacity(n_samples);
+            for sample_idx in 0..n_samples {
+                genotypes.push(decode_sample(bytes, sample_idx));
+            }
+            genotypes
+        }
     }
-    genotypes
+}
+
+fn decode_sample(bytes: &[u8], sample_idx: usize) -> Allele {
+    let byte = bytes[sample_idx / 4];
+    // Extract the two bits of the i-th sample
+    let shift = 6 - 2 * (sample_idx % 4);
+    let code = (byte >> shift) & 0b11;
+    match code {
+        0b00 => Allele::Alt,
+        0b01 => Allele::Het,
+        0b10 => Allele::Ref,
+        0b11 => Allele::Missing,
+        _ => unreachable!(),
+    }
 }

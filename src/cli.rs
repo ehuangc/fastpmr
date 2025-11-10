@@ -20,6 +20,7 @@ pub enum InputSpec {
         output_dir: PathBuf,
         npz: bool,
         sample_pairs: Option<Vec<(String, String)>>,
+        samples_to_keep: Option<HashSet<String>>,
         // Parsed 0-based indices of variants to keep
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
@@ -32,6 +33,7 @@ impl InputSpec {
         output_dir: &str,
         npz: bool,
         sample_pairs: Option<Vec<(String, String)>>,
+        samples_to_keep: Option<HashSet<String>>,
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
     ) -> Self {
@@ -42,6 +44,7 @@ impl InputSpec {
             output_dir: PathBuf::from(output_dir.to_string()),
             npz,
             sample_pairs,
+            samples_to_keep,
             variant_indices,
             threads,
         }
@@ -66,6 +69,7 @@ impl InputSpec {
                 geno,
                 snp,
                 variant_indices,
+                samples_to_keep,
                 ..
             } => {
                 // Check .geno header to determine if it's transposed or not
@@ -84,14 +88,20 @@ impl InputSpec {
                 let header_prefix = &buffer[..buffer.len().min(5)];
 
                 if header_prefix.starts_with(b"GENO") {
-                    let reader =
-                        PackedAncestryMapReader::open(ind, geno, snp, variant_indices.clone())?;
+                    let reader = PackedAncestryMapReader::open(
+                        ind,
+                        geno,
+                        snp,
+                        samples_to_keep.clone(),
+                        variant_indices.clone(),
+                    )?;
                     Ok(Box::new(reader))
                 } else if header_prefix.starts_with(b"TGENO") {
                     let reader = TransposedPackedAncestryMapReader::open(
                         ind,
                         geno,
                         snp,
+                        samples_to_keep.clone(),
                         variant_indices.clone(),
                     )?;
                     Ok(Box::new(reader))
@@ -176,11 +186,15 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
         Some(path) => Some(load_sample_pairs_csv(path)?),
         None => None,
     };
+    let samples_to_keep = sample_pairs
+        .as_ref()
+        .map(|pairs| samples_to_keep_from_pairs(pairs));
     Ok(InputSpec::from_prefix_packedancestrymap(
         &args.prefix,
         &args.output_directory,
         args.npz,
         sample_pairs,
+        samples_to_keep,
         variant_indices,
         args.threads,
     ))
@@ -280,6 +294,15 @@ fn load_sample_pairs_csv(path: &str) -> Result<Vec<(String, String)>> {
     }
 }
 
+fn samples_to_keep_from_pairs(pairs: &[(String, String)]) -> HashSet<String> {
+    let mut keep = HashSet::new();
+    for (left, right) in pairs {
+        keep.insert(left.clone());
+        keep.insert(right.clone());
+    }
+    keep
+}
+
 /// Convert sample pairs from a vector of pairs of IDs to a set of pairs of indices
 fn resolve_sample_pairs(
     samples: &[String],
@@ -342,11 +365,13 @@ pub fn run(
     sample_pairs: Option<&[(String, String)]>,
 ) -> Result<()> {
     const PARALLEL_THRESHOLD: usize = 500;
+    // This gets the filtered sample set if a sample/sample pair CSV was provided
     let samples: Vec<String> = reader.samples().to_vec();
-
+    // Resolve sample pairs to indices
     let pairs_to_keep = sample_pairs
         .map(|pairs| resolve_sample_pairs(&samples, pairs))
         .transpose()?;
+
     let mut counts = Counts::new(samples, pairs_to_keep);
     if (threads.is_none() && counts.n_samples() < PARALLEL_THRESHOLD) || threads == Some(1) {
         counts = counts.consume_reader(reader)?;

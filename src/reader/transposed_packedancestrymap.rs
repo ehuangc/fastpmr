@@ -8,14 +8,18 @@ use crate::error::{CustomError, Result};
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
 use crate::reader::eigenstrat::{header_hash, read_eigenstrat_ind, read_eigenstrat_snp};
+use crate::reader::sample_filter::select_samples;
 
 const HEADER_BLOCK_SIZE: usize = 48;
 const GENO_HEADER_FIELDS: usize = 5;
 
 pub struct TransposedPackedAncestryMapReader {
     header: Header,
-    samples: Vec<String>,
     sample_block_size: usize,
+    // Filtered set of samples, if a sample/sample pair CSV is provided
+    samples: Vec<String>,
+    // Indices corresponding to the (filtered) set
+    sample_indices_to_keep: Option<Vec<usize>>,
     variant_indices_to_keep: Option<HashSet<usize>>,
     next_variant_idx: usize,
     // Entire TGENO file mapped into memory
@@ -35,6 +39,7 @@ impl TransposedPackedAncestryMapReader {
         ind_path: &impl AsRef<Path>,
         geno_path: &impl AsRef<Path>,
         snp_path: &impl AsRef<Path>,
+        samples_to_keep: Option<HashSet<String>>,
         variant_indices_to_keep: Option<HashSet<usize>>,
     ) -> Result<Self> {
         let samples = read_eigenstrat_ind(ind_path)?;
@@ -116,11 +121,15 @@ impl TransposedPackedAncestryMapReader {
         if genotype_mmap.len() != expected_file_size {
             return Err(CustomError::PackedAncestryMapFileSize);
         }
+        // Overwrite samples with the filtered set
+        // Also record indices of the kept samples so we can read only the relevant genotypes later
+        let (samples, sample_indices_to_keep) = select_samples(samples, samples_to_keep)?;
 
         Ok(Self {
             header,
             samples,
             sample_block_size,
+            sample_indices_to_keep,
             variant_indices_to_keep,
             next_variant_idx: 0,
             genotype_mmap,
@@ -128,30 +137,42 @@ impl TransposedPackedAncestryMapReader {
     }
 
     fn genotypes_for_variant(&self, variant_idx: usize) -> Vec<Allele> {
+        match self.sample_indices_to_keep.as_deref() {
+            Some(indices) => {
+                let mut genotypes = Vec::with_capacity(indices.len());
+                for &sample_idx in indices {
+                    genotypes.push(self.decode_sample(sample_idx, variant_idx));
+                }
+                genotypes
+            }
+            None => {
+                let mut genotypes = Vec::with_capacity(self.header.n_samples);
+                for sample_idx in 0..self.header.n_samples {
+                    genotypes.push(self.decode_sample(sample_idx, variant_idx));
+                }
+                genotypes
+            }
+        }
+    }
+
+    fn decode_sample(&self, sample_idx: usize, variant_idx: usize) -> Allele {
         // For a given sample block, byte (variant_idx / 4) holds 4 genotypes (2 bits each)
         // We shift by 6, 4, 2, or 0 to get the relevant 2 right-most bits
         let byte_idx = variant_idx / 4;
         let shift = 6 - 2 * (variant_idx % 4);
-
-        let n_samples = self.header.n_samples;
-        let mut genotypes = Vec::with_capacity(n_samples);
-
         // Decode directly from the memory-mapped genotype matrix
         let genotype_matrix = &self.genotype_mmap[HEADER_BLOCK_SIZE..];
-        for s in 0..n_samples {
-            let sample_block_start = s * self.sample_block_size;
-            let genotype_matrix_idx = sample_block_start + byte_idx;
-            let byte = genotype_matrix[genotype_matrix_idx];
-            let code = (byte >> shift) & 0b11;
-            genotypes.push(match code {
-                0b00 => Allele::Alt,
-                0b01 => Allele::Het,
-                0b10 => Allele::Ref,
-                0b11 => Allele::Missing,
-                _ => unreachable!(),
-            });
+        let sample_block_start = sample_idx * self.sample_block_size;
+        let genotype_matrix_idx = sample_block_start + byte_idx;
+        let byte = genotype_matrix[genotype_matrix_idx];
+        let code = (byte >> shift) & 0b11;
+        match code {
+            0b00 => Allele::Alt,
+            0b01 => Allele::Het,
+            0b10 => Allele::Ref,
+            0b11 => Allele::Missing,
+            _ => unreachable!(),
         }
-        genotypes
     }
 }
 
