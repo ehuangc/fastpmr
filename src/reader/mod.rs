@@ -1,5 +1,6 @@
 pub mod eigenstrat;
 pub mod packedancestrymap;
+pub mod plink;
 pub mod sample_filter;
 pub mod transposed_packedancestrymap;
 

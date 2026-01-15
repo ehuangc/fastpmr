@@ -4,6 +4,7 @@ use crate::error::{CustomError, Result};
 use crate::output::{plot_mismatch_rates, write_counts_npz, write_mismatch_rates};
 use crate::reader::SiteReader;
 use crate::reader::packedancestrymap::PackedAncestryMapReader;
+use crate::reader::plink::PlinkBedReader;
 use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapReader;
 use rayon::ThreadPoolBuilder;
 use std::collections::{HashMap, HashSet};
@@ -25,11 +26,29 @@ pub enum InputSpec {
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
     },
+    Plink {
+        bed: PathBuf,
+        bim: PathBuf,
+        fam: PathBuf,
+        output_dir: PathBuf,
+        npz: bool,
+        sample_pairs: Option<Vec<(String, String)>>,
+        samples_to_keep: Option<HashSet<String>>,
+        // Parsed 0-based indices of variants to keep
+        variant_indices: Option<HashSet<usize>>,
+        threads: Option<usize>,
+    },
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum FormatHint {
+    PackedAncestryMap,
+    Plink,
 }
 
 impl InputSpec {
-    pub fn from_prefix_packedancestrymap(
-        prefix: &str,
+    fn from_packedancestrymap(
+        prefix: &Path,
         output_dir: &str,
         npz: bool,
         sample_pairs: Option<Vec<(String, String)>>,
@@ -38,9 +57,9 @@ impl InputSpec {
         threads: Option<usize>,
     ) -> Self {
         Self::PackedAncestryMap {
-            ind: PathBuf::from(prefix.to_string() + ".ind"),
-            geno: PathBuf::from(prefix.to_string() + ".geno"),
-            snp: PathBuf::from(prefix.to_string() + ".snp"),
+            ind: path_with_extension(prefix, "ind"),
+            geno: path_with_extension(prefix, "geno"),
+            snp: path_with_extension(prefix, "snp"),
             output_dir: PathBuf::from(output_dir.to_string()),
             npz,
             sample_pairs,
@@ -50,12 +69,100 @@ impl InputSpec {
         }
     }
 
+    fn from_plink(
+        prefix: &Path,
+        output_dir: &str,
+        npz: bool,
+        sample_pairs: Option<Vec<(String, String)>>,
+        samples_to_keep: Option<HashSet<String>>,
+        variant_indices: Option<HashSet<usize>>,
+        threads: Option<usize>,
+    ) -> Self {
+        Self::Plink {
+            bed: path_with_extension(prefix, "bed"),
+            bim: path_with_extension(prefix, "bim"),
+            fam: path_with_extension(prefix, "fam"),
+            output_dir: PathBuf::from(output_dir.to_string()),
+            npz,
+            sample_pairs,
+            samples_to_keep,
+            variant_indices,
+            threads,
+        }
+    }
+
+    pub fn from_prefix(
+        prefix: &str,
+        output_dir: &str,
+        npz: bool,
+        sample_pairs: Option<Vec<(String, String)>>,
+        samples_to_keep: Option<HashSet<String>>,
+        variant_indices: Option<HashSet<usize>>,
+        threads: Option<usize>,
+    ) -> Result<Self> {
+        let (base_prefix, hint) = normalize_prefix(prefix);
+        let packed_ind = path_with_extension(&base_prefix, "ind");
+        let packed_geno = path_with_extension(&base_prefix, "geno");
+        let packed_snp = path_with_extension(&base_prefix, "snp");
+        let plink_bed = path_with_extension(&base_prefix, "bed");
+        let plink_bim = path_with_extension(&base_prefix, "bim");
+        let plink_fam = path_with_extension(&base_prefix, "fam");
+
+        let packed_available =
+            packed_ind.is_file() && packed_geno.is_file() && packed_snp.is_file();
+        let plink_available = plink_bed.is_file() && plink_bim.is_file() && plink_fam.is_file();
+
+        let selected_format = if packed_available
+            && (!plink_available || hint == Some(FormatHint::PackedAncestryMap))
+        {
+            Some(FormatHint::PackedAncestryMap)
+        } else if plink_available && (!packed_available || hint == Some(FormatHint::Plink)) {
+            Some(FormatHint::Plink)
+        } else if packed_available {
+            Some(FormatHint::PackedAncestryMap)
+        } else if plink_available {
+            Some(FormatHint::Plink)
+        } else {
+            None
+        };
+
+        match selected_format {
+            Some(FormatHint::PackedAncestryMap) => Ok(Self::from_packedancestrymap(
+                &base_prefix,
+                output_dir,
+                npz,
+                sample_pairs,
+                samples_to_keep,
+                variant_indices,
+                threads,
+            )),
+            Some(FormatHint::Plink) => Ok(Self::from_plink(
+                &base_prefix,
+                output_dir,
+                npz,
+                sample_pairs,
+                samples_to_keep,
+                variant_indices,
+                threads,
+            )),
+            None => Err(CustomError::InputFilesMissing {
+                prefix: base_prefix.display().to_string(),
+            }),
+        }
+    }
+
     pub fn print_paths(&self) {
         match self {
             InputSpec::PackedAncestryMap { ind, geno, snp, .. } => {
                 println!("IND : {}", ind.display());
                 println!("GENO: {}", geno.display());
                 println!("SNP : {}", snp.display());
+                println!();
+            }
+            InputSpec::Plink { bed, bim, fam, .. } => {
+                println!("BED: {}", bed.display());
+                println!("BIM: {}", bim.display());
+                println!("FAM: {}", fam.display());
                 println!();
             }
         }
@@ -109,31 +216,80 @@ impl InputSpec {
                     Err(crate::error::CustomError::PackedAncestryMapHeaderPrefix)
                 }
             }
+            InputSpec::Plink {
+                bed,
+                bim,
+                fam,
+                variant_indices,
+                samples_to_keep,
+                ..
+            } => {
+                let reader = PlinkBedReader::open(
+                    bed,
+                    bim,
+                    fam,
+                    samples_to_keep.clone(),
+                    variant_indices.clone(),
+                )?;
+                Ok(Box::new(reader))
+            }
         }
     }
 
     pub fn output_dir(&self) -> &Path {
         match self {
-            InputSpec::PackedAncestryMap { output_dir, .. } => output_dir.as_path(),
+            InputSpec::PackedAncestryMap { output_dir, .. }
+            | InputSpec::Plink { output_dir, .. } => output_dir.as_path(),
         }
     }
 
     pub fn npz(&self) -> bool {
         match self {
-            InputSpec::PackedAncestryMap { npz, .. } => *npz,
+            InputSpec::PackedAncestryMap { npz, .. } | InputSpec::Plink { npz, .. } => *npz,
         }
     }
 
     pub fn sample_pairs(&self) -> Option<&[(String, String)]> {
         match self {
-            InputSpec::PackedAncestryMap { sample_pairs, .. } => sample_pairs.as_deref(),
+            InputSpec::PackedAncestryMap { sample_pairs, .. }
+            | InputSpec::Plink { sample_pairs, .. } => sample_pairs.as_deref(),
         }
     }
 
     pub fn threads(&self) -> Option<usize> {
         match self {
-            InputSpec::PackedAncestryMap { threads, .. } => *threads,
+            InputSpec::PackedAncestryMap { threads, .. } | InputSpec::Plink { threads, .. } => {
+                *threads
+            }
         }
+    }
+}
+
+fn path_with_extension(prefix: &Path, ext: &str) -> PathBuf {
+    let mut path = prefix.to_path_buf();
+    path.set_extension(ext);
+    path
+}
+
+fn normalize_prefix(prefix: &str) -> (PathBuf, Option<FormatHint>) {
+    let path = PathBuf::from(prefix);
+    let hint = match path.extension().and_then(|ext| ext.to_str()) {
+        Some("geno") | Some("ind") | Some("snp") => Some(FormatHint::PackedAncestryMap),
+        Some("bed") | Some("bim") | Some("fam") => Some(FormatHint::Plink),
+        _ => None,
+    };
+    let base = match hint {
+        Some(_) => strip_extension(&path),
+        None => path,
+    };
+    (base, hint)
+}
+
+fn strip_extension(path: &Path) -> PathBuf {
+    match (path.file_stem(), path.parent()) {
+        (Some(stem), Some(parent)) => parent.join(Path::new(stem)),
+        (Some(stem), None) => Path::new(stem).to_path_buf(),
+        _ => path.to_path_buf(),
     }
 }
 
@@ -189,7 +345,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
     let samples_to_keep = sample_pairs
         .as_ref()
         .map(|pairs| samples_to_keep_from_pairs(pairs));
-    Ok(InputSpec::from_prefix_packedancestrymap(
+    InputSpec::from_prefix(
         &args.prefix,
         &args.output_directory,
         args.npz,
@@ -197,7 +353,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
         samples_to_keep,
         variant_indices,
         args.threads,
-    ))
+    )
 }
 
 fn load_sample_pairs_csv(path: &str) -> Result<Vec<(String, String)>> {

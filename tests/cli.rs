@@ -58,6 +58,30 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
 }
 
 #[test]
+fn plink_cli_generates_outputs() {
+    let dataset = common::create_dataset(common::GenoFormat::Plink, "plink").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_all_variants();
+    let output = run_fastpmr(&dataset, None, false, None);
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records"
+    );
+}
+
+#[test]
 fn packedancestrymap_cli_generates_npz_outputs() {
     let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-npz").unwrap();
     if dataset.output_dir.exists() {
@@ -101,8 +125,80 @@ fn variant_indices_limit_sites() {
 }
 
 #[test]
+fn plink_variant_indices_limit_sites() {
+    let dataset = common::create_dataset(common::GenoFormat::Plink, "plink-filtered").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_filtered_variants();
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None);
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records after filtering PLINK input"
+    );
+}
+
+#[test]
 fn sample_pairs_csv_runs_successfully() {
     let dataset = common::create_dataset(common::GenoFormat::Packed, "sample-pairs-ok").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+    let csv_path = dataset.prefix.with_extension("pairs.csv");
+    fs::write(
+        &csv_path,
+        "Sample1,Sample2\nSample3,Sample1\nSample4,Sample2\n",
+    )
+    .unwrap();
+
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
+        .into_iter()
+        .filter(|((id1, id2), _)| {
+            matches!(
+                (id1.as_str(), id2.as_str()),
+                ("Sample1", "Sample2") | ("Sample1", "Sample3") | ("Sample2", "Sample4")
+            )
+        })
+        .collect();
+
+    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    assert_eq!(records.len(), 3, "expected exactly three requested pairs");
+    let pairs: std::collections::HashSet<(String, String)> = records
+        .iter()
+        .map(|record| (record.id1.clone(), record.id2.clone()))
+        .collect();
+    let expected_pairs: std::collections::HashSet<(String, String)> = [
+        ("Sample1".to_string(), "Sample2".to_string()),
+        ("Sample1".to_string(), "Sample3".to_string()),
+        ("Sample2".to_string(), "Sample4".to_string()),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(pairs, expected_pairs);
+}
+
+#[test]
+fn plink_sample_pairs_csv_runs_successfully() {
+    let dataset =
+        common::create_dataset(common::GenoFormat::Plink, "plink-sample-pairs-ok").unwrap();
     if dataset.output_dir.exists() {
         fs::remove_dir_all(&dataset.output_dir).unwrap();
     }

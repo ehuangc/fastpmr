@@ -9,6 +9,11 @@ pub enum CustomError {
     },
 
     #[error(
+        "could not find supported input files for prefix {prefix} (.geno/.ind/.snp or .bed/.bim/.fam)"
+    )]
+    InputFilesMissing { prefix: String },
+
+    #[error(
         "sample pairs CSV must contain either one column of sample IDs or two columns of explicit pairs"
     )]
     SamplePairsColumns,
@@ -135,6 +140,29 @@ pub enum CustomError {
 
     #[error("header variant hash does not match (expected: {expected}, found: {found})")]
     PackedAncestryMapVariantHash { expected: String, found: String },
+
+    #[error("invalid PLINK .bed header magic bytes")]
+    PlinkBedHeaderMagic,
+
+    #[error("PLINK .bed file must be SNP-major")]
+    PlinkBedMode,
+
+    #[error("PLINK .bed file size mismatch (expected {expected} bytes, found {found} bytes)")]
+    PlinkBedFileSize { expected: u64, found: u64 },
+
+    #[error("expected {expected} fields (got {n_fields}) in line {line_num} of .fam file")]
+    PlinkFamFields {
+        line_num: usize,
+        n_fields: usize,
+        expected: usize,
+    },
+
+    #[error("expected {expected} fields (got {n_fields}) in line {line_num} of .bim file")]
+    PlinkBimFields {
+        line_num: usize,
+        n_fields: usize,
+        expected: usize,
+    },
 
     #[error("expected {expected} fields (got {n_fields}) in line {line_num} of .ind file")]
     EigenstratIndFields {

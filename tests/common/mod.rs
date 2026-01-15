@@ -15,6 +15,7 @@ const ALT: u8 = 0b00;
 const HET: u8 = 0b01;
 const REF: u8 = 0b10;
 const MISSING: u8 = 0b11;
+const PLINK_HEADER: [u8; 3] = [0x6c, 0x1b, 0x01];
 
 static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
 
@@ -22,6 +23,7 @@ static NEXT_ID: AtomicUsize = AtomicUsize::new(0);
 pub enum GenoFormat {
     Packed,
     Transposed,
+    Plink,
 }
 
 pub struct Dataset {
@@ -80,6 +82,11 @@ pub fn create_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
             &sample_ids,
             &variant_ids,
         )?,
+        GenoFormat::Plink => {
+            write_bed(prefix.with_extension("bed"), &variants)?;
+            write_bim(prefix.with_extension("bim"), &variant_ids)?;
+            write_fam(prefix.with_extension("fam"), &sample_ids)?;
+        }
     }
 
     Ok(Dataset { prefix, output_dir })
@@ -237,6 +244,47 @@ fn write_tgeno(
             block[byte_idx] |= code << shift;
         }
         file.write_all(&block)?;
+    }
+    Ok(())
+}
+
+fn write_bed(path: impl AsRef<Path>, variants: &[[u8; N_SAMPLES]]) -> io::Result<()> {
+    let mut file = File::create(path)?;
+    file.write_all(&PLINK_HEADER)?;
+
+    let bytes_per_variant = N_SAMPLES.div_ceil(4);
+    let mut block = vec![0u8; bytes_per_variant];
+    for variant in variants {
+        block.fill(0);
+        for (sample_idx, &sample) in variant.iter().enumerate() {
+            let code = match sample {
+                REF => 0b00,
+                HET => 0b10,
+                ALT => 0b11,
+                MISSING => 0b01,
+                _ => unreachable!(),
+            };
+            let byte_idx = sample_idx / 4;
+            let shift = (sample_idx % 4) * 2;
+            block[byte_idx] |= code << shift;
+        }
+        file.write_all(&block)?;
+    }
+    Ok(())
+}
+
+fn write_bim(path: impl AsRef<Path>, variant_ids: &[String]) -> io::Result<()> {
+    let mut file = File::create(path)?;
+    for (idx, variant) in variant_ids.iter().enumerate() {
+        writeln!(file, "1 {variant} 0 {} A G", idx + 1)?;
+    }
+    Ok(())
+}
+
+fn write_fam(path: impl AsRef<Path>, samples: &[String]) -> io::Result<()> {
+    let mut file = File::create(path)?;
+    for sample in samples {
+        writeln!(file, "0 {sample} 0 0 0 -9")?;
     }
     Ok(())
 }
