@@ -266,9 +266,10 @@ impl InputSpec {
 }
 
 fn path_with_extension(prefix: &Path, ext: &str) -> PathBuf {
-    let mut path = prefix.to_path_buf();
-    path.set_extension(ext);
-    path
+    let mut path = prefix.as_os_str().to_os_string();
+    path.push(".");
+    path.push(ext);
+    PathBuf::from(path)
 }
 
 fn normalize_prefix(prefix: &str) -> (PathBuf, Option<FormatHint>) {
@@ -566,6 +567,75 @@ pub fn run(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn path_with_extension_preserves_multi_dot_prefix() {
+        let prefix = std::path::Path::new("/tmp/data/v62.0_1240k_public");
+        let expected = std::path::PathBuf::from("/tmp/data/v62.0_1240k_public.geno");
+        assert_eq!(path_with_extension(prefix, "geno"), expected);
+    }
+
+    #[test]
+    fn from_prefix_accepts_multi_dot_paths() {
+        let unique_dir = format!(
+            "fastpmr-prefix-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
+        let base_dir = std::env::temp_dir().join(unique_dir);
+        std::fs::create_dir_all(&base_dir).unwrap();
+
+        let prefix = base_dir.join("dataset.v62.0");
+        for ext in ["ind", "geno", "snp"] {
+            let filename = format!("{}.{ext}", prefix.file_name().unwrap().to_string_lossy());
+            let path = prefix.with_file_name(filename);
+            std::fs::write(path, b"").unwrap();
+        }
+        let output_dir = base_dir.join("output");
+
+        let spec = InputSpec::from_prefix(
+            prefix.to_str().unwrap(),
+            output_dir.to_str().unwrap(),
+            false,
+            None,
+            None,
+            None,
+            None,
+        )
+        .expect("should detect packed ancestry map inputs");
+
+        match spec {
+            InputSpec::PackedAncestryMap { ind, geno, snp, .. } => {
+                assert_eq!(
+                    ind,
+                    prefix.with_file_name(format!(
+                        "{}.ind",
+                        prefix.file_name().unwrap().to_string_lossy()
+                    ))
+                );
+                assert_eq!(
+                    geno,
+                    prefix.with_file_name(format!(
+                        "{}.geno",
+                        prefix.file_name().unwrap().to_string_lossy()
+                    ))
+                );
+                assert_eq!(
+                    snp,
+                    prefix.with_file_name(format!(
+                        "{}.snp",
+                        prefix.file_name().unwrap().to_string_lossy()
+                    ))
+                );
+            }
+            other => panic!("unexpected input spec: {other:?}"),
+        }
+
+        std::fs::remove_dir_all(base_dir).unwrap();
+    }
 
     #[test]
     fn resolve_sample_pairs_succeeds() {
