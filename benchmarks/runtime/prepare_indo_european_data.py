@@ -3,7 +3,7 @@ import subprocess
 import tarfile
 from pathlib import Path
 
-from benchmark_utils import DATA_PREFIX, DATA_EXTS
+from benchmark_utils import DATA_EXTS, DATA_PREFIX
 
 DATA_DIR = DATA_PREFIX.parent
 SAMPLE_DIR = DATA_DIR / "indo_european_sample_sets"
@@ -30,9 +30,7 @@ SAMPLE_SIZES = (
     1280,
 )
 SAMPLE_SHUFFLE_SEED = 42
-INDO_EUROPEAN_URL = (
-    "https://dataverse.harvard.edu/api/access/datafile/10629469?version=1.2"
-)
+INDO_EUROPEAN_URL = "https://dataverse.harvard.edu/api/access/datafile/10629469?version=1.2"
 ARCHIVE_PATH = DATA_DIR / "indo_european_dataset.tar.gz"
 
 

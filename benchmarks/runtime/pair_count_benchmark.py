@@ -3,10 +3,10 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
-    FASTPMR_BIN,
     DATA_PREFIX,
-    SCRIPT_DIR,
+    FASTPMR_BIN,
     RUNS,
+    SCRIPT_DIR,
     quote_path,
 )
 
@@ -59,9 +59,7 @@ def main() -> None:
         pair_count = sample_count * (sample_count - 1) // 2
         with tempfile.TemporaryDirectory() as output_dir:
             command = build_command(fastpmr_bin, data_prefix, csv_path, output_dir)
-            hyperfine_args.extend(
-                ["-n", f"samples={sample_count}_pairs={pair_count}", command]
-            )
+            hyperfine_args.extend(["-n", f"samples={sample_count}_pairs={pair_count}", command])
     subprocess.run(hyperfine_args, check=True)
     print(f"\nHyperfine results written to {export_path}")
 

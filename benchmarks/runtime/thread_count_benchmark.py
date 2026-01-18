@@ -3,20 +3,18 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
-    FASTPMR_BIN,
     DATA_PREFIX,
+    FASTPMR_BIN,
+    RUNS,
     SCRIPT_DIR,
     ensure_data_present,
-    RUNS,
     quote_path,
 )
 
 THREAD_COUNTS = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
 
 
-def build_command(
-    fastpmr_bin: Path, prefix: Path, threads: int, output_dir: Path
-) -> str:
+def build_command(fastpmr_bin: Path, prefix: Path, threads: int, output_dir: Path) -> str:
     parts = [
         quote_path(fastpmr_bin),
         f"--prefix {quote_path(prefix)}",

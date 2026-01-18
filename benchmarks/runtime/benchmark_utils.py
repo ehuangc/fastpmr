@@ -14,11 +14,7 @@ def quote_path(path: Path) -> str:
 
 
 def ensure_data_present(prefix: Path) -> None:
-    missing = [
-        prefix.with_suffix(ext)
-        for ext in DATA_EXTS
-        if not prefix.with_suffix(ext).is_file()
-    ]
+    missing = [prefix.with_suffix(ext) for ext in DATA_EXTS if not prefix.with_suffix(ext).is_file()]
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
         raise SystemExit(

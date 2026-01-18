@@ -3,11 +3,11 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
-    FASTPMR_BIN,
     DATA_PREFIX,
+    FASTPMR_BIN,
+    RUNS,
     SCRIPT_DIR,
     ensure_data_present,
-    RUNS,
     quote_path,
 )
 
