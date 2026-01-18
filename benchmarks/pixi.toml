@@ -1,0 +1,25 @@
+[project]
+name = "fastpmr-benchmarks"
+version = "0.1.0"
+description = "Pixi environment for running fastpmr benchmarks."
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+bash = ">=5"
+coreutils = "*"
+findutils = "*"
+hyperfine = "*"
+python = ">=3.10"
+
+[tasks.prepare-runtime-data]
+cmd = "python runtime/prepare_indo_european_data.py"
+
+[tasks.pairs]
+cmd = "python runtime/pair_count_benchmark.py"
+
+[tasks.variants]
+cmd = "python runtime/variant_count_benchmark.py"
+
+[tasks.threads]
+cmd = "python runtime/thread_count_benchmark.py"
