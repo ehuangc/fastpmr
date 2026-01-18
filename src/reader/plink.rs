@@ -158,7 +158,7 @@ impl Iterator for PlinkBedReader {
     }
 }
 
-pub(super) fn read_plink_fam(path: &impl AsRef<Path>) -> Result<Vec<String>> {
+fn read_plink_fam(path: &impl AsRef<Path>) -> Result<Vec<String>> {
     let f = File::open(path).map_err(|e| CustomError::ReadWithPath {
         source: e,
         path: path.as_ref().to_path_buf(),
@@ -189,7 +189,7 @@ pub(super) fn read_plink_fam(path: &impl AsRef<Path>) -> Result<Vec<String>> {
     Ok(samples)
 }
 
-pub(super) fn count_plink_bim(path: &impl AsRef<Path>) -> Result<usize> {
+fn count_plink_bim(path: &impl AsRef<Path>) -> Result<usize> {
     let f = File::open(path).map_err(|e| CustomError::ReadWithPath {
         source: e,
         path: path.as_ref().to_path_buf(),
