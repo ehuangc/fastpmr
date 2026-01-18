@@ -7,7 +7,7 @@ use std::path::Path;
 use crate::error::{CustomError, Result};
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
-use crate::reader::sample_filter::select_samples;
+use crate::reader::common::select_samples;
 
 const BED_MAGIC: [u8; 2] = [0x6c, 0x1b];
 const BED_SNP_MAJOR: u8 = 0x01;

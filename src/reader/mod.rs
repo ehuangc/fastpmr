@@ -1,8 +1,8 @@
-pub mod eigenstrat;
+pub mod common;
 pub mod packedancestrymap;
 pub mod plink;
-pub mod sample_filter;
 pub mod transposed_packedancestrymap;
+pub mod unpacked_eigenstrat;
 
 use crate::error::Result;
 use crate::model::Site;

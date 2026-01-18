@@ -7,8 +7,9 @@ use std::path::Path;
 use crate::error::{CustomError, Result};
 use crate::model::{Allele, Site};
 use crate::reader::SiteReader;
-use crate::reader::eigenstrat::{header_hash, read_eigenstrat_ind, read_eigenstrat_snp};
-use crate::reader::sample_filter::select_samples;
+use crate::reader::common::{
+    header_hash, read_eigenstrat_ind, read_eigenstrat_snp, select_samples,
+};
 
 const MIN_BLOCK_BYTES: usize = 48;
 const GENO_HEADER_FIELDS: usize = 5;
