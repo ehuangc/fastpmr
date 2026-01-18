@@ -29,8 +29,8 @@ def main() -> None:
     data_prefix = Path(DATA_PREFIX)
     fastpmr_bin = Path(FASTPMR_BIN)
     thread_counts = THREAD_COUNTS
-
     ensure_data_present(data_prefix)
+
     results_dir = SCRIPT_DIR / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
     export_path = results_dir / "thread_count_benchmark.csv"

@@ -7,6 +7,7 @@ from benchmark_utils import (
     FASTPMR_BIN,
     RUNS,
     SCRIPT_DIR,
+    ensure_data_present,
     quote_path,
 )
 
@@ -33,6 +34,7 @@ def main() -> None:
     data_prefix = Path(DATA_PREFIX)
     fastpmr_bin = Path(FASTPMR_BIN)
     sample_dir = Path(SAMPLE_DIR)
+    ensure_data_present(data_prefix)
 
     def sample_size(path: Path) -> int:
         return int(path.stem.rsplit("_", 1)[1])
