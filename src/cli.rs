@@ -3,6 +3,7 @@ use crate::counts::Counts;
 use crate::error::{CustomError, Result};
 use crate::output::{plot_mismatch_rates, write_counts_npz, write_mismatch_rates};
 use crate::reader::SiteReader;
+use crate::reader::eigenstrat::EigenstratReader;
 use crate::reader::packedancestrymap::PackedAncestryMapReader;
 use crate::reader::plink::PlinkBedReader;
 use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapReader;
@@ -213,7 +214,14 @@ impl InputSpec {
                     )?;
                     Ok(Box::new(reader))
                 } else {
-                    Err(crate::error::CustomError::PackedAncestryMapHeaderPrefix)
+                    let reader = EigenstratReader::open(
+                        ind,
+                        geno,
+                        snp,
+                        samples_to_keep.clone(),
+                        variant_indices.clone(),
+                    )?;
+                    Ok(Box::new(reader))
                 }
             }
             InputSpec::Plink {

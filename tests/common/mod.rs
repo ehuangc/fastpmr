@@ -24,6 +24,7 @@ pub enum GenoFormat {
     Packed,
     Transposed,
     Plink,
+    Eigenstrat,
 }
 
 pub struct Dataset {
@@ -87,6 +88,7 @@ pub fn create_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
             write_bim(prefix.with_extension("bim"), &variant_ids)?;
             write_fam(prefix.with_extension("fam"), &sample_ids)?;
         }
+        GenoFormat::Eigenstrat => write_unpacked_geno(prefix.with_extension("geno"), &variants)?,
     }
 
     Ok(Dataset { prefix, output_dir })
@@ -208,6 +210,25 @@ fn write_geno(
             *byte = value;
         }
         file.write_all(&block)?;
+    }
+    Ok(())
+}
+
+fn write_unpacked_geno(path: impl AsRef<Path>, variants: &[[u8; N_SAMPLES]]) -> io::Result<()> {
+    let mut file = File::create(path)?;
+    for variant in variants {
+        let mut line = String::with_capacity(N_SAMPLES);
+        for &code in variant {
+            let allele = match code {
+                ALT => '0',
+                HET => '1',
+                REF => '2',
+                MISSING => '9',
+                _ => unreachable!(),
+            };
+            line.push(allele);
+        }
+        writeln!(file, "{line}")?;
     }
     Ok(())
 }

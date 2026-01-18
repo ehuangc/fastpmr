@@ -103,9 +103,6 @@ pub enum CustomError {
         source: std::str::Utf8Error,
     },
 
-    #[error("header block does not start with \"GENO\" or \"TGENO\"")]
-    PackedAncestryMapHeaderPrefix,
-
     #[error("header block does not start with \"GENO\"")]
     PackedAncestryMapHeaderGeno,
 
@@ -177,6 +174,16 @@ pub enum CustomError {
         n_fields: usize,
         expected: usize,
     },
+
+    #[error("expected {expected} genotypes (got {n_fields}) in line {line_num} of .geno file")]
+    EigenstratGenoFields {
+        line_num: usize,
+        n_fields: usize,
+        expected: usize,
+    },
+
+    #[error(".geno file contains {found} variants but .snp lists {expected}")]
+    EigenstratGenoVariantCount { expected: usize, found: usize },
 
     #[error("need at least 2 samples (got {n_samples})")]
     SampleCount { n_samples: usize },
