@@ -3,6 +3,7 @@
 .DS_Store
 archive/
 sandbox*/
+benchmarks/aadr/data
 benchmarks/runtime/data
 
 # Byte-compiled / optimized / DLL files
