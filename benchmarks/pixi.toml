@@ -6,11 +6,11 @@ channels = ["conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64"]
 
 [dependencies]
-bash = ">=5"
-coreutils = "*"
-findutils = "*"
-hyperfine = "*"
-python = ">=3.10"
+bash = ">=5.2.37,<6"
+coreutils = ">=9.5,<10"
+findutils = ">=4.10.0,<5"
+hyperfine = ">=1.20.0,<2"
+python = ">=3.10,<3.15"
 
 [tasks.prepare-aadr-data]
 cmd = "python aadr/prepare_aadr_data.py"
