@@ -38,7 +38,6 @@ def main() -> None:
         "hyperfine",
         "--runs",
         str(RUNS),
-        "--show-output",
         "--export-csv",
         str(export_path),
     ]
