@@ -1,8 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from aadr_utils import SCRIPT_DIR
-
+SCRIPT_DIR = Path(__file__).resolve().parent
 DATA_DIR = SCRIPT_DIR / "data"
 REMOTE_FILES = [
     (
