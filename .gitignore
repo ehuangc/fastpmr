@@ -4,6 +4,7 @@
 archive/
 sandbox*/
 benchmarks/aadr/data
+benchmarks/aadr/results/fastpmr/*.npz
 benchmarks/runtime/data
 
 # Byte-compiled / optimized / DLL files
