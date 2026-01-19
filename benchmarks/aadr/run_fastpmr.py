@@ -58,7 +58,7 @@ def main() -> None:
         "--export-csv",
         str(hyperfine_export_path),
         "-n",
-        "fastpmr_aadr",
+        "fastpmr-aadr",
         command,
     ]
 
