@@ -32,7 +32,7 @@ def build_command(fastpmr_bin: Path, prefix: Path, spec: str, output_dir: Path) 
         quote_path(fastpmr_bin),
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
-        f"--variant-spec {spec}",
+        f"--variant-indices {spec}",
         "-n",
     ]
     return " ".join(parts)
