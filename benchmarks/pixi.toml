@@ -15,6 +15,9 @@ python = ">=3.10"
 [tasks.prepare-aadr-data]
 cmd = "python aadr/prepare_aadr_data.py"
 
+[tasks.fastpmr-aadr]
+cmd = "python aadr/run_fastpmr.py"
+
 [tasks.prepare-runtime-data]
 cmd = "python runtime/prepare_indo_european_data.py"
 
