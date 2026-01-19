@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "fastpmr-benchmarks"
 version = "0.1.0"
 description = "Pixi environment for running fastpmr benchmarks."
