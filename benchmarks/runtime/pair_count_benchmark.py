@@ -11,6 +11,8 @@ from benchmark_utils import (
     quote_path,
 )
 
+# Keep threads constant to avoid fastpmr's automatic switch from single- to multi-threaded mode at 500 samples
+THREADS = 512
 SAMPLE_DIR = SCRIPT_DIR / "data" / "indo_european_sample_sets"
 
 
@@ -25,6 +27,7 @@ def build_command(
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--sample-pairs-csv {quote_path(csv_path)}",
+        f"--threads {THREADS}",
         "-n",
     ]
     return " ".join(parts)
