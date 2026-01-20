@@ -11,6 +11,8 @@ coreutils = ">=9.5,<10"
 findutils = ">=4.10.0,<5"
 hyperfine = ">=1.20.0,<2"
 python = ">=3.10,<3.15"
+matplotlib = ">=3.10.8,<4"
+seaborn = ">=0.13.2,<0.14"
 
 [tasks.prepare-aadr-data]
 cmd = "python aadr/prepare_aadr_data.py"
@@ -29,3 +31,6 @@ cmd = "python runtime/variant_count_benchmark.py"
 
 [tasks.threads]
 cmd = "python runtime/thread_count_benchmark.py"
+
+[tasks.plot-runtime-data]
+cmd = "python runtime/plot_benchmark_data.py"
