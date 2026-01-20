@@ -58,7 +58,7 @@ def save_line_plot(
     )
     ax.set_xlabel(xlabel, fontsize=16)
     ax.set_ylabel(ylabel, fontsize=16)
-    ax.set_title(title, fontsize=18)
+    ax.set_title(title, fontsize=16)
     ax.tick_params(axis="both", labelsize=14)
     ax.ticklabel_format(style="plain", axis="x")
     if x_max_ticks is not None:
