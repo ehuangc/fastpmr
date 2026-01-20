@@ -8,25 +8,15 @@ from benchmark_utils import DATA_EXTS, DATA_PREFIX
 DATA_DIR = DATA_PREFIX.parent
 SAMPLE_DIR = DATA_DIR / "indo_european_sample_sets"
 SAMPLE_SIZES = (
-    64,
     128,
-    192,
     256,
-    320,
     384,
-    448,
     512,
-    576,
     640,
-    704,
     768,
-    832,
     896,
-    960,
     1024,
-    1088,
     1152,
-    1216,
     1280,
 )
 SAMPLE_SHUFFLE_SEED = 42
