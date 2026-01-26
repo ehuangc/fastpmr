@@ -32,7 +32,7 @@ def parse_pair_count(command: str) -> int:
             continue
         key, value = part.split("=", 1)
         fields[key] = int(value)
-    return fields["pairs"]
+    return fields["samples"]
 
 
 def save_line_plot(
@@ -110,11 +110,10 @@ def main() -> None:
         "pairs",
         "mean",
         "stddev",
-        "Sample Pairs",
+        "Samples",
         "Mean Runtime (s)",
-        "Runtime vs. Pair Count",
-        PLOTS_DIR / "pair_count_benchmark.pdf",
-        x_max_ticks=7,
+        "Runtime vs. Sample Count",
+        PLOTS_DIR / "sample_count_benchmark.pdf",
     )
 
 

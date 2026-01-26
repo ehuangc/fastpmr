@@ -23,8 +23,8 @@ cmd = "python aadr/run_fastpmr.py"
 [tasks.prepare-runtime-data]
 cmd = "python runtime/prepare_indo_european_data.py"
 
-[tasks.pairs]
-cmd = "python runtime/pair_count_benchmark.py"
+[tasks.samples]
+cmd = "python runtime/sample_count_benchmark.py"
 
 [tasks.variants]
 cmd = "python runtime/variant_count_benchmark.py"
