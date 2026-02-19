@@ -4,6 +4,7 @@ import zipfile
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 from scipy.stats import beta
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -90,13 +91,6 @@ def compute_mismatch_rate_cis(
     return lower, upper
 
 
-def write_csv(path: Path, header: list[str], rows: list[tuple[object]]) -> None:
-    with path.open("w", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(header)
-        writer.writerows(rows)
-
-
 def filter_samples(
     mismatches: np.ndarray,
     totals: np.ndarray,
@@ -133,14 +127,14 @@ def find_same_master_id_high_pmr_pairs(
     rates_ci_upper: np.ndarray,
     threshold: float,
     overlap_threshold: int,
-) -> list[tuple[str, str, str, int, float, float, float]]:
+) -> pd.DataFrame:
     master_id_to_indices: dict[str, list[int]] = {}
     for idx, master_id in enumerate(master_ids):
         if not master_id:
             continue
         master_id_to_indices.setdefault(master_id, []).append(idx)
 
-    pairs: list[tuple[str, str, str, int, float, float, float]] = []
+    rows: list[dict[str, str | int | float]] = []
     for master_id, indices in master_id_to_indices.items():
         if len(indices) < 2:
             continue
@@ -155,9 +149,19 @@ def find_same_master_id_high_pmr_pairs(
                 if n_overlap <= overlap_threshold:
                     continue
                 if pmr > threshold:
-                    pairs.append((master_id, samples[idx_i], samples[idx_j], n_overlap, pmr, lower, upper))
-    pairs.sort(key=lambda row: row[4], reverse=True)
-    return pairs
+                    rows.append(
+                        {
+                            "master_id": master_id,
+                            "genetic_id1": samples[idx_i],
+                            "genetic_id2": samples[idx_j],
+                            "site_overlap": n_overlap,
+                            "mismatch_rate": pmr,
+                            "mismatch_rate_95_ci_lower": lower,
+                            "mismatch_rate_95_ci_upper": upper,
+                        }
+                    )
+    rows.sort(key=lambda row: row["mismatch_rate"], reverse=True)
+    return pd.DataFrame.from_records(rows)
 
 
 def find_diff_master_id_low_pmr_pairs(
@@ -169,11 +173,10 @@ def find_diff_master_id_low_pmr_pairs(
     rates_ci_upper: np.ndarray,
     threshold: float,
     overlap_threshold: int,
-) -> list[tuple[str, str, str, str, int, float, float, float]]:
-    pairs: list[tuple[str, str, str, str, int, float, float, float]] = []
+) -> pd.DataFrame:
     master_ids_array = np.asarray(master_ids, dtype=object)
-    sample_count = len(samples)
-    for idx_i in range(sample_count - 1):
+    rows: list[dict[str, str | int | float]] = []
+    for idx_i in range(len(samples) - 1):
         master_id_i = master_ids_array[idx_i]
         if not master_id_i:
             continue
@@ -192,20 +195,20 @@ def find_diff_master_id_low_pmr_pairs(
             idx_j = idx_i + 1 + int(offset)
             lower = rates_ci_lower[idx_i, idx_j]
             upper = rates_ci_upper[idx_i, idx_j]
-            pairs.append(
-                (
-                    master_id_i,
-                    row_master_ids[offset],
-                    samples[idx_i],
-                    samples[idx_j],
-                    row_overlaps[offset],
-                    row_rates[offset],
-                    lower,
-                    upper,
-                )
+            rows.append(
+                {
+                    "master_id1": master_id_i,
+                    "master_id2": row_master_ids[offset],
+                    "genetic_id1": samples[idx_i],
+                    "genetic_id2": samples[idx_j],
+                    "site_overlap": row_overlaps[offset],
+                    "mismatch_rate": row_rates[offset],
+                    "mismatch_rate_95_ci_lower": lower,
+                    "mismatch_rate_95_ci_upper": upper,
+                }
             )
-    pairs.sort(key=lambda row: row[5])
-    return pairs
+    rows.sort(key=lambda row: row["mismatch_rate"])
+    return pd.DataFrame.from_records(rows)
 
 
 def main() -> None:
@@ -233,19 +236,7 @@ def main() -> None:
         OVERLAP_THRESHOLD,
     )
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    write_csv(
-        SAME_MASTER_OUTPUT_CSV,
-        [
-            "master_id",
-            "genetic_id1",
-            "genetic_id2",
-            "site_overlap",
-            "mismatch_rate",
-            "mismatch_rate_95_ci_lower",
-            "mismatch_rate_95_ci_upper",
-        ],
-        high_pmr_pairs,
-    )
+    high_pmr_pairs.to_csv(SAME_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(high_pmr_pairs)} same-master-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
         f"and site overlap > {OVERLAP_THRESHOLD} to {SAME_MASTER_OUTPUT_CSV}."
@@ -261,20 +252,7 @@ def main() -> None:
         IDENTICAL_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
     )
-    write_csv(
-        DIFF_MASTER_OUTPUT_CSV,
-        [
-            "master_id1",
-            "master_id2",
-            "genetic_id1",
-            "genetic_id2",
-            "site_overlap",
-            "mismatch_rate",
-            "mismatch_rate_95_ci_lower",
-            "mismatch_rate_95_ci_upper",
-        ],
-        low_pmr_pairs,
-    )
+    low_pmr_pairs.to_csv(DIFF_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(low_pmr_pairs)} different-master-ID pairs with PMR < {IDENTICAL_PMR_THRESHOLD} "
         f"and site overlap > {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}."
