@@ -118,7 +118,30 @@ def filter_samples(
     )
 
 
+def get_pair_metadata(metadata: dict[str, dict[str, str]], sample1: str, sample2: str) -> dict[str, str]:
+    date_field = (
+        "Full Date One of two formats. (Format 1) 95.4% CI calibrated radiocarbon age "
+        "(Conventional Radiocarbon Age BP, Lab number) e.g. 2624-2350 calBCE (3990±40 BP, Ua-35016). "
+        "(Format 2) Archaeological context range, e.g. 2500-1700 BCE"
+    )
+    return {
+        "publication_abbreviation1": metadata[sample1]["Publication abbreviation"],
+        "publication_abbreviation2": metadata[sample2]["Publication abbreviation"],
+        "skeletal_code1": metadata[sample1]["Skeletal code"],
+        "skeletal_code2": metadata[sample2]["Skeletal code"],
+        "date1": metadata[sample1][date_field],
+        "date2": metadata[sample2][date_field],
+        "group_id1": metadata[sample1]["Group ID"],
+        "group_id2": metadata[sample2]["Group ID"],
+        "locality1": metadata[sample1]["Locality"],
+        "locality2": metadata[sample2]["Locality"],
+        "political_entity1": metadata[sample1]["Political Entity"],
+        "political_entity2": metadata[sample2]["Political Entity"],
+    }
+
+
 def find_same_master_id_high_pmr_pairs(
+    metadata: dict[str, dict[str, str]],
     samples: list[str],
     master_ids: list[str],
     site_overlaps: np.ndarray,
@@ -149,22 +172,23 @@ def find_same_master_id_high_pmr_pairs(
                 if n_overlap <= overlap_threshold:
                     continue
                 if pmr > threshold:
-                    rows.append(
-                        {
-                            "master_id": master_id,
-                            "genetic_id1": samples[idx_i],
-                            "genetic_id2": samples[idx_j],
-                            "site_overlap": n_overlap,
-                            "mismatch_rate": pmr,
-                            "mismatch_rate_95_ci_lower": lower,
-                            "mismatch_rate_95_ci_upper": upper,
-                        }
-                    )
+                    row = {
+                        "master_id": master_id,
+                        "genetic_id1": samples[idx_i],
+                        "genetic_id2": samples[idx_j],
+                        "site_overlap": n_overlap,
+                        "mismatch_rate": pmr,
+                        "mismatch_rate_95_ci_lower": lower,
+                        "mismatch_rate_95_ci_upper": upper,
+                    }
+                    row.update(get_pair_metadata(metadata, samples[idx_i], samples[idx_j]))
+                    rows.append(row)
     rows.sort(key=lambda row: row["mismatch_rate"], reverse=True)
     return pd.DataFrame.from_records(rows)
 
 
 def find_diff_master_id_low_pmr_pairs(
+    metadata: dict[str, dict[str, str]],
     samples: list[str],
     master_ids: list[str],
     site_overlaps: np.ndarray,
@@ -195,18 +219,18 @@ def find_diff_master_id_low_pmr_pairs(
             idx_j = idx_i + 1 + int(offset)
             lower = rates_ci_lower[idx_i, idx_j]
             upper = rates_ci_upper[idx_i, idx_j]
-            rows.append(
-                {
-                    "master_id1": master_id_i,
-                    "master_id2": row_master_ids[offset],
-                    "genetic_id1": samples[idx_i],
-                    "genetic_id2": samples[idx_j],
-                    "site_overlap": row_overlaps[offset],
-                    "mismatch_rate": row_rates[offset],
-                    "mismatch_rate_95_ci_lower": lower,
-                    "mismatch_rate_95_ci_upper": upper,
-                }
-            )
+            row = {
+                "master_id1": master_id_i,
+                "master_id2": row_master_ids[offset],
+                "genetic_id1": samples[idx_i],
+                "genetic_id2": samples[idx_j],
+                "site_overlap": row_overlaps[offset],
+                "mismatch_rate": row_rates[offset],
+                "mismatch_rate_95_ci_lower": lower,
+                "mismatch_rate_95_ci_upper": upper,
+            }
+            row.update(get_pair_metadata(metadata, samples[idx_i], samples[idx_j]))
+            rows.append(row)
     rows.sort(key=lambda row: row["mismatch_rate"])
     return pd.DataFrame.from_records(rows)
 
@@ -226,6 +250,7 @@ def main() -> None:
     filtered_rates_ci_lower, filtered_rates_ci_upper = compute_mismatch_rate_cis(filtered_mismatches, filtered_totals)
 
     high_pmr_pairs = find_same_master_id_high_pmr_pairs(
+        metadata,
         filtered_samples,
         filtered_master_ids,
         filtered_site_overlaps,
@@ -243,6 +268,7 @@ def main() -> None:
     )
 
     low_pmr_pairs = find_diff_master_id_low_pmr_pairs(
+        metadata,
         filtered_samples,
         filtered_master_ids,
         filtered_site_overlaps,
