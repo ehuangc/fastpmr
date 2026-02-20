@@ -11,10 +11,14 @@ use crate::reader::plink::PlinkBedReader;
 use crate::reader::transposed_packedancestrymap::TransposedPackedAncestryMapReader;
 use crate::reader::unpacked_eigenstrat::EigenstratReader;
 use rayon::ThreadPoolBuilder;
+use rayon::prelude::*;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
+
+const PARALLEL_THRESHOLD: usize = 500;
 
 #[derive(Debug, Clone)]
 pub enum InputSpec {
@@ -582,11 +586,38 @@ fn count_covered_snps(reader: &mut dyn SiteReader) -> Result<Vec<u64>> {
     Ok(covered)
 }
 
+fn count_covered_snps_parallel(reader: &mut dyn SiteReader) -> Result<Vec<u64>> {
+    let n_samples = reader.samples().len();
+    let covered: Vec<AtomicU64> = (0..n_samples).map(|_| AtomicU64::new(0)).collect();
+    reader.par_bridge().try_for_each(|site| -> Result<()> {
+        let site = site?;
+        for (idx, allele) in site.genotypes.iter().enumerate() {
+            if *allele != Allele::Missing {
+                covered[idx].fetch_add(1, Ordering::Relaxed);
+            }
+        }
+        Ok(())
+    })?;
+    Ok(covered
+        .into_iter()
+        .map(|count| count.load(Ordering::Relaxed))
+        .collect())
+}
+
 pub fn run(input_spec: &InputSpec) -> Result<()> {
-    const PARALLEL_THRESHOLD: usize = 500;
+    let threads = input_spec.threads();
     let mut coverage_reader = input_spec.open_reader()?;
     let samples: Vec<String> = coverage_reader.samples().to_vec();
-    let covered_snps = count_covered_snps(coverage_reader.as_mut())?;
+
+    let covered_snps;
+    if (threads.is_none() && samples.len() < PARALLEL_THRESHOLD) || threads == Some(1) {
+        covered_snps = count_covered_snps(coverage_reader.as_mut())?;
+    } else if let Some(n) = threads {
+        let pool = ThreadPoolBuilder::new().num_threads(n).build()?;
+        covered_snps = pool.install(|| count_covered_snps_parallel(coverage_reader.as_mut()))?;
+    } else {
+        covered_snps = count_covered_snps_parallel(coverage_reader.as_mut())?;
+    }
 
     let pair_indices_to_count = build_pair_indices_to_count(
         &samples,
@@ -596,8 +627,6 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
     )?;
     let mut counts = Counts::new(samples, pair_indices_to_count, covered_snps);
     let mut reader = input_spec.open_reader()?;
-
-    let threads = input_spec.threads();
     if (threads.is_none() && counts.n_samples() < PARALLEL_THRESHOLD) || threads == Some(1) {
         counts = counts.consume_reader(reader.as_mut())?;
     } else if let Some(n) = threads {
