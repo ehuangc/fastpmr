@@ -11,8 +11,9 @@ pub struct Counts {
     samples: Vec<String>,
     n_samples: usize,
     // Note that there are up to 2 mismatches per site so totals = 2 * n_sites
-    mismatches: Vec<u64>, // Flat (n x n) row-major
-    totals: Vec<u64>,
+    mismatches: Vec<u64>,   // Flat (n x n) row-major
+    totals: Vec<u64>,       // Flat (n x n) row-major
+    covered_snps: Vec<u64>, // Length n
     // If Some, only calculate PMRs for pairs where indices_to_count[idx(i, j)] is true
     indices_to_count: Option<Vec<bool>>,
 }
@@ -21,6 +22,7 @@ impl Counts {
     pub fn new(
         samples: Vec<String>,
         pair_indices_to_count: Option<HashSet<(usize, usize)>>,
+        covered_snps: Vec<u64>,
     ) -> Self {
         let n_samples = samples.len();
         let indices_to_count = pair_indices_to_count.map(|pairs| {
@@ -38,6 +40,7 @@ impl Counts {
             n_samples,
             mismatches: vec![0; n_samples * n_samples],
             totals: vec![0; n_samples * n_samples],
+            covered_snps,
             indices_to_count,
         }
     }
@@ -163,6 +166,10 @@ impl Counts {
         self.n_samples
     }
 
+    pub fn covered_snps(&self) -> &[u64] {
+        &self.covered_snps
+    }
+
     pub fn site_overlaps(&self) -> Vec<u64> {
         self.totals.iter().map(|x| x / 2).collect()
     }
@@ -233,6 +240,7 @@ mod tests {
         let counts = Counts::new(
             vec!["A".to_string(), "B".to_string(), "C".to_string()],
             Some(indices_to_count),
+            vec![0; 3],
         );
         assert!(counts.should_count_pair(0, 2));
         assert!(counts.should_count_pair(2, 0));
@@ -242,7 +250,7 @@ mod tests {
 
     #[test]
     fn should_count_pair_defaults_to_all_pairs() {
-        let counts = Counts::new(vec!["A".to_string(), "B".to_string()], None);
+        let counts = Counts::new(vec!["A".to_string(), "B".to_string()], None, vec![0; 2]);
         assert!(counts.should_count_pair(0, 1));
         assert!(counts.should_count_pair(1, 0));
         assert!(!counts.should_count_pair(0, 0));

@@ -1,5 +1,6 @@
 use crate::counts::Counts;
 use crate::error::{CustomError, Result};
+use ndarray::Array1;
 use plotters::coord::combinators::IntoLogRange;
 use plotters::prelude::*;
 use plotters::style::{FontStyle, register_font};
@@ -8,6 +9,22 @@ use std::io::Write;
 use std::path::Path;
 use zip::ZipWriter;
 use zip::write::SimpleFileOptions;
+
+pub fn write_covered_snps(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
+    let samples = counts.samples();
+    let covered_snps = counts.covered_snps();
+
+    let mut wtr = csv::Writer::from_path(path)?;
+    wtr.write_record(["sample_id", "covered_snps"])?;
+    for (sample, covered) in samples.iter().zip(covered_snps.iter()) {
+        wtr.serialize((sample.as_str(), *covered))?;
+    }
+    wtr.flush().map_err(|e| CustomError::Write {
+        source: e,
+        path: path.as_ref().into(),
+    })?;
+    Ok(())
+}
 
 pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
     let n_samples = counts.n_samples();
@@ -49,6 +66,10 @@ pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> 
             }
         })?);
     // Write one array at a time and free it immediately
+    {
+        let covered_snps = Array1::from_vec(counts.covered_snps().to_vec());
+        npz.add_array("covered_snps", &covered_snps)?;
+    }
     {
         let mismatches = counts.mismatches_2d();
         npz.add_array("mismatches", &mismatches)?;

@@ -102,6 +102,14 @@ pub fn expected_pair_stats_filtered_variants() -> BTreeMap<(String, String), Pai
     build_pair_expectations(false)
 }
 
+pub fn expected_covered_snps_all_variants() -> BTreeMap<String, u64> {
+    build_covered_snps(true)
+}
+
+pub fn expected_covered_snps_filtered_variants() -> BTreeMap<String, u64> {
+    build_covered_snps(false)
+}
+
 pub fn expected_sample_ids() -> Vec<String> {
     sample_ids()
 }
@@ -371,4 +379,24 @@ fn build_pair_expectations(include_extra_variants: bool) -> BTreeMap<(String, St
     }
 
     expectations
+}
+
+fn build_covered_snps(include_extra_variants: bool) -> BTreeMap<String, u64> {
+    let samples = sample_ids();
+    let mut coverage = BTreeMap::new();
+    let base = if include_extra_variants {
+        TOTAL_VARIANTS as u64
+    } else {
+        CORE_VARIANTS as u64
+    };
+
+    for (idx, sample) in samples.into_iter().enumerate() {
+        let count = if include_extra_variants && idx == 0 {
+            base - (EXTRA_MISSING_VARIANTS as u64)
+        } else {
+            base
+        };
+        coverage.insert(sample, count);
+    }
+    coverage
 }

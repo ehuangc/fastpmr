@@ -27,9 +27,9 @@ pub struct Args {
     )]
     output_directory: String,
 
-    /// Flag to write outputs in compressed .npz format. If true, skips writing plain-text
-    /// mismatch_rates.csv and instead writes count matrices (and a samples.json) to
-    /// mismatch_counts.npz. Recommended true for large sample sizes. Defaults to false.
+    /// Flag to write outputs in compressed .npz format. If true, count matrices, covered
+    /// SNP counts, and a samples.json will be written to mismatch_counts.npz. We recommend
+    /// setting this flag to true for large sample sizes. Defaults to false.
     #[arg(short, long, default_value_t = false)]
     npz: bool,
 
@@ -38,6 +38,12 @@ pub struct Args {
     /// No header row is expected.
     #[arg(short, long, value_hint = clap::ValueHint::FilePath)]
     sample_pairs_csv: Option<String>,
+
+    /// Minimum SNPs covered per sample. Samples with fewer covered SNPs will be excluded
+    /// from pairwise mismatch rate calculations. Set to 0 to disable filtering. Defaults
+    /// to 30000.
+    #[arg(long = "min-covered-snps", default_value_t = 30000)]
+    min_covered_snps: u64,
 
     /// 1-based, inclusive range(s) of variant indices to keep.
     /// Examples: "1-5000,10000-20000", "1,2,3000-4000".
@@ -58,14 +64,7 @@ fn try_main() -> Result<()> {
     let input_spec = cli::build_input_spec(&args)?;
     input_spec.print_paths();
 
-    let mut reader = input_spec.open_reader()?;
-    cli::run(
-        reader.as_mut(),
-        input_spec.output_dir(),
-        input_spec.npz(),
-        input_spec.threads(),
-        input_spec.sample_pairs(),
-    )?;
+    cli::run(&input_spec)?;
     Ok(())
 }
 

@@ -1,7 +1,10 @@
 use crate::Args;
 use crate::counts::Counts;
 use crate::error::{CustomError, Result};
-use crate::output::{plot_mismatch_rates, write_counts_npz, write_mismatch_rates};
+use crate::model::Allele;
+use crate::output::{
+    plot_mismatch_rates, write_counts_npz, write_covered_snps, write_mismatch_rates,
+};
 use crate::reader::SiteReader;
 use crate::reader::packedancestrymap::PackedAncestryMapReader;
 use crate::reader::plink::PlinkBedReader;
@@ -23,6 +26,7 @@ pub enum InputSpec {
         npz: bool,
         sample_pairs: Option<Vec<(String, String)>>,
         samples_to_keep: Option<HashSet<String>>,
+        min_covered_snps: u64,
         // Parsed 0-based indices of variants to keep
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
@@ -35,10 +39,21 @@ pub enum InputSpec {
         npz: bool,
         sample_pairs: Option<Vec<(String, String)>>,
         samples_to_keep: Option<HashSet<String>>,
+        min_covered_snps: u64,
         // Parsed 0-based indices of variants to keep
         variant_indices: Option<HashSet<usize>>,
         threads: Option<usize>,
     },
+}
+
+struct InputSpecOptions {
+    output_dir: PathBuf,
+    npz: bool,
+    sample_pairs: Option<Vec<(String, String)>>,
+    samples_to_keep: Option<HashSet<String>>,
+    min_covered_snps: u64,
+    variant_indices: Option<HashSet<usize>>,
+    threads: Option<usize>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -48,59 +63,16 @@ enum FormatHint {
 }
 
 impl InputSpec {
-    fn from_packedancestrymap(
-        prefix: &Path,
-        output_dir: &str,
-        npz: bool,
-        sample_pairs: Option<Vec<(String, String)>>,
-        samples_to_keep: Option<HashSet<String>>,
-        variant_indices: Option<HashSet<usize>>,
-        threads: Option<usize>,
-    ) -> Self {
-        Self::PackedAncestryMap {
-            ind: path_with_extension(prefix, "ind"),
-            geno: path_with_extension(prefix, "geno"),
-            snp: path_with_extension(prefix, "snp"),
-            output_dir: PathBuf::from(output_dir.to_string()),
+    fn from_prefix(prefix: &str, options: InputSpecOptions) -> Result<Self> {
+        let InputSpecOptions {
+            output_dir,
             npz,
             sample_pairs,
             samples_to_keep,
+            min_covered_snps,
             variant_indices,
             threads,
-        }
-    }
-
-    fn from_plink(
-        prefix: &Path,
-        output_dir: &str,
-        npz: bool,
-        sample_pairs: Option<Vec<(String, String)>>,
-        samples_to_keep: Option<HashSet<String>>,
-        variant_indices: Option<HashSet<usize>>,
-        threads: Option<usize>,
-    ) -> Self {
-        Self::Plink {
-            bed: path_with_extension(prefix, "bed"),
-            bim: path_with_extension(prefix, "bim"),
-            fam: path_with_extension(prefix, "fam"),
-            output_dir: PathBuf::from(output_dir.to_string()),
-            npz,
-            sample_pairs,
-            samples_to_keep,
-            variant_indices,
-            threads,
-        }
-    }
-
-    pub fn from_prefix(
-        prefix: &str,
-        output_dir: &str,
-        npz: bool,
-        sample_pairs: Option<Vec<(String, String)>>,
-        samples_to_keep: Option<HashSet<String>>,
-        variant_indices: Option<HashSet<usize>>,
-        threads: Option<usize>,
-    ) -> Result<Self> {
+        } = options;
         let (base_prefix, hint) = normalize_prefix(prefix);
         let packed_ind = path_with_extension(&base_prefix, "ind");
         let packed_geno = path_with_extension(&base_prefix, "geno");
@@ -128,24 +100,30 @@ impl InputSpec {
         };
 
         match selected_format {
-            Some(FormatHint::PackedAncestryMap) => Ok(Self::from_packedancestrymap(
-                &base_prefix,
+            Some(FormatHint::PackedAncestryMap) => Ok(Self::PackedAncestryMap {
+                ind: packed_ind,
+                geno: packed_geno,
+                snp: packed_snp,
                 output_dir,
                 npz,
                 sample_pairs,
                 samples_to_keep,
+                min_covered_snps,
                 variant_indices,
                 threads,
-            )),
-            Some(FormatHint::Plink) => Ok(Self::from_plink(
-                &base_prefix,
+            }),
+            Some(FormatHint::Plink) => Ok(Self::Plink {
+                bed: plink_bed,
+                bim: plink_bim,
+                fam: plink_fam,
                 output_dir,
                 npz,
                 sample_pairs,
                 samples_to_keep,
+                min_covered_snps,
                 variant_indices,
                 threads,
-            )),
+            }),
             None => Err(CustomError::InputFilesMissing {
                 prefix: base_prefix.display().to_string(),
             }),
@@ -264,6 +242,17 @@ impl InputSpec {
         }
     }
 
+    pub fn min_covered_snps(&self) -> u64 {
+        match self {
+            InputSpec::PackedAncestryMap {
+                min_covered_snps, ..
+            }
+            | InputSpec::Plink {
+                min_covered_snps, ..
+            } => *min_covered_snps,
+        }
+    }
+
     pub fn threads(&self) -> Option<usize> {
         match self {
             InputSpec::PackedAncestryMap { threads, .. } | InputSpec::Plink { threads, .. } => {
@@ -356,12 +345,15 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
         .map(|pairs| samples_to_keep_from_pairs(pairs));
     InputSpec::from_prefix(
         &args.prefix,
-        &args.output_directory,
-        args.npz,
-        sample_pairs,
-        samples_to_keep,
-        variant_indices,
-        args.threads,
+        InputSpecOptions {
+            output_dir: PathBuf::from(&args.output_directory),
+            npz: args.npz,
+            sample_pairs,
+            samples_to_keep,
+            min_covered_snps: args.min_covered_snps,
+            variant_indices,
+            threads: args.threads,
+        },
     )
 }
 
@@ -522,40 +514,115 @@ fn resolve_sample_pairs(
     Ok(to_keep)
 }
 
-pub fn run(
-    reader: &mut dyn SiteReader,
-    output_dir: impl AsRef<Path>,
-    npz: bool,
-    threads: Option<usize>,
+/// Build a set of sample index pairs for which to compute mismatch counts
+/// This set is constructed from user-specified sample pairs and the minimum covered SNPs threshold
+fn build_pair_indices_to_count(
+    samples: &[String],
     sample_pairs: Option<&[(String, String)]>,
-) -> Result<()> {
-    const PARALLEL_THRESHOLD: usize = 500;
-    // This gets the filtered sample set if a sample/sample pair CSV was provided
-    let samples: Vec<String> = reader.samples().to_vec();
-    // Resolve sample pairs to indices
-    let pairs_to_keep = sample_pairs
-        .map(|pairs| resolve_sample_pairs(&samples, pairs))
-        .transpose()?;
+    covered_snps: &[u64],
+    min_covered_snps: u64,
+) -> Result<Option<HashSet<(usize, usize)>>> {
+    let apply_threshold = min_covered_snps > 0;
+    let allowed: HashSet<usize> = if apply_threshold {
+        covered_snps
+            .iter()
+            .enumerate()
+            .filter_map(|(idx, &count)| {
+                if count > min_covered_snps {
+                    Some(idx)
+                } else {
+                    None
+                }
+            })
+            .collect()
+    } else {
+        HashSet::new()
+    };
 
-    let mut counts = Counts::new(samples, pairs_to_keep);
+    match sample_pairs {
+        Some(pairs) => {
+            let mut resolved = resolve_sample_pairs(samples, pairs)?;
+            if apply_threshold {
+                resolved.retain(|(sample1, sample2)| {
+                    allowed.contains(sample1) && allowed.contains(sample2)
+                });
+            }
+            Ok(Some(resolved))
+        }
+        None => {
+            if !apply_threshold {
+                return Ok(None);
+            }
+            if allowed.len() == samples.len() {
+                return Ok(None);
+            }
+            let mut keep = HashSet::new();
+            let allowed_indices: Vec<usize> = allowed.into_iter().collect();
+            for i in 0..allowed_indices.len() {
+                for j in (i + 1)..allowed_indices.len() {
+                    keep.insert((allowed_indices[i], allowed_indices[j]));
+                }
+            }
+            Ok(Some(keep))
+        }
+    }
+}
+
+fn count_covered_snps(reader: &mut dyn SiteReader) -> Result<Vec<u64>> {
+    let n_samples = reader.samples().len();
+    let mut covered = vec![0u64; n_samples];
+    for site in reader {
+        let site = site?;
+        for (idx, allele) in site.genotypes.iter().enumerate() {
+            if *allele != Allele::Missing {
+                covered[idx] += 1;
+            }
+        }
+    }
+    Ok(covered)
+}
+
+pub fn run(input_spec: &InputSpec) -> Result<()> {
+    const PARALLEL_THRESHOLD: usize = 500;
+    let mut coverage_reader = input_spec.open_reader()?;
+    let samples: Vec<String> = coverage_reader.samples().to_vec();
+    let covered_snps = count_covered_snps(coverage_reader.as_mut())?;
+
+    let pair_indices_to_count = build_pair_indices_to_count(
+        &samples,
+        input_spec.sample_pairs(),
+        &covered_snps,
+        input_spec.min_covered_snps(),
+    )?;
+    let mut counts = Counts::new(samples, pair_indices_to_count, covered_snps);
+    let mut reader = input_spec.open_reader()?;
+
+    let threads = input_spec.threads();
     if (threads.is_none() && counts.n_samples() < PARALLEL_THRESHOLD) || threads == Some(1) {
-        counts = counts.consume_reader(reader)?;
+        counts = counts.consume_reader(reader.as_mut())?;
     } else if let Some(n) = threads {
         let pool = ThreadPoolBuilder::new().num_threads(n).build()?;
-        counts = pool.install(|| counts.consume_reader_parallel(reader))?;
+        counts = pool.install(|| counts.consume_reader_parallel(reader.as_mut()))?;
     } else {
-        counts = counts.consume_reader_parallel(reader)?;
+        counts = counts.consume_reader_parallel(reader.as_mut())?;
     }
 
-    if npz {
-        let npz_path = output_dir.as_ref().join("mismatch_counts.npz");
+    if input_spec.npz() {
+        let npz_path = input_spec.output_dir().join("mismatch_counts.npz");
         println!(
             "Writing pairwise mismatch counts to {}...",
             npz_path.display()
         );
         write_counts_npz(&counts, &npz_path)?;
     } else {
-        let rates_path = output_dir.as_ref().join("mismatch_rates.csv");
+        let coverage_path = input_spec.output_dir().join("covered_snps.csv");
+        println!(
+            "Writing covered SNP counts to {}...",
+            coverage_path.display()
+        );
+        write_covered_snps(&counts, &coverage_path)?;
+
+        let rates_path = input_spec.output_dir().join("mismatch_rates.csv");
         println!(
             "Writing pairwise mismatch rates to {}...",
             rates_path.display()
@@ -563,7 +630,7 @@ pub fn run(
         write_mismatch_rates(&counts, &rates_path)?;
     }
 
-    let plot_path = output_dir.as_ref().join("mismatch_rates.png");
+    let plot_path = input_spec.output_dir().join("mismatch_rates.png");
     println!(
         "Writing pairwise mismatch rate plot to {}...",
         plot_path.display()
@@ -606,12 +673,15 @@ mod tests {
 
         let spec = InputSpec::from_prefix(
             prefix.to_str().unwrap(),
-            output_dir.to_str().unwrap(),
-            false,
-            None,
-            None,
-            None,
-            None,
+            InputSpecOptions {
+                output_dir,
+                npz: false,
+                sample_pairs: None,
+                samples_to_keep: None,
+                min_covered_snps: 30000,
+                variant_indices: None,
+                threads: None,
+            },
         )
         .expect("should detect packed ancestry map inputs");
 

@@ -1,6 +1,6 @@
 mod common;
 
-use ndarray::Array2;
+use ndarray::{Array1, Array2};
 use ndarray_npy::NpzReader;
 use std::collections::BTreeMap;
 use std::fs::{self, File};
@@ -17,7 +17,8 @@ fn packedancestrymap_cli_generates_outputs() {
     }
 
     let expected_pairs = common::expected_pair_stats_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None);
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(&dataset, None, false, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -25,7 +26,7 @@ fn packedancestrymap_cli_generates_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -41,7 +42,8 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
     }
 
     let expected_pairs = common::expected_pair_stats_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None);
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(&dataset, None, false, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -49,7 +51,7 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -65,7 +67,8 @@ fn eigenstrat_cli_generates_outputs() {
     }
 
     let expected_pairs = common::expected_pair_stats_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None);
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(&dataset, None, false, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -73,7 +76,7 @@ fn eigenstrat_cli_generates_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -89,7 +92,8 @@ fn plink_cli_generates_outputs() {
     }
 
     let expected_pairs = common::expected_pair_stats_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None);
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(&dataset, None, false, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -97,7 +101,7 @@ fn plink_cli_generates_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -113,7 +117,8 @@ fn packedancestrymap_cli_generates_npz_outputs() {
     }
 
     let expected_pairs = common::expected_pair_stats_all_variants();
-    let output = run_fastpmr(&dataset, None, true, None);
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(&dataset, None, true, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -121,7 +126,7 @@ fn packedancestrymap_cli_generates_npz_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_npz_outputs(&dataset.output_dir, &expected_pairs);
+    assert_npz_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
 }
 
 #[test]
@@ -132,7 +137,8 @@ fn variant_indices_limit_sites() {
     }
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), false, None);
+    let expected_coverage = common::expected_covered_snps_filtered_variants();
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0));
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -140,7 +146,7 @@ fn variant_indices_limit_sites() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -157,7 +163,8 @@ fn eigenstrat_variant_indices_limit_sites() {
     }
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), false, None);
+    let expected_coverage = common::expected_covered_snps_filtered_variants();
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0));
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -165,7 +172,7 @@ fn eigenstrat_variant_indices_limit_sites() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -181,7 +188,8 @@ fn plink_variant_indices_limit_sites() {
     }
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), false, None);
+    let expected_coverage = common::expected_covered_snps_filtered_variants();
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0));
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -189,7 +197,7 @@ fn plink_variant_indices_limit_sites() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    let records = assert_outputs(&dataset.output_dir, &expected_pairs);
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
     assert_eq!(
         records.len(),
         expected_pairs.len(),
@@ -210,7 +218,7 @@ fn sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -218,6 +226,7 @@ fn sample_pairs_csv_runs_successfully() {
         String::from_utf8_lossy(&output.stderr)
     );
 
+    let expected_coverage = common::expected_covered_snps_all_variants();
     let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
         .into_iter()
         .filter(|((id1, id2), _)| {
@@ -228,7 +237,7 @@ fn sample_pairs_csv_runs_successfully() {
         })
         .collect();
 
-    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    let records = assert_outputs(&dataset.output_dir, &expected_subset, &expected_coverage);
     assert_eq!(records.len(), 3, "expected exactly three requested pairs");
     let pairs: std::collections::HashSet<(String, String)> = records
         .iter()
@@ -259,7 +268,7 @@ fn eigenstrat_sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -267,6 +276,7 @@ fn eigenstrat_sample_pairs_csv_runs_successfully() {
         String::from_utf8_lossy(&output.stderr)
     );
 
+    let expected_coverage = common::expected_covered_snps_all_variants();
     let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
         .into_iter()
         .filter(|((id1, id2), _)| {
@@ -277,7 +287,7 @@ fn eigenstrat_sample_pairs_csv_runs_successfully() {
         })
         .collect();
 
-    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    let records = assert_outputs(&dataset.output_dir, &expected_subset, &expected_coverage);
     assert_eq!(records.len(), 3, "expected exactly three requested pairs");
     let pairs: std::collections::HashSet<(String, String)> = records
         .iter()
@@ -307,7 +317,7 @@ fn plink_sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -315,6 +325,7 @@ fn plink_sample_pairs_csv_runs_successfully() {
         String::from_utf8_lossy(&output.stderr)
     );
 
+    let expected_coverage = common::expected_covered_snps_all_variants();
     let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
         .into_iter()
         .filter(|((id1, id2), _)| {
@@ -325,7 +336,7 @@ fn plink_sample_pairs_csv_runs_successfully() {
         })
         .collect();
 
-    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    let records = assert_outputs(&dataset.output_dir, &expected_subset, &expected_coverage);
     assert_eq!(records.len(), 3, "expected exactly three requested pairs");
     let pairs: std::collections::HashSet<(String, String)> = records
         .iter()
@@ -350,7 +361,7 @@ fn sample_list_csv_runs_successfully() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(&csv_path, "Sample1\nSample3\nSample4\n").unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -358,6 +369,8 @@ fn sample_list_csv_runs_successfully() {
         String::from_utf8_lossy(&output.stderr)
     );
 
+    let mut expected_coverage = common::expected_covered_snps_all_variants();
+    expected_coverage.retain(|id, _| matches!(id.as_str(), "Sample1" | "Sample3" | "Sample4"));
     let expected_subset: BTreeMap<_, _> = common::expected_pair_stats_all_variants()
         .into_iter()
         .filter(|((id1, id2), _)| {
@@ -367,7 +380,7 @@ fn sample_list_csv_runs_successfully() {
         .collect();
     assert_eq!(expected_subset.len(), 3, "expected exactly three pairs");
 
-    let records = assert_outputs(&dataset.output_dir, &expected_subset);
+    let records = assert_outputs(&dataset.output_dir, &expected_subset, &expected_coverage);
     let pairs: std::collections::HashSet<(String, String)> = records
         .iter()
         .map(|record| (record.id1.clone(), record.id2.clone()))
@@ -391,7 +404,7 @@ fn sample_pairs_csv_with_unknown_sample_fails() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(&csv_path, "Sample1,Unknown\n").unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path));
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
     assert!(
         !output.status.success(),
         "fastpmr unexpectedly succeeded: stdout={} stderr={}",
@@ -410,6 +423,7 @@ fn run_fastpmr(
     variant_spec: Option<&str>,
     npz: bool,
     sample_pairs_csv: Option<&Path>,
+    min_covered_snps: Option<u64>,
 ) -> std::process::Output {
     let mut command = Command::new(env!("CARGO_BIN_EXE_fastpmr"));
     command
@@ -426,6 +440,9 @@ fn run_fastpmr(
     if let Some(path) = sample_pairs_csv {
         command.arg("--sample-pairs-csv").arg(path);
     }
+    if let Some(min) = min_covered_snps {
+        command.arg("--min-covered-snps").arg(min.to_string());
+    }
     command.output().expect("failed to run fastpmr")
 }
 
@@ -440,6 +457,7 @@ struct OutputRecord {
 fn assert_outputs(
     output_dir: &Path,
     expected_pairs: &BTreeMap<(String, String), common::PairStats>,
+    expected_coverage: &BTreeMap<String, u64>,
 ) -> Vec<OutputRecord> {
     let csv_path = output_dir.join("mismatch_rates.csv");
     let records = read_records(&csv_path);
@@ -484,6 +502,8 @@ fn assert_outputs(
         expected_pairs.len()
     );
 
+    assert_covered_snps(output_dir, expected_coverage);
+
     let plot_path = output_dir.join("mismatch_rates.png");
     let metadata = fs::metadata(plot_path).expect("missing plot output");
     assert!(metadata.len() > 0, "plot output is empty");
@@ -493,11 +513,18 @@ fn assert_outputs(
 fn assert_npz_outputs(
     output_dir: &Path,
     expected_pairs: &BTreeMap<(String, String), common::PairStats>,
+    expected_coverage: &BTreeMap<String, u64>,
 ) {
     let csv_path = output_dir.join("mismatch_rates.csv");
     assert!(
         !csv_path.exists(),
         "unexpected mismatch_rates.csv output alongside npz"
+    );
+
+    let coverage_path = output_dir.join("covered_snps.csv");
+    assert!(
+        !coverage_path.exists(),
+        "unexpected covered_snps.csv output alongside npz"
     );
 
     let npz_path = output_dir.join("mismatch_counts.npz");
@@ -515,10 +542,14 @@ fn assert_npz_outputs(
     let overlaps: Array2<u64> = npz
         .by_name("site_overlaps")
         .expect("missing site_overlaps array");
+    let covered_snps: Array1<u64> = npz
+        .by_name("covered_snps")
+        .expect("missing covered_snps array");
     let expected_shape = &[common::N_SAMPLES, common::N_SAMPLES];
     assert_eq!(mismatches.shape(), expected_shape);
     assert_eq!(totals.shape(), expected_shape);
     assert_eq!(overlaps.shape(), expected_shape);
+    assert_eq!(covered_snps.len(), common::N_SAMPLES);
 
     for idx in 0..common::N_SAMPLES {
         assert_eq!(mismatches[[idx, idx]], 0);
@@ -527,6 +558,15 @@ fn assert_npz_outputs(
     }
 
     let samples = common::expected_sample_ids();
+    for (idx, sample) in samples.iter().enumerate() {
+        let expected = expected_coverage
+            .get(sample)
+            .unwrap_or_else(|| panic!("missing coverage expectation for {sample}"));
+        assert_eq!(
+            covered_snps[idx], *expected,
+            "unexpected covered SNPs for {sample}"
+        );
+    }
     let mut validated_pairs = 0usize;
     for i in 0..common::N_SAMPLES {
         for j in (i + 1)..common::N_SAMPLES {
@@ -610,6 +650,17 @@ fn assert_npz_outputs(
     assert!(metadata.len() > 0, "plot output is empty");
 }
 
+fn assert_covered_snps(output_dir: &Path, expected: &BTreeMap<String, u64>) {
+    let coverage_path = output_dir.join("covered_snps.csv");
+    let coverage = read_covered_snps(&coverage_path);
+    assert_eq!(
+        coverage,
+        *expected,
+        "unexpected sample covered SNPs in {}",
+        coverage_path.display()
+    );
+}
+
 fn read_records(path: &Path) -> Vec<OutputRecord> {
     let content = fs::read_to_string(path).expect("could not read mismatch rates");
     let mut lines = content.lines();
@@ -647,4 +698,32 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
         });
     }
     records
+}
+
+fn read_covered_snps(path: &Path) -> BTreeMap<String, u64> {
+    let content = fs::read_to_string(path).expect("could not read sample covered SNPs");
+    let mut lines = content.lines();
+    let header = lines.next().expect("missing header").trim_end_matches('\r');
+    assert_eq!(header, "sample_id,covered_snps");
+
+    let mut coverage = BTreeMap::new();
+    for line in lines {
+        let trimmed = line.trim_end_matches('\r');
+        if trimmed.is_empty() {
+            continue;
+        }
+        let mut fields = trimmed.split(',');
+        let id = fields.next().expect("missing sample_id field").to_string();
+        let covered: u64 = fields
+            .next()
+            .expect("missing covered_snps field")
+            .parse()
+            .expect("invalid covered_snps value");
+        assert!(
+            fields.next().is_none(),
+            "unexpected extra columns in record: {trimmed}"
+        );
+        coverage.insert(id, covered);
+    }
+    coverage
 }
