@@ -34,7 +34,7 @@ pub struct Args {
     npz: bool,
 
     /// CSV file containing either explicit sample pairs (two columns) or a single
-    /// column of samples for which all pairwise PMRs will be calculated.
+    /// column of samples for which all pairwise mismatch rates will be calculated.
     /// No header row is expected.
     #[arg(short, long, value_hint = clap::ValueHint::FilePath)]
     sample_pairs_csv: Option<String>,
