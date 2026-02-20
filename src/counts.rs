@@ -231,6 +231,7 @@ impl Counts {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::model::Site;
     use std::collections::HashSet;
 
     #[test]
@@ -254,5 +255,81 @@ mod tests {
         assert!(counts.should_count_pair(0, 1));
         assert!(counts.should_count_pair(1, 0));
         assert!(!counts.should_count_pair(0, 0));
+    }
+
+    #[derive(Clone)]
+    struct TestReader {
+        samples: Vec<String>,
+        sites: Vec<Vec<Allele>>,
+        index: usize,
+    }
+
+    impl TestReader {
+        fn new(samples: Vec<String>, sites: Vec<Vec<Allele>>) -> Self {
+            Self {
+                samples,
+                sites,
+                index: 0,
+            }
+        }
+    }
+
+    impl Iterator for TestReader {
+        type Item = Result<Site>;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            if self.index >= self.sites.len() {
+                return None;
+            }
+            let genotypes = self.sites[self.index].clone();
+            self.index += 1;
+            Some(Ok(Site { genotypes }))
+        }
+    }
+
+    impl SiteReader for TestReader {
+        fn samples(&self) -> &[String] {
+            &self.samples
+        }
+
+        fn n_sites(&self) -> usize {
+            self.sites.len()
+        }
+    }
+
+    fn build_test_reader() -> TestReader {
+        let samples = vec!["A".to_string(), "B".to_string(), "C".to_string()];
+        let sites = vec![
+            vec![Allele::Ref, Allele::Het, Allele::Alt],
+            vec![Allele::Missing, Allele::Het, Allele::Alt],
+            vec![Allele::Ref, Allele::Ref, Allele::Missing],
+        ];
+        TestReader::new(samples, sites)
+    }
+
+    #[test]
+    fn consume_reader_parallel_matches_serial() {
+        let samples = vec!["A".to_string(), "B".to_string(), "C".to_string()];
+        let mut serial_reader = build_test_reader();
+        let serial = Counts::new(samples.clone(), None, vec![0; samples.len()])
+            .consume_reader(&mut serial_reader)
+            .expect("serial counts failed");
+
+        let mut parallel_reader = build_test_reader();
+        let parallel = Counts::new(samples.clone(), None, vec![0; samples.len()])
+            .consume_reader_parallel(&mut parallel_reader)
+            .expect("parallel counts failed");
+
+        assert_eq!(serial.mismatches_2d(), parallel.mismatches_2d());
+        assert_eq!(serial.totals_2d(), parallel.totals_2d());
+
+        let mismatches = serial.mismatches_2d();
+        let totals = serial.totals_2d();
+        assert_eq!(totals[(0, 1)], 4);
+        assert_eq!(mismatches[(0, 1)], 1);
+        assert_eq!(totals[(0, 2)], 2);
+        assert_eq!(mismatches[(0, 2)], 2);
+        assert_eq!(totals[(1, 2)], 4);
+        assert_eq!(mismatches[(1, 2)], 2);
     }
 }

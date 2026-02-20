@@ -18,7 +18,7 @@ fn packedancestrymap_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None, None);
+    let output = run_fastpmr(&dataset, None, false, None, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -43,7 +43,7 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None, None);
+    let output = run_fastpmr(&dataset, None, false, None, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -68,7 +68,7 @@ fn eigenstrat_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None, None);
+    let output = run_fastpmr(&dataset, None, false, None, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -93,7 +93,32 @@ fn plink_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, false, None, None);
+    let output = run_fastpmr(&dataset, None, false, None, None, None);
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records"
+    );
+}
+
+#[test]
+fn packedancestrymap_cli_generates_outputs_with_threads() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-threads").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_all_variants();
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(&dataset, None, false, None, None, Some(2));
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -118,7 +143,7 @@ fn packedancestrymap_cli_generates_npz_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, true, None, None);
+    let output = run_fastpmr(&dataset, None, true, None, None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -138,7 +163,7 @@ fn variant_indices_limit_sites() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0));
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -164,7 +189,7 @@ fn eigenstrat_variant_indices_limit_sites() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0));
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -189,7 +214,7 @@ fn plink_variant_indices_limit_sites() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0));
+    let output = run_fastpmr(&dataset, Some("1-30000"), false, None, Some(0), None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -218,7 +243,7 @@ fn sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -268,7 +293,7 @@ fn eigenstrat_sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -317,7 +342,7 @@ fn plink_sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -361,7 +386,7 @@ fn sample_list_csv_runs_successfully() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(&csv_path, "Sample1\nSample3\nSample4\n").unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None, None);
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -404,7 +429,7 @@ fn sample_pairs_csv_with_unknown_sample_fails() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(&csv_path, "Sample1,Unknown\n").unwrap();
 
-    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None);
+    let output = run_fastpmr(&dataset, None, false, Some(&csv_path), None, None);
     assert!(
         !output.status.success(),
         "fastpmr unexpectedly succeeded: stdout={} stderr={}",
@@ -424,6 +449,7 @@ fn run_fastpmr(
     npz: bool,
     sample_pairs_csv: Option<&Path>,
     min_covered_snps: Option<u64>,
+    threads: Option<usize>,
 ) -> std::process::Output {
     let mut command = Command::new(env!("CARGO_BIN_EXE_fastpmr"));
     command
@@ -442,6 +468,9 @@ fn run_fastpmr(
     }
     if let Some(min) = min_covered_snps {
         command.arg("--min-covered-snps").arg(min.to_string());
+    }
+    if let Some(n) = threads {
+        command.arg("--threads").arg(n.to_string());
     }
     command.output().expect("failed to run fastpmr")
 }
