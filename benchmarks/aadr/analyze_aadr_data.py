@@ -145,6 +145,7 @@ def find_same_master_id_high_pmr_pairs(
     samples: list[str],
     master_ids: list[str],
     site_overlaps: np.ndarray,
+    mismatches: np.ndarray,
     rates: np.ndarray,
     rates_ci_lower: np.ndarray,
     rates_ci_upper: np.ndarray,
@@ -177,6 +178,8 @@ def find_same_master_id_high_pmr_pairs(
                         "genetic_id1": samples[idx_i],
                         "genetic_id2": samples[idx_j],
                         "site_overlap": n_overlap,
+                        # Up to 2 mismatches per site, so divide by 2 for "per-site" mismatches
+                        "site_mismatches": mismatches[idx_i, idx_j].astype(np.float64) / 2.0,
                         "mismatch_rate": pmr,
                         "mismatch_rate_95_ci_lower": lower,
                         "mismatch_rate_95_ci_upper": upper,
@@ -192,6 +195,7 @@ def find_diff_master_id_low_pmr_pairs(
     samples: list[str],
     master_ids: list[str],
     site_overlaps: np.ndarray,
+    mismatches: np.ndarray,
     rates: np.ndarray,
     rates_ci_lower: np.ndarray,
     rates_ci_upper: np.ndarray,
@@ -206,6 +210,7 @@ def find_diff_master_id_low_pmr_pairs(
             continue
         row_rates = rates[idx_i, idx_i + 1 :]
         row_overlaps = site_overlaps[idx_i, idx_i + 1 :]
+        row_mismatches = mismatches[idx_i, idx_i + 1 :]
         row_master_ids = master_ids_array[idx_i + 1 :]
         mask = (
             (row_master_ids != "")
@@ -225,6 +230,8 @@ def find_diff_master_id_low_pmr_pairs(
                 "genetic_id1": samples[idx_i],
                 "genetic_id2": samples[idx_j],
                 "site_overlap": row_overlaps[offset],
+                # Up to 2 mismatches per site, so divide by 2 for "per-site" mismatches
+                "site_mismatches": row_mismatches[offset].astype(np.float64) / 2.0,
                 "mismatch_rate": row_rates[offset],
                 "mismatch_rate_95_ci_lower": lower,
                 "mismatch_rate_95_ci_upper": upper,
@@ -254,6 +261,7 @@ def main() -> None:
         filtered_samples,
         filtered_master_ids,
         filtered_site_overlaps,
+        filtered_mismatches,
         filtered_rates,
         filtered_rates_ci_lower,
         filtered_rates_ci_upper,
@@ -272,6 +280,7 @@ def main() -> None:
         filtered_samples,
         filtered_master_ids,
         filtered_site_overlaps,
+        filtered_mismatches,
         filtered_rates,
         filtered_rates_ci_lower,
         filtered_rates_ci_upper,
