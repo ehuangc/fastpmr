@@ -125,8 +125,8 @@ def get_pair_metadata(metadata: dict[str, dict[str, str]], sample1: str, sample2
         "(Format 2) Archaeological context range, e.g. 2500-1700 BCE"
     )
     return {
-        "publication_abbreviation1": metadata[sample1]["Publication abbreviation"],
-        "publication_abbreviation2": metadata[sample2]["Publication abbreviation"],
+        "publication1": metadata[sample1]["Publication abbreviation"],
+        "publication2": metadata[sample2]["Publication abbreviation"],
         "skeletal_code1": metadata[sample1]["Skeletal code"],
         "skeletal_code2": metadata[sample2]["Skeletal code"],
         "date1": metadata[sample1][date_field],
