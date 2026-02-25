@@ -3,6 +3,7 @@ import json
 import zipfile
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.stats import beta
@@ -13,6 +14,8 @@ METADATA_PATH = SCRIPT_DIR / "data" / "v62.0_1240k_public.anno"
 OUTPUT_DIR = SCRIPT_DIR / "results" / "analysis"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
+SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.png"
+DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.png"
 IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
 OVERLAP_THRESHOLD = 30000
@@ -242,6 +245,56 @@ def find_diff_master_id_low_pmr_pairs(
     return pd.DataFrame.from_records(rows)
 
 
+def collect_pairwise_mismatch_rates(
+    master_ids: list[str],
+    rates: np.ndarray,
+    totals: np.ndarray,
+    overlap_threshold: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    master_ids_array = np.asarray(master_ids, dtype=object)
+    pair_i, pair_j = np.triu_indices(len(master_ids_array), k=1)
+    pair_rates = rates[pair_i, pair_j]
+    pair_site_overlaps = totals[pair_i, pair_j] / 2
+    master_i = master_ids_array[pair_i]
+    master_j = master_ids_array[pair_j]
+
+    valid = (pair_site_overlaps >= overlap_threshold) & ~np.isnan(pair_rates) & (master_i != "") & (master_j != "")
+    same_mask = valid & (master_i == master_j)
+    diff_mask = valid & (master_i != master_j)
+    return pair_rates[same_mask], pair_rates[diff_mask]
+
+
+def plot_pairwise_mismatch_rate_histograms(
+    same_rates: np.ndarray,
+    diff_rates: np.ndarray,
+    same_output_path: Path,
+    diff_output_path: Path,
+) -> None:
+    Y_AXIS_LIMIT = 100
+
+    def plot_histogram(rates: np.ndarray, title: str, color: str, output_path: Path) -> None:
+        bins = np.histogram_bin_edges(rates, bins=50)
+        fig, ax = plt.subplots(figsize=(7, 4.5))
+        ax.hist(rates, bins=bins, color=color, alpha=0.85, edgecolor="black", linewidth=0.5)
+        ax.set_title(title)
+        ax.set_xlabel("Pairwise mismatch rate")
+        ax.set_ylabel("Count")
+        ax.set_ylim(0, Y_AXIS_LIMIT)
+        fig.tight_layout()
+        fig.savefig(output_path, dpi=600)
+        plt.close(fig)
+
+    plot_histogram(
+        same_rates, f"AADR Sample Pairs, Matching Master IDs\n(n={len(same_rates)})", "#4C78A8", same_output_path
+    )
+    plot_histogram(
+        diff_rates,
+        f"AADR Sample Pairs, Non-Matching Master IDs\n(n={len(diff_rates)}, y-axis limit={Y_AXIS_LIMIT})",
+        "#F58518",
+        diff_output_path,
+    )
+
+
 def main() -> None:
     ensure_data_present(COUNTS_PATH, METADATA_PATH)
     mismatches, totals, site_overlaps, samples = load_mismatch_counts(COUNTS_PATH)
@@ -256,6 +309,15 @@ def main() -> None:
     filtered_rates = compute_mismatch_rates(filtered_mismatches, filtered_totals)
     filtered_rates_ci_lower, filtered_rates_ci_upper = compute_mismatch_rate_cis(filtered_mismatches, filtered_totals)
 
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    same_rates, diff_rates = collect_pairwise_mismatch_rates(
+        filtered_master_ids, filtered_rates, filtered_totals, OVERLAP_THRESHOLD
+    )
+    plot_pairwise_mismatch_rate_histograms(
+        same_rates, diff_rates, SAME_MASTER_HISTOGRAM_PATH, DIFF_MASTER_HISTOGRAM_PATH
+    )
+    print(f"Wrote pairwise mismatch rate histograms to {SAME_MASTER_HISTOGRAM_PATH} and {DIFF_MASTER_HISTOGRAM_PATH}.")
+
     high_pmr_pairs = find_same_master_id_high_pmr_pairs(
         metadata,
         filtered_samples,
@@ -268,7 +330,6 @@ def main() -> None:
         NON_IDENTICAL_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
     )
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     high_pmr_pairs.to_csv(SAME_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(high_pmr_pairs)} same-master-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
