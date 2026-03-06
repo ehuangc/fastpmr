@@ -42,7 +42,7 @@ pub struct Args {
     /// Minimum SNPs covered per sample. Samples with fewer covered SNPs will be excluded
     /// from pairwise mismatch rate calculations. Set to 0 to disable filtering. Defaults
     /// to 30000.
-    #[arg(long = "min-covered-snps", default_value_t = 30000)]
+    #[arg(short, long, default_value_t = 30000)]
     min_covered_snps: u64,
 
     /// 1-based, inclusive range(s) of variant indices to keep.
