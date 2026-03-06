@@ -24,25 +24,11 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_I
 
 **NPZ Output** (`-n`, `--npz`) (*flag*): Write compressed count matrices to `mismatch_counts.npz` instead of CSV count outputs. Recommended for large sample sets.
 
-**Sample Pairs CSV** (`-s`, `--sample-pairs-csv`) (*optional*): CSV with no header that controls which sample pairs are computed.
+**Sample Pairs CSV** (`-s`, `--sample-pairs-csv`) (*optional*): CSV with no header that controls which sample pairs are computed. This parameter accepts 1-column CSVs and 2-column CSVs. 1-column CSVs specify a sample list, and PMRs for all pairs of these samples are computed. 2-column CSVs specify the exact sample pairs for which PMRs are computed.
 
-<dl>
-  <dd>
-<details open>
-  <summary><ins>Accepted CSV shapes</ins></summary>
+**Minimum Covered SNPs** (`--min-covered-snps`) (*optional*): Exclude samples with too-few covered SNPs from PMR calculations. Defaults to `30000`. Set to `0` to disable.
 
-  - **2 columns**: explicit sample pairs (`id1,id2`) per row.
-  - **1 column**: sample list; `fastpmr` expands this into all pairwise combinations.
-
-</details>
-  </dd>
-</dl>
-
-**Minimum Covered SNPs** (`--min-covered-snps`) (*optional*): Exclude samples with too-few covered SNPs from PMR calculations. Defaults to `30000`; set to `0` to disable.
-
-**Variant Indices** (`-v`, `--variant-indices`) (*optional*): 1-based inclusive variant index ranges to keep, for example:
-- `1-5000,10000-20000`
-- `1,2,3000-4000`
+**Variant Indices** (`-v`, `--variant-indices`) (*optional*): 1-based inclusive variant index ranges to keep, e.g., `1,2,3000-5000,10000-20000`.
 
 **Threads** (`-t`, `--threads`) (*optional*): Number of threads to use. Default behavior is:
 - `<500` samples: single-threaded
