@@ -2,10 +2,11 @@
 name = "fastpmr-benchmarks"
 version = "0.1.0"
 description = "Pixi environment for running fastpmr benchmarks."
-channels = ["conda-forge"]
+channels = ["conda-forge", "bioconda"]
 platforms = ["linux-64", "osx-64", "osx-arm64"]
 
 [dependencies]
+admixtools = ">=8.0.2,<9"
 bash = ">=5.2.37,<6"
 coreutils = ">=9.5,<10"
 findutils = ">=4.10.0,<5"
