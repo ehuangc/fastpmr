@@ -32,6 +32,7 @@ def build_command(fastpmr_bin: Path, prefix: Path, spec: str, output_dir: Path) 
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--variant-indices {spec}",
+        "--min-covered-snps 0",
         "-n",
     ]
     return " ".join(parts)

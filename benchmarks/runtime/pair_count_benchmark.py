@@ -27,6 +27,7 @@ def build_command(
         f"--output-directory {quote_path(output_dir)}",
         f"--sample-pairs-csv {quote_path(csv_path)}",
         f"--threads {THREADS}",
+        "--min-covered-snps 0",
         "-n",
     ]
     return " ".join(parts)

@@ -19,6 +19,7 @@ def build_command(fastpmr_bin: Path, prefix: Path, threads: int, output_dir: Pat
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--threads {threads}",
+        "--min-covered-snps 0",
         "-n",
     ]
     return " ".join(parts)

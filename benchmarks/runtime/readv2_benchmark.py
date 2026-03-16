@@ -33,6 +33,7 @@ def build_fastpmr_command(fastpmr_bin: Path, prefix: Path, output_dir: Path) -> 
         # Ensure we test fastpmr on PLINK dataset, not EIGENSTRAT
         f"--prefix {quote_path(prefix.with_suffix('.bed'))}",
         f"--output-directory {quote_path(output_dir)}",
+        "--min-covered-snps 0",
         "-n",
     ]
     return " ".join(parts)
