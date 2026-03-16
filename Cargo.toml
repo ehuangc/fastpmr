@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 description = "A command-line tool to calculate pairwise mismatch rates (PMRs) between ancient DNA sequences."
 license = "MIT"
+exclude = ["benchmarks"]
 
 [dependencies]
 chrono = "0.4.42"
