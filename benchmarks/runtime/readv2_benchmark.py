@@ -5,6 +5,7 @@ from pathlib import Path
 from benchmark_utils import (
     DATA_PREFIX,
     FASTPMR_BIN,
+    PLINK_EXTS,
     SCRIPT_DIR,
     ensure_data_present,
     quote_path,
@@ -46,7 +47,7 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 def main() -> None:
     data_prefix = Path(DATA_PREFIX)
     fastpmr_bin = Path(FASTPMR_BIN)
-    ensure_data_present(data_prefix)
+    ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
     results_dir = SCRIPT_DIR / "results"

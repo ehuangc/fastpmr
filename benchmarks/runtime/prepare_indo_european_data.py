@@ -4,7 +4,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from benchmark_utils import DATA_EXTS, DATA_PREFIX
+from benchmark_utils import DATA_PREFIX, EIGENSTRAT_EXTS
 
 DATA_DIR = DATA_PREFIX.parent
 SAMPLE_DIR = DATA_DIR / "indo_european_sample_sets"
@@ -34,7 +34,7 @@ def download_archive(url: str, destination: Path) -> None:
 
 def extract_required_files(archive_path: Path, destination: Path, prefix: Path) -> None:
     destination.mkdir(parents=True, exist_ok=True)
-    expected = {f"{prefix.name}{ext}": prefix.with_suffix(ext) for ext in DATA_EXTS}
+    expected = {f"{prefix.name}{ext}": prefix.with_suffix(ext) for ext in EIGENSTRAT_EXTS}
 
     with tarfile.open(archive_path, "r:gz") as tar:
         for member in tar.getmembers():
