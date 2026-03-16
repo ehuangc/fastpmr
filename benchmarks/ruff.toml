@@ -1,4 +1,5 @@
 line-length = 120
+exclude = ["runtime/READv2/READ2.py"]
 
 [lint]
 select = [
