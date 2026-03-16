@@ -1,6 +1,7 @@
 import random
 import subprocess
 import tarfile
+import tempfile
 from pathlib import Path
 
 from benchmark_utils import DATA_EXTS, DATA_PREFIX
@@ -55,6 +56,37 @@ def read_sample_ids(ind_path: Path) -> list[str]:
     return samples
 
 
+def create_plink_dataset(prefix: Path) -> None:
+    ind_path = prefix.with_suffix(".ind")
+    snp_path = prefix.with_suffix(".snp")
+    geno_path = prefix.with_suffix(".geno")
+    fam_path = prefix.with_suffix(".fam")
+    bim_path = prefix.with_suffix(".bim")
+    bed_path = prefix.with_suffix(".bed")
+
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".par") as handle:
+        handle.write(
+            "\n".join(
+                (
+                    f"genotypename: {geno_path}",
+                    f"snpname: {snp_path}",
+                    f"indivname: {ind_path}",
+                    "inputformat: EIGENSTRAT",
+                    f"genotypeoutname: {bed_path}",
+                    f"snpoutname: {bim_path}",
+                    f"indivoutname: {fam_path}",
+                    "outputformat: PACKEDPED",
+                    "familynames: NO",
+                )
+            )
+            + "\n"
+        )
+        handle.flush()
+        subprocess.run(["convertf", "-p", handle.name], check=True)
+
+    print(f"Wrote PLINK files ({bed_path.name}, {bim_path.name}, {fam_path.name}) via convertf -> {prefix.parent}")
+
+
 def format_pair_count(size: int) -> str:
     pairs = size * (size - 1) // 2
     return f"{pairs:,}"
@@ -78,6 +110,7 @@ def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
 def main() -> None:
     download_archive(INDO_EUROPEAN_URL, ARCHIVE_PATH)
     extract_required_files(ARCHIVE_PATH, DATA_DIR, DATA_PREFIX)
+    create_plink_dataset(DATA_PREFIX)
     generate_sample_sets(DATA_PREFIX, SAMPLE_DIR)
 
 
