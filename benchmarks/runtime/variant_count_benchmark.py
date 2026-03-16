@@ -1,14 +1,13 @@
-import subprocess
 import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
     DATA_PREFIX,
     FASTPMR_BIN,
-    RUNS,
     SCRIPT_DIR,
     ensure_data_present,
     quote_path,
+    run_benchmark,
 )
 
 VARIANT_SPECS = (
@@ -45,22 +44,14 @@ def main() -> None:
     ensure_data_present(data_prefix)
 
     results_dir = SCRIPT_DIR / "results"
-    results_dir.mkdir(parents=True, exist_ok=True)
     export_path = results_dir / "variant_count_benchmark.csv"
-    hyperfine_args = [
-        "hyperfine",
-        "--runs",
-        str(RUNS),
-        "--export-csv",
-        str(export_path),
-    ]
-    for spec in variant_specs:
-        with tempfile.TemporaryDirectory() as output_dir:
-            command = build_command(fastpmr_bin, data_prefix, spec, output_dir)
-            hyperfine_args.extend(["-n", f"variants={spec}", command])
 
-    subprocess.run(hyperfine_args, check=True)
-    print(f"\nHyperfine results written to {export_path}")
+    configs = []
+    for spec in variant_specs:
+        output_dir = tempfile.mkdtemp()
+        command = build_command(fastpmr_bin, data_prefix, spec, output_dir)
+        configs.append((f"variants={spec}", command))
+    run_benchmark(configs, export_path)
 
 
 if __name__ == "__main__":

@@ -5,10 +5,10 @@ from pathlib import Path
 from benchmark_utils import (
     DATA_PREFIX,
     FASTPMR_BIN,
-    RUNS,
     SCRIPT_DIR,
     ensure_data_present,
     quote_path,
+    run_benchmark,
 )
 
 READV2_REPO = "https://github.com/GuntherLab/READv2"
@@ -49,26 +49,13 @@ def main() -> None:
     ensure_readv2(READV2_DIR)
 
     results_dir = SCRIPT_DIR / "results"
-    results_dir.mkdir(parents=True, exist_ok=True)
     export_path = results_dir / "readv2_comparison_benchmark.csv"
-    hyperfine_args = [
-        "hyperfine",
-        "--runs",
-        str(RUNS),
-        "--export-csv",
-        str(export_path),
-        "--shell",
-        "bash",
-    ]
 
-    with tempfile.TemporaryDirectory() as output_dir:
-        fastpmr_cmd = build_fastpmr_command(fastpmr_bin, PLINK_PREFIX, output_dir)
-        readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
-        hyperfine_args.extend(["-n", "fastpmr", fastpmr_cmd])
-        hyperfine_args.extend(["-n", "READv2", readv2_cmd])
-        subprocess.run(hyperfine_args, check=True)
-
-    print(f"\nHyperfine results written to {export_path}")
+    output_dir = tempfile.mkdtemp()
+    fastpmr_cmd = build_fastpmr_command(fastpmr_bin, PLINK_PREFIX, output_dir)
+    readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
+    configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
+    run_benchmark(configs, export_path)
 
 
 if __name__ == "__main__":

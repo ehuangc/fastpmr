@@ -38,7 +38,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/graphite2-1.3.14-hecca717_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/gsl-2.7-he838d99_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/harfbuzz-12.3.2-h6083320_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/hyperfine-1.20.0-hdab8a38_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/icu-78.2-h33c6efd_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/keyutils-1.6.3-hb9d3cd8_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/kiwisolver-1.5.0-py314h97ea11e_0.conda
@@ -172,7 +171,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/fonttools-4.61.1-pyh7db6752_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/freetype-2.14.2-h694c41f_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/gsl-2.7-h93259b0_0.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/osx-64/hyperfine-1.20.0-h121f529_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/kiwisolver-1.5.0-py314hd6e1bd6_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/lcms2-2.18-h90db99b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/lerc-4.1.0-h35c7297_0.conda
@@ -253,7 +251,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/fonttools-4.61.1-pyh7db6752_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/freetype-2.14.2-hce30654_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/gsl-2.7-h6e638da_0.tar.bz2
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/hyperfine-1.20.0-hd1458d2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/icu-78.2-hef89b57_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/kiwisolver-1.5.0-py314hf8a3a22_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/lcms2-2.18-hdfa7624_0.conda
@@ -940,43 +937,6 @@ packages:
   purls: []
   size: 2035859
   timestamp: 1769445400168
-- conda: https://conda.anaconda.org/conda-forge/linux-64/hyperfine-1.20.0-hdab8a38_0.conda
-  sha256: 4a6028de3fa945768314353060f16298fe662d10e61fb765bb78f36d09025949
-  md5: 174ce67eb597947bc77fd99c8b149735
-  depends:
-  - __glibc >=2.17,<3.0.a0
-  - libgcc >=14
-  constrains:
-  - __glibc >=2.17
-  license: MIT
-  license_family: MIT
-  purls: []
-  size: 568361
-  timestamp: 1763464711342
-- conda: https://conda.anaconda.org/conda-forge/osx-64/hyperfine-1.20.0-h121f529_0.conda
-  sha256: 6253ba27b361dadd18350bc5669850830d06bb2102096331885c3a4bf8218e1f
-  md5: e48bd3d6f44e300fc48729cfd28b5638
-  depends:
-  - __osx >=10.13
-  constrains:
-  - __osx >=10.13
-  license: MIT
-  license_family: MIT
-  purls: []
-  size: 535742
-  timestamp: 1763464881824
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/hyperfine-1.20.0-hd1458d2_0.conda
-  sha256: 522e1dd8db7900f9f047c5b422a11e0c95655ca60b1e0812d5e93d815a3ea270
-  md5: fa30ece6aec7cba0b3aa642a5c64dcae
-  depends:
-  - __osx >=11.0
-  constrains:
-  - __osx >=11.0
-  license: MIT
-  license_family: MIT
-  purls: []
-  size: 503032
-  timestamp: 1763465144794
 - conda: https://conda.anaconda.org/conda-forge/linux-64/icu-78.2-h33c6efd_0.conda
   sha256: 142a722072fa96cf16ff98eaaf641f54ab84744af81754c292cb81e0881c0329
   md5: 186a18e3ba246eccfc7cff00cd19a870

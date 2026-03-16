@@ -14,20 +14,20 @@ VARIANTS_CSV = RESULTS_DIR / "variant_count_benchmark.csv"
 PAIRS_CSV = RESULTS_DIR / "pair_count_benchmark.csv"
 
 
-def parse_thread_count(command: str) -> int:
-    return int(command.split("threads=", 1)[1])
+def parse_thread_count(label: str) -> int:
+    return int(label.split("threads=", 1)[1])
 
 
-def parse_variant_count(command: str) -> int:
-    spec = command.split("variants=", 1)[1]
+def parse_variant_count(label: str) -> int:
+    spec = label.split("variants=", 1)[1]
     if "-" in spec:
         spec = spec.split("-")[-1]
     return int(spec)
 
 
-def parse_pair_count(command: str) -> int:
+def parse_pair_count(label: str) -> int:
     fields = {}
-    for part in command.split("_"):
+    for part in label.split("_"):
         if "=" not in part:
             continue
         key, value = part.split("=", 1)
@@ -71,49 +71,89 @@ def save_line_plot(
     plt.close(fig)
 
 
+def bytes_to_mb(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["mean_mb"] = df["mean_bytes"] / (1024**2)
+    df["stddev_mb"] = df["stddev_bytes"] / (1024**2)
+    return df
+
+
 def main() -> None:
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
     threads_df = pd.read_csv(THREADS_CSV)
-    threads_df["threads"] = threads_df["command"].apply(parse_thread_count)
+    threads_df["threads"] = threads_df["label"].apply(parse_thread_count)
     threads_df = threads_df.sort_values("threads")
+    threads_df = bytes_to_mb(threads_df)
     save_line_plot(
         threads_df,
         "threads",
-        "mean",
-        "stddev",
+        "mean_s",
+        "stddev_s",
         "Threads",
         "Mean Runtime (s)",
         "Runtime vs. Thread Count",
-        PLOTS_DIR / "thread_count_benchmark.pdf",
+        PLOTS_DIR / "thread_count_benchmark_runtime.pdf",
+    )
+    save_line_plot(
+        threads_df,
+        "threads",
+        "mean_mb",
+        "stddev_mb",
+        "Threads",
+        "Peak RSS (MB)",
+        "Peak Memory vs. Thread Count",
+        PLOTS_DIR / "thread_count_benchmark_memory.pdf",
     )
 
     variants_df = pd.read_csv(VARIANTS_CSV)
-    variants_df["variants"] = variants_df["command"].apply(parse_variant_count)
+    variants_df["variants"] = variants_df["label"].apply(parse_variant_count)
     variants_df = variants_df.sort_values("variants")
+    variants_df = bytes_to_mb(variants_df)
     save_line_plot(
         variants_df,
         "variants",
-        "mean",
-        "stddev",
+        "mean_s",
+        "stddev_s",
         "Variant Count",
         "Mean Runtime (s)",
         "Runtime vs. Variant Count",
-        PLOTS_DIR / "variant_count_benchmark.pdf",
+        PLOTS_DIR / "variant_count_benchmark_runtime.pdf",
+    )
+    save_line_plot(
+        variants_df,
+        "variants",
+        "mean_mb",
+        "stddev_mb",
+        "Variant Count",
+        "Peak RSS (MB)",
+        "Peak Memory vs. Variant Count",
+        PLOTS_DIR / "variant_count_benchmark_memory.pdf",
     )
 
     pairs_df = pd.read_csv(PAIRS_CSV)
-    pairs_df["pairs"] = pairs_df["command"].apply(parse_pair_count)
+    pairs_df["pairs"] = pairs_df["label"].apply(parse_pair_count)
     pairs_df = pairs_df.sort_values("pairs")
+    pairs_df = bytes_to_mb(pairs_df)
     save_line_plot(
         pairs_df,
         "pairs",
-        "mean",
-        "stddev",
+        "mean_s",
+        "stddev_s",
         "Samples",
         "Mean Runtime (s)",
         "Runtime vs. Sample Count",
-        PLOTS_DIR / "sample_count_benchmark.pdf",
+        PLOTS_DIR / "sample_count_benchmark_runtime.pdf",
+    )
+    save_line_plot(
+        pairs_df,
+        "pairs",
+        "mean_mb",
+        "stddev_mb",
+        "Samples",
+        "Peak RSS (MB)",
+        "Peak Memory vs. Sample Count",
+        PLOTS_DIR / "sample_count_benchmark_memory.pdf",
     )
 
 
