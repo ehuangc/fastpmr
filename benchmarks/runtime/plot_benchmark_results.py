@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from benchmark_utils import SCRIPT_DIR
-from matplotlib.ticker import MaxNLocator
 
 RESULTS_DIR = SCRIPT_DIR / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
@@ -44,7 +43,6 @@ def save_line_plot(
     ylabel: str,
     title: str,
     output_path: Path,
-    x_max_ticks: int | None = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=(8, 5), constrained_layout=True)
     ax.errorbar(
@@ -61,8 +59,6 @@ def save_line_plot(
     ax.set_ylabel(ylabel, fontsize=16)
     ax.tick_params(axis="both", labelsize=14)
     ax.ticklabel_format(style="plain", axis="x")
-    if x_max_ticks is not None:
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=x_max_ticks))
     ax.grid(True, linewidth=0.8, alpha=0.4)
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
