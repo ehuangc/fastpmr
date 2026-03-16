@@ -30,8 +30,8 @@ cmd = "python aadr/analyze_aadr_results.py"
 [tasks.prepare-runtime-benchmarks]
 cmd = "python runtime/prepare_indo_european_data.py"
 
-[tasks.samples-benchmark]
-cmd = "python runtime/sample_count_benchmark.py"
+[tasks.pairs-benchmark]
+cmd = "python runtime/pair_count_benchmark.py"
 
 [tasks.variants-benchmark]
 cmd = "python runtime/variant_count_benchmark.py"
