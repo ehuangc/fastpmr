@@ -4,13 +4,13 @@ It supports EIGENSTRAT (unpacked, packed, and transposed packed formats) and PLI
 
 ## Installation
 ### Pixi (recommended)
-```
+```bash
 pixi global install -c conda-forge -c bioconda fastpmr
 ```
 We recommend installing `fastpmr` using [`Pixi`](https://pixi.prefix.dev/latest/), a fast and reproducible package manager. To install `Pixi`, see [this page](https://pixi.prefix.dev/latest/installation/).
 
 ### Conda
-```
+```bash
 conda create -n fastpmr -c conda-forge -c bioconda fastpmr
 conda activate fastpmr
 ```
@@ -59,4 +59,4 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_I
   - Arrays: `covered_snps`, `mismatches`, `totals`, `site_overlaps`
 
 ## Reproducibility
-We recommend using [pixi](https://pixi.sh/) to reproduce benchmarks. Pixi benchmark tasks can be found in `benchmarks/pixi.toml`.
+We recommend using [`Pixi`](https://pixi.sh/) to reproduce benchmarks. `Pixi` benchmark tasks can be found in `benchmarks/pixi.toml`.
