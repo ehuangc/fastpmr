@@ -4,7 +4,6 @@ from pathlib import Path
 
 from benchmark_utils import (
     DATA_PREFIX,
-    FASTPMR_BIN,
     PLINK_EXTS,
     SCRIPT_DIR,
     ensure_data_present,
@@ -28,9 +27,9 @@ def ensure_readv2(readv2_dir: Path) -> None:
     )
 
 
-def build_fastpmr_command(fastpmr_bin: Path, prefix: Path, output_dir: Path) -> str:
+def build_fastpmr_command(prefix: Path, output_dir: Path) -> str:
     parts = [
-        quote_path(fastpmr_bin),
+        "fastpmr",
         # Ensure we test fastpmr on PLINK dataset, not EIGENSTRAT
         f"--prefix {quote_path(prefix.with_suffix('.bed'))}",
         f"--output-directory {quote_path(output_dir)}",
@@ -46,7 +45,6 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 
 def main() -> None:
     data_prefix = Path(DATA_PREFIX)
-    fastpmr_bin = Path(FASTPMR_BIN)
     ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
@@ -54,7 +52,7 @@ def main() -> None:
     export_path = results_dir / "readv2_comparison_benchmark.csv"
 
     output_dir = tempfile.mkdtemp()
-    fastpmr_cmd = build_fastpmr_command(fastpmr_bin, PLINK_PREFIX, output_dir)
+    fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, output_dir)
     readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
     run_benchmark(configs, export_path)

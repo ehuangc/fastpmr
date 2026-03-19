@@ -3,7 +3,6 @@ from pathlib import Path
 
 from benchmark_utils import (
     DATA_PREFIX,
-    FASTPMR_BIN,
     SCRIPT_DIR,
     ensure_data_present,
     quote_path,
@@ -26,9 +25,9 @@ VARIANT_SPECS = (
 )
 
 
-def build_command(fastpmr_bin: Path, prefix: Path, spec: str, output_dir: Path) -> str:
+def build_command(prefix: Path, spec: str, output_dir: Path) -> str:
     parts = [
-        quote_path(fastpmr_bin),
+        "fastpmr",
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--variant-indices {spec}",
@@ -41,7 +40,6 @@ def build_command(fastpmr_bin: Path, prefix: Path, spec: str, output_dir: Path) 
 def main() -> None:
     variant_specs = list(VARIANT_SPECS)
     data_prefix = Path(DATA_PREFIX)
-    fastpmr_bin = Path(FASTPMR_BIN)
     ensure_data_present(data_prefix)
 
     results_dir = SCRIPT_DIR / "results"
@@ -50,7 +48,7 @@ def main() -> None:
     configs = []
     for spec in variant_specs:
         output_dir = tempfile.mkdtemp()
-        command = build_command(fastpmr_bin, data_prefix, spec, output_dir)
+        command = build_command(data_prefix, spec, output_dir)
         configs.append((f"variants={spec}", command))
     run_benchmark(configs, export_path)
 

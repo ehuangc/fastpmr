@@ -3,7 +3,6 @@ from pathlib import Path
 
 from benchmark_utils import (
     DATA_PREFIX,
-    FASTPMR_BIN,
     SCRIPT_DIR,
     ensure_data_present,
     quote_path,
@@ -16,13 +15,12 @@ SAMPLE_DIR = SCRIPT_DIR / "data" / "indo_european_sample_sets"
 
 
 def build_command(
-    fastpmr_bin: Path,
     prefix: Path,
     csv_path: Path,
     output_dir: Path,
 ) -> str:
     parts = [
-        quote_path(fastpmr_bin),
+        "fastpmr",
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--sample-pairs-csv {quote_path(csv_path)}",
@@ -35,7 +33,6 @@ def build_command(
 
 def main() -> None:
     data_prefix = Path(DATA_PREFIX)
-    fastpmr_bin = Path(FASTPMR_BIN)
     sample_dir = Path(SAMPLE_DIR)
     ensure_data_present(data_prefix)
 
@@ -56,7 +53,7 @@ def main() -> None:
         sample_count = count_lines(csv_path)
         pair_count = sample_count * (sample_count - 1) // 2
         output_dir = tempfile.mkdtemp()
-        command = build_command(fastpmr_bin, data_prefix, csv_path, output_dir)
+        command = build_command(data_prefix, csv_path, output_dir)
         configs.append((f"samples={sample_count}_pairs={pair_count}", command))
     run_benchmark(configs, export_path)
 
