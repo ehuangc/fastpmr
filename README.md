@@ -1,4 +1,4 @@
-🚀 <b>fastpmr</b> is a command-line tool, written in Rust, that calculates pairwise mismatch rates (PMRs) between ancient DNA sequences.
+🚀 <b>`fastpmr`</b> is a command-line tool, written in Rust, that calculates pairwise mismatch rates (PMRs) between ancient DNA sequences.
 
 It supports EIGENSTRAT (unpacked, packed, and transposed packed formats) and PLINK inputs, as well as multithreading and sample/variant filtering.
 
