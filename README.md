@@ -3,7 +3,7 @@
 It supports EIGENSTRAT (unpacked, packed, and transposed packed formats) and PLINK inputs, as well as multithreading and sample/variant filtering.
 
 ## Installation
-### Pixi (Recommended)
+### Pixi (recommended)
 ```
 pixi global install -c conda-forge -c bioconda fastpmr
 ```
