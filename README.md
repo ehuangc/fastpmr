@@ -3,7 +3,17 @@
 It supports EIGENSTRAT (unpacked, packed, and transposed packed formats) and PLINK inputs, as well as multithreading and sample/variant filtering.
 
 ## Installation
-```TBD```
+### Pixi (Recommended)
+```
+pixi global install -c conda-forge -c bioconda fastpmr
+```
+We recommend installing `fastpmr` using [`Pixi`](https://pixi.prefix.dev/latest/), a fast and reproducible package manager. To install `Pixi`, see [this page](https://pixi.prefix.dev/latest/installation/).
+
+### Conda
+```
+conda create -n fastpmr -c conda-forge -c bioconda fastpmr
+conda activate fastpmr
+```
 
 ## Usage
 
