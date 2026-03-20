@@ -12,6 +12,7 @@ PLOTS_DIR = RESULTS_DIR / "plots"
 THREADS_CSV = RESULTS_DIR / "thread_count_benchmark.csv"
 VARIANTS_CSV = RESULTS_DIR / "variant_count_benchmark.csv"
 PAIRS_CSV = RESULTS_DIR / "pair_count_benchmark.csv"
+READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 
 
 def parse_thread_count(label: str) -> int:
@@ -63,6 +64,35 @@ def save_line_plot(
     ax.grid(True, linewidth=0.8, alpha=0.4)
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
+    sns.despine(ax=ax)
+    fig.savefig(output_path, bbox_inches="tight", dpi=600)
+    plt.close(fig)
+
+
+def save_bar_plot(
+    data: pd.DataFrame,
+    label_col: str,
+    y_col: str,
+    err_col: str,
+    ylabel: str,
+    title: str,
+    output_path: Path,
+) -> None:
+    fig, ax = plt.subplots(figsize=(8, 10), constrained_layout=True)
+    ax.bar(
+        data[label_col],
+        data[y_col],
+        yerr=data[err_col],
+        width=0.6,
+        capsize=14,
+        error_kw={"elinewidth": 2.5, "capthick": 1.5},
+    )
+    ax.margins(x=0.2)
+    ax.set_title(title, fontsize=16)
+    ax.set_ylabel(ylabel, fontsize=16)
+    ax.tick_params(axis="both", labelsize=16)
+    ax.set_ylim(bottom=0)
+    ax.grid(True, axis="y", linewidth=0.8, alpha=0.4)
     sns.despine(ax=ax)
     fig.savefig(output_path, bbox_inches="tight", dpi=600)
     plt.close(fig)
@@ -151,6 +181,27 @@ def main() -> None:
         "Peak RSS (MB)",
         "Peak Memory vs. Sample Count",
         PLOTS_DIR / "sample_count_benchmark_memory.pdf",
+    )
+
+    readv2_df = pd.read_csv(READV2_CSV)
+    readv2_df = bytes_to_mb(readv2_df)
+    save_bar_plot(
+        readv2_df,
+        "label",
+        "mean_s",
+        "stddev_s",
+        "Mean Runtime (s)",
+        "Runtime: fastpmr vs. READv2",
+        PLOTS_DIR / "readv2_comparison_benchmark_runtime.pdf",
+    )
+    save_bar_plot(
+        readv2_df,
+        "label",
+        "mean_mb",
+        "stddev_mb",
+        "Peak RSS (MB)",
+        "Peak Memory: fastpmr vs. READv2",
+        PLOTS_DIR / "readv2_comparison_benchmark_memory.pdf",
     )
 
 
