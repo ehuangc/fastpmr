@@ -36,32 +36,31 @@ seaborn = ">=0.13.2,<0.14"
 benchmark-utils = { path = ".", editable = true }
 plinkio = ">=0.9.8, <0.10"
 
-[tool.pixi.tasks.prepare-aadr]
-cmd = "python aadr/prepare_aadr_data.py"
+[tool.pixi.tasks]
+prepare-aadr = "python aadr/prepare_aadr_data.py"
+fastpmr-aadr = "python aadr/run_fastpmr_aadr.py"
+analyze-aadr = "python aadr/analyze_aadr_results.py"
 
-[tool.pixi.tasks.fastpmr-aadr]
-cmd = "python aadr/run_fastpmr_aadr.py"
+prepare-runtime-benchmarks = "python runtime/prepare_indo_european_data.py"
+pairs-benchmark = "python runtime/pair_count_benchmark.py"
+variants-benchmark = "python runtime/variant_count_benchmark.py"
+threads-benchmark = "python runtime/thread_count_benchmark.py"
+readv2-benchmark = "python runtime/readv2_benchmark.py"
+plot-runtime-benchmarks = "python runtime/plot_benchmark_results.py"
 
-[tool.pixi.tasks.analyze-aadr]
-cmd = "python aadr/analyze_aadr_results.py"
-
-[tool.pixi.tasks.prepare-runtime-benchmarks]
-cmd = "python runtime/prepare_indo_european_data.py"
-
-[tool.pixi.tasks.pairs-benchmark]
-cmd = "python runtime/pair_count_benchmark.py"
-
-[tool.pixi.tasks.variants-benchmark]
-cmd = "python runtime/variant_count_benchmark.py"
-
-[tool.pixi.tasks.threads-benchmark]
-cmd = "python runtime/thread_count_benchmark.py"
-
-[tool.pixi.tasks.readv2-benchmark]
-cmd = "python runtime/readv2_benchmark.py"
-
-[tool.pixi.tasks.plot-runtime-benchmarks]
-cmd = "python runtime/plot_benchmark_results.py"
+aadr-pipeline = [
+    { task = "prepare-aadr" },
+    { task = "fastpmr-aadr" },
+    { task = "analyze-aadr" },
+]
+runtime-pipeline = [
+    { task = "prepare-runtime-benchmarks" },
+    { task = "pairs-benchmark" },
+    { task = "variants-benchmark" },
+    { task = "threads-benchmark" },
+    { task = "readv2-benchmark" },
+    { task = "plot-runtime-benchmarks" },
+]
 
 [tool.ruff]
 line-length = 120
