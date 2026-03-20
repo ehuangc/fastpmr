@@ -15,10 +15,10 @@ AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 
-RUNTIME_DIR = BENCHMARKS_DIR / "runtime"
-RUNTIME_DATA_PREFIX = RUNTIME_DIR / "data" / "IEdata"
-RUNTIME_SAMPLE_SET_DIR = RUNTIME_DIR / "data" / "indo_european_sample_sets"
-RUNTIME_SAMPLE_SET_SIZES = (
+PERF_DIR = BENCHMARKS_DIR / "perf"
+PERF_DATA_PREFIX = PERF_DIR / "data" / "IEdata"
+PERF_SAMPLE_SET_DIR = PERF_DIR / "data" / "indo_european_sample_sets"
+PERF_SAMPLE_SET_SIZES = (
     128,
     256,
     384,
@@ -30,7 +30,7 @@ RUNTIME_SAMPLE_SET_SIZES = (
     1152,
     1280,
 )
-RUNTIME_RUNS = 3
+PERF_RUNS = 3
 EIGENSTRAT_EXTS = (".ind", ".snp", ".geno")
 PLINK_EXTS = (".bed", ".bim", ".fam")
 
@@ -62,7 +62,7 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
             command = "pixi run prepare-aadr"
             dataset = "AADR dataset"
         else:
-            command = "pixi run prepare-runtime-benchmarks"
+            command = "pixi run prepare-perf-benchmarks"
             dataset = "Indo-European dataset"
         raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to download and unpack the {dataset}.")
 

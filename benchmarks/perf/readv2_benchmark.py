@@ -3,19 +3,19 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
+    PERF_DATA_PREFIX,
+    PERF_DIR,
+    PERF_RUNS,
     PLINK_EXTS,
-    RUNTIME_DATA_PREFIX,
-    RUNTIME_DIR,
-    RUNTIME_RUNS,
     ensure_data_present,
     quote_path,
     run_benchmark,
 )
 
 READV2_REPO = "https://github.com/GuntherLab/READv2"
-READV2_DIR = RUNTIME_DIR / "READv2"
+READV2_DIR = PERF_DIR / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
-PLINK_PREFIX = RUNTIME_DATA_PREFIX
+PLINK_PREFIX = PERF_DATA_PREFIX
 
 
 def ensure_readv2(readv2_dir: Path) -> None:
@@ -45,18 +45,18 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 
 
 def main() -> None:
-    data_prefix = Path(RUNTIME_DATA_PREFIX)
+    data_prefix = Path(PERF_DATA_PREFIX)
     ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
-    results_dir = RUNTIME_DIR / "results"
+    results_dir = PERF_DIR / "results"
     export_path = results_dir / "readv2_comparison_benchmark.csv"
 
     output_dir = tempfile.mkdtemp()
     fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, output_dir)
     readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
-    run_benchmark(configs, export_path, runs=RUNTIME_RUNS)
+    run_benchmark(configs, export_path, runs=PERF_RUNS)
 
 
 if __name__ == "__main__":

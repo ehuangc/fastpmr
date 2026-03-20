@@ -459,7 +459,7 @@ packages:
 - pypi: ./
   name: benchmark-utils
   version: 0.1.0
-  sha256: 09a82ccb5fafa921bc7e9a29202d80882b84af3d83b65d2bd9f1be6ecd98e3eb
+  sha256: 6de4bf2769a393b165b33ba619d9f8afcda8298f07947101a24082914cd501ee
   requires_python: '>=3.10'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/brotli-1.2.0-hed03a55_1.conda
   sha256: e511644d691f05eb12ebe1e971fd6dc3ae55a4df5c253b4e1788b789bdf2dfa6

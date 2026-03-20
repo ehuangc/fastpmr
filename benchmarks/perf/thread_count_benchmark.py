@@ -2,9 +2,9 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
-    RUNTIME_DATA_PREFIX,
-    RUNTIME_DIR,
-    RUNTIME_RUNS,
+    PERF_DATA_PREFIX,
+    PERF_DIR,
+    PERF_RUNS,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -26,10 +26,10 @@ def build_command(prefix: Path, threads: int, output_dir: Path) -> str:
 
 
 def main() -> None:
-    data_prefix = Path(RUNTIME_DATA_PREFIX)
+    data_prefix = Path(PERF_DATA_PREFIX)
     ensure_data_present(data_prefix)
 
-    results_dir = RUNTIME_DIR / "results"
+    results_dir = PERF_DIR / "results"
     export_path = results_dir / "thread_count_benchmark.csv"
 
     configs = []
@@ -37,7 +37,7 @@ def main() -> None:
         output_dir = tempfile.mkdtemp()
         command = build_command(data_prefix, count, output_dir)
         configs.append((f"threads={count}", command))
-    run_benchmark(configs, export_path, runs=RUNTIME_RUNS)
+    run_benchmark(configs, export_path, runs=PERF_RUNS)
 
 
 if __name__ == "__main__":

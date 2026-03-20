@@ -5,8 +5,8 @@ archive/
 sandbox*/
 benchmarks/aadr/data
 benchmarks/aadr/results/fastpmr/*.npz
-benchmarks/runtime/data
-benchmarks/runtime/READv2
+benchmarks/perf/data
+benchmarks/perf/READv2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
