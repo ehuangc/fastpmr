@@ -1,9 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from benchmark_utils import AADR_DATA_PREFIX, AADR_DIR, AADR_EXTS, ensure_data_present, quote_path
-
-RUNS = 1
+from benchmark_utils import AADR_DATA_PREFIX, AADR_DIR, AADR_EXTS, AADR_RUNS, ensure_data_present, quote_path
 
 
 def build_command(prefix: Path, output_dir: Path) -> str:
@@ -31,7 +29,7 @@ def main() -> None:
     hyperfine_args = [
         "hyperfine",
         "--runs",
-        str(RUNS),
+        str(AADR_RUNS),
         "--show-output",
         "--export-csv",
         str(hyperfine_export_path),

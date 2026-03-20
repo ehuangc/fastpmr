@@ -13,11 +13,14 @@ BENCHMARKS_DIR = Path(__file__).resolve().parent.parent
 AADR_DIR = BENCHMARKS_DIR / "aadr"
 AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
+AADR_RUNS = 1
+
 RUNTIME_DIR = BENCHMARKS_DIR / "runtime"
 RUNTIME_DATA_PREFIX = RUNTIME_DIR / "data" / "IEdata"
+RUNTIME_RUNS = 3
 EIGENSTRAT_EXTS = (".ind", ".snp", ".geno")
 PLINK_EXTS = (".bed", ".bim", ".fam")
-RUNS = 3
+
 CSV_FIELDS = [
     "label",
     "mean_s",
@@ -81,7 +84,7 @@ def measure_command(command: str) -> dict[str, float]:
 def run_benchmark(
     configs: list[tuple[str, str]],
     output_path: Path,
-    runs: int = RUNS,
+    runs: int,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     rows = []

@@ -4,6 +4,7 @@ from pathlib import Path
 from benchmark_utils import (
     RUNTIME_DATA_PREFIX,
     RUNTIME_DIR,
+    RUNTIME_RUNS,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -36,7 +37,7 @@ def main() -> None:
         output_dir = tempfile.mkdtemp()
         command = build_command(data_prefix, count, output_dir)
         configs.append((f"threads={count}", command))
-    run_benchmark(configs, export_path)
+    run_benchmark(configs, export_path, runs=RUNTIME_RUNS)
 
 
 if __name__ == "__main__":

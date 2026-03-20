@@ -6,6 +6,7 @@ from benchmark_utils import (
     PLINK_EXTS,
     RUNTIME_DATA_PREFIX,
     RUNTIME_DIR,
+    RUNTIME_RUNS,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -55,7 +56,7 @@ def main() -> None:
     fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, output_dir)
     readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
-    run_benchmark(configs, export_path)
+    run_benchmark(configs, export_path, runs=RUNTIME_RUNS)
 
 
 if __name__ == "__main__":
