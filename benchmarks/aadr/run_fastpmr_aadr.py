@@ -1,7 +1,14 @@
-import subprocess
 from pathlib import Path
 
-from benchmark_utils import AADR_DATA_PREFIX, AADR_DIR, AADR_EXTS, AADR_RUNS, ensure_data_present, quote_path
+from benchmark_utils import (
+    AADR_DATA_PREFIX,
+    AADR_DIR,
+    AADR_EXTS,
+    AADR_RUNS,
+    ensure_data_present,
+    quote_path,
+    run_benchmark,
+)
 
 
 def build_command(prefix: Path, output_dir: Path) -> str:
@@ -21,25 +28,10 @@ def main() -> None:
     results_dir.mkdir(parents=True, exist_ok=True)
     fastpmr_output_dir = results_dir / "fastpmr"
     fastpmr_output_dir.mkdir(parents=True, exist_ok=True)
-    hyperfine_output_dir = results_dir / "runtime"
-    hyperfine_output_dir.mkdir(parents=True, exist_ok=True)
-    hyperfine_export_path = hyperfine_output_dir / "aadr_benchmark.csv"
+    runtime_output_path = results_dir / "runtime" / "aadr_benchmark.csv"
 
     command = build_command(AADR_DATA_PREFIX, fastpmr_output_dir)
-    hyperfine_args = [
-        "hyperfine",
-        "--runs",
-        str(AADR_RUNS),
-        "--show-output",
-        "--export-csv",
-        str(hyperfine_export_path),
-        "-n",
-        "fastpmr-aadr",
-        command,
-    ]
-
-    subprocess.run(hyperfine_args, check=True)
-    print(f"\nHyperfine results written to {hyperfine_export_path}")
+    run_benchmark([("aadr", command)], runtime_output_path, AADR_RUNS)
     print(f"fastpmr outputs written under {fastpmr_output_dir}")
 
 
