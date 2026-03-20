@@ -10,3 +10,73 @@ requires-python = ">=3.10"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["benchmark_utils"]
+
+[tool.pixi.workspace]
+name = "fastpmr-benchmarks"
+version = "0.1.0"
+description = "Pixi environment for running fastpmr benchmarks."
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[tool.pixi.dependencies]
+admixtools = ">=8.0.2,<9"
+bash = ">=5.2.37,<6"
+coreutils = ">=9.5,<10"
+# Benchmark against bioconda package, not a local build
+fastpmr = "==0.1.0"
+findutils = ">=4.10.0,<5"
+pandas = ">=3.0.1,<4"
+python = ">=3.10,<3.15"
+matplotlib = ">=3.10.8,<4"
+numpy = ">=2.4.1,<3"
+scipy = ">=1.17.0,<2"
+seaborn = ">=0.13.2,<0.14"
+
+[tool.pixi.pypi-dependencies]
+benchmark-utils = { path = ".", editable = true }
+plinkio = ">=0.9.8, <0.10"
+
+[tool.pixi.tasks.prepare-aadr]
+cmd = "python aadr/prepare_aadr_data.py"
+
+[tool.pixi.tasks.fastpmr-aadr]
+cmd = "python aadr/run_fastpmr_aadr.py"
+
+[tool.pixi.tasks.analyze-aadr]
+cmd = "python aadr/analyze_aadr_results.py"
+
+[tool.pixi.tasks.prepare-runtime-benchmarks]
+cmd = "python runtime/prepare_indo_european_data.py"
+
+[tool.pixi.tasks.pairs-benchmark]
+cmd = "python runtime/pair_count_benchmark.py"
+
+[tool.pixi.tasks.variants-benchmark]
+cmd = "python runtime/variant_count_benchmark.py"
+
+[tool.pixi.tasks.threads-benchmark]
+cmd = "python runtime/thread_count_benchmark.py"
+
+[tool.pixi.tasks.readv2-benchmark]
+cmd = "python runtime/readv2_benchmark.py"
+
+[tool.pixi.tasks.plot-runtime-benchmarks]
+cmd = "python runtime/plot_benchmark_results.py"
+
+[tool.ruff]
+line-length = 120
+exclude = ["runtime/READv2/READ2.py"]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # isort
+    "I",
+]
