@@ -317,7 +317,9 @@ def main() -> None:
     plot_pairwise_mismatch_rate_histograms(
         same_rates, diff_rates, SAME_MASTER_HISTOGRAM_PATH, DIFF_MASTER_HISTOGRAM_PATH
     )
-    print(f"Wrote pairwise mismatch rate histograms to {SAME_MASTER_HISTOGRAM_PATH} and {DIFF_MASTER_HISTOGRAM_PATH}.")
+    print(
+        f"Wrote pairwise mismatch rate histograms to {SAME_MASTER_HISTOGRAM_PATH} and {DIFF_MASTER_HISTOGRAM_PATH}.\n"
+    )
 
     high_pmr_pairs = find_same_master_id_high_pmr_pairs(
         metadata,
@@ -334,7 +336,7 @@ def main() -> None:
     high_pmr_pairs.to_csv(SAME_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(high_pmr_pairs)} same-master-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
-        f"and site overlap > {OVERLAP_THRESHOLD} to {SAME_MASTER_OUTPUT_CSV}."
+        f"and site overlap > {OVERLAP_THRESHOLD} to {SAME_MASTER_OUTPUT_CSV}.\n"
     )
 
     low_pmr_pairs = find_diff_master_id_low_pmr_pairs(

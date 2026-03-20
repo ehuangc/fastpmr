@@ -71,7 +71,7 @@ def create_plink_dataset(prefix: Path) -> None:
         handle.flush()
         subprocess.run(["convertf", "-p", handle.name], check=True)
 
-    print(f"Wrote PLINK files ({bed_path.name}, {bim_path.name}, {fam_path.name}) via convertf -> {prefix.parent}")
+    print(f"Wrote PLINK files ({bed_path.name}, {bim_path.name}, {fam_path.name}) via convertf -> {prefix.parent}\n")
 
 
 def format_pair_count(size: int) -> str:
