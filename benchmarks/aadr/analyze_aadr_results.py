@@ -22,7 +22,7 @@ NON_IDENTICAL_PMR_THRESHOLD = 0.17
 OVERLAP_THRESHOLD = 30000
 
 
-def ensure_data_present(counts_path: Path, metadata_path: Path) -> None:
+def ensure_counts_data_present(counts_path: Path, metadata_path: Path) -> None:
     missing = [path for path in (counts_path, metadata_path) if not path.is_file()]
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
@@ -297,7 +297,7 @@ def plot_pairwise_mismatch_rate_histograms(
 
 
 def main() -> None:
-    ensure_data_present(COUNTS_PATH, METADATA_PATH)
+    ensure_counts_data_present(COUNTS_PATH, METADATA_PATH)
     mismatches, totals, site_overlaps, samples = load_mismatch_counts(COUNTS_PATH)
     metadata = load_metadata(METADATA_PATH)
     matched = sum(sample in metadata for sample in samples)
