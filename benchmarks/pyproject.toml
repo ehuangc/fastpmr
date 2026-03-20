@@ -41,12 +41,12 @@ prepare-aadr = "python aadr/prepare_aadr_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr_aadr.py"
 analyze-aadr = "python aadr/analyze_aadr_results.py"
 
-prepare-perf-benchmarks = "python perf/prepare_indo_european_data.py"
+prepare-perf = "python perf/prepare_indo_european_data.py"
 pairs-benchmark = "python perf/pair_count_benchmark.py"
 variants-benchmark = "python perf/variant_count_benchmark.py"
 threads-benchmark = "python perf/thread_count_benchmark.py"
 readv2-benchmark = "python perf/readv2_benchmark.py"
-plot-perf-benchmarks = "python perf/plot_benchmark_results.py"
+plot-perf = "python perf/plot_benchmark_results.py"
 
 aadr-pipeline = [
     { task = "prepare-aadr" },
@@ -54,12 +54,12 @@ aadr-pipeline = [
     { task = "analyze-aadr" },
 ]
 perf-pipeline = [
-    { task = "prepare-perf-benchmarks" },
+    { task = "prepare-perf" },
     { task = "pairs-benchmark" },
     { task = "variants-benchmark" },
     { task = "threads-benchmark" },
     { task = "readv2-benchmark" },
-    { task = "plot-perf-benchmarks" },
+    { task = "plot-perf" },
 ]
 
 [tool.ruff]
