@@ -3,9 +3,10 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from benchmark_utils import SCRIPT_DIR
 
-RESULTS_DIR = SCRIPT_DIR / "results"
+from benchmark_utils import RUNTIME_DIR
+
+RESULTS_DIR = RUNTIME_DIR / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
 
 THREADS_CSV = RESULTS_DIR / "thread_count_benchmark.csv"

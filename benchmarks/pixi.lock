@@ -156,6 +156,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zlib-ng-2.3.3-hceb46e0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_6.conda
       - pypi: https://files.pythonhosted.org/packages/0b/b3/f940e8f603b8a0fa09b4cce185e99a203234e16a56877efd7bd2ec943a36/plinkio-0.9.8.tar.gz
+      - pypi: ./
       osx-64:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/_openmp_mutex-4.5-7_kmp_llvm.conda
       - conda: https://conda.anaconda.org/bioconda/osx-64/admixtools-8.0.2-h848dfa8_0.tar.bz2
@@ -237,6 +238,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zlib-ng-2.3.3-h8bce59a_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
       - pypi: https://files.pythonhosted.org/packages/0b/b3/f940e8f603b8a0fa09b4cce185e99a203234e16a56877efd7bd2ec943a36/plinkio-0.9.8.tar.gz
+      - pypi: ./
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/_openmp_mutex-4.5-7_kmp_llvm.conda
       - conda: https://conda.anaconda.org/bioconda/osx-arm64/admixtools-8.0.2-ha8dfbab_0.tar.bz2
@@ -319,6 +321,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zlib-ng-2.3.3-hed4e4f5_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hbf9d68e_6.conda
       - pypi: https://files.pythonhosted.org/packages/0b/b3/f940e8f603b8a0fa09b4cce185e99a203234e16a56877efd7bd2ec943a36/plinkio-0.9.8.tar.gz
+      - pypi: ./
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
   build_number: 20
@@ -453,6 +456,11 @@ packages:
   purls: []
   size: 1715546
   timestamp: 1748631203521
+- pypi: ./
+  name: benchmark-utils
+  version: 0.1.0
+  sha256: ef3f4839703b824241348359cd4ba566aa8c8075971e7b7ee88c9e2ec766739d
+  requires_python: '>=3.10'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/brotli-1.2.0-hed03a55_1.conda
   sha256: e511644d691f05eb12ebe1e971fd6dc3ae55a4df5c253b4e1788b789bdf2dfa6
   md5: 8ccf913aaba749a5496c17629d859ed1

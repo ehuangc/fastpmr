@@ -2,8 +2,8 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
-    DATA_PREFIX,
-    SCRIPT_DIR,
+    RUNTIME_DATA_PREFIX,
+    RUNTIME_DIR,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -11,7 +11,7 @@ from benchmark_utils import (
 
 # Keep threads constant to avoid fastpmr's automatic switch from single- to multi-threaded mode at 500 samples
 THREADS = 512
-SAMPLE_DIR = SCRIPT_DIR / "data" / "indo_european_sample_sets"
+SAMPLE_DIR = RUNTIME_DIR / "data" / "indo_european_sample_sets"
 
 
 def build_command(
@@ -32,7 +32,7 @@ def build_command(
 
 
 def main() -> None:
-    data_prefix = Path(DATA_PREFIX)
+    data_prefix = Path(RUNTIME_DATA_PREFIX)
     sample_dir = Path(SAMPLE_DIR)
     ensure_data_present(data_prefix)
 
@@ -41,7 +41,7 @@ def main() -> None:
 
     csv_files = sorted(sample_dir.glob("indo_european_samples_*.csv"), key=sample_size)
 
-    results_dir = SCRIPT_DIR / "results"
+    results_dir = RUNTIME_DIR / "results"
     export_path = results_dir / "pair_count_benchmark.csv"
 
     def count_lines(path: Path) -> int:

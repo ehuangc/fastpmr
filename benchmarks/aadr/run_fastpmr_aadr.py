@@ -1,27 +1,9 @@
-import shlex
 import subprocess
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-DATA_PREFIX = SCRIPT_DIR / "data" / "v62.0_1240k_public"
-DATA_EXTS = (".anno", ".ind", ".snp", ".geno")
+from benchmark_utils import AADR_DATA_PREFIX, AADR_DIR, AADR_EXTS, ensure_data_present, quote_path
+
 RUNS = 1
-
-
-def quote_path(path: Path) -> str:
-    return shlex.quote(str(path))
-
-
-def ensure_data_present(prefix: Path) -> None:
-    def data_file(ext: str) -> Path:
-        return prefix.parent / f"{prefix.name}{ext}"
-
-    missing = [data_file(ext) for ext in DATA_EXTS if not data_file(ext).is_file()]
-    if missing:
-        missing_str = ", ".join(str(path) for path in missing)
-        raise SystemExit(
-            f"Missing data files: {missing_str}. Run `pixi run prepare-aadr-data` to download the AADR dataset."
-        )
 
 
 def build_command(prefix: Path, output_dir: Path) -> str:
@@ -35,10 +17,9 @@ def build_command(prefix: Path, output_dir: Path) -> str:
 
 
 def main() -> None:
-    data_prefix = Path(DATA_PREFIX)
-    ensure_data_present(data_prefix)
+    ensure_data_present(AADR_DATA_PREFIX, AADR_EXTS)
 
-    results_dir = SCRIPT_DIR / "results"
+    results_dir = AADR_DIR / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
     fastpmr_output_dir = results_dir / "fastpmr"
     fastpmr_output_dir.mkdir(parents=True, exist_ok=True)
@@ -46,7 +27,7 @@ def main() -> None:
     hyperfine_output_dir.mkdir(parents=True, exist_ok=True)
     hyperfine_export_path = hyperfine_output_dir / "aadr_benchmark.csv"
 
-    command = build_command(data_prefix, fastpmr_output_dir)
+    command = build_command(AADR_DATA_PREFIX, fastpmr_output_dir)
     hyperfine_args = [
         "hyperfine",
         "--runs",

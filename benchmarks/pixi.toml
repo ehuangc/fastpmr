@@ -20,6 +20,7 @@ scipy = ">=1.17.0,<2"
 seaborn = ">=0.13.2,<0.14"
 
 [pypi-dependencies]
+benchmark-utils = { path = ".", editable = true }
 plinkio = ">=0.9.8, <0.10"
 
 [tasks.prepare-aadr]

@@ -3,18 +3,18 @@ import tempfile
 from pathlib import Path
 
 from benchmark_utils import (
-    DATA_PREFIX,
     PLINK_EXTS,
-    SCRIPT_DIR,
+    RUNTIME_DATA_PREFIX,
+    RUNTIME_DIR,
     ensure_data_present,
     quote_path,
     run_benchmark,
 )
 
 READV2_REPO = "https://github.com/GuntherLab/READv2"
-READV2_DIR = SCRIPT_DIR / "READv2"
+READV2_DIR = RUNTIME_DIR / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
-PLINK_PREFIX = DATA_PREFIX
+PLINK_PREFIX = RUNTIME_DATA_PREFIX
 
 
 def ensure_readv2(readv2_dir: Path) -> None:
@@ -44,11 +44,11 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 
 
 def main() -> None:
-    data_prefix = Path(DATA_PREFIX)
+    data_prefix = Path(RUNTIME_DATA_PREFIX)
     ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
-    results_dir = SCRIPT_DIR / "results"
+    results_dir = RUNTIME_DIR / "results"
     export_path = results_dir / "readv2_comparison_benchmark.csv"
 
     output_dir = tempfile.mkdtemp()

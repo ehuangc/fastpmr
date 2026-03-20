@@ -4,9 +4,9 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from benchmark_utils import DATA_PREFIX, EIGENSTRAT_EXTS
+from benchmark_utils import EIGENSTRAT_EXTS, RUNTIME_DATA_PREFIX
 
-DATA_DIR = DATA_PREFIX.parent
+DATA_DIR = RUNTIME_DATA_PREFIX.parent
 SAMPLE_DIR = DATA_DIR / "indo_european_sample_sets"
 SAMPLE_SIZES = (
     128,
@@ -109,9 +109,9 @@ def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
 
 def main() -> None:
     download_archive(INDO_EUROPEAN_URL, ARCHIVE_PATH)
-    extract_required_files(ARCHIVE_PATH, DATA_DIR, DATA_PREFIX)
-    create_plink_dataset(DATA_PREFIX)
-    generate_sample_sets(DATA_PREFIX, SAMPLE_DIR)
+    extract_required_files(ARCHIVE_PATH, DATA_DIR, RUNTIME_DATA_PREFIX)
+    create_plink_dataset(RUNTIME_DATA_PREFIX)
+    generate_sample_sets(RUNTIME_DATA_PREFIX, SAMPLE_DIR)
 
 
 if __name__ == "__main__":
