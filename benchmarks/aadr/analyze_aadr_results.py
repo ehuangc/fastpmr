@@ -44,7 +44,7 @@ def load_metadata(metadata_path: Path) -> dict[str, dict[str, str]]:
         for row in reader:
             if not row:
                 continue
-            metadata[row[0]] = dict(zip(header, row))
+            metadata[row[0]] = dict(zip(header, row, strict=True))
     return metadata
 
 
