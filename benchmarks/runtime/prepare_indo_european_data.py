@@ -4,22 +4,9 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from benchmark_utils import EIGENSTRAT_EXTS, RUNTIME_DATA_PREFIX
+from benchmark_utils import EIGENSTRAT_EXTS, RUNTIME_DATA_PREFIX, RUNTIME_SAMPLE_SET_DIR, RUNTIME_SAMPLE_SET_SIZES
 
 DATA_DIR = RUNTIME_DATA_PREFIX.parent
-SAMPLE_DIR = DATA_DIR / "indo_european_sample_sets"
-SAMPLE_SIZES = (
-    128,
-    256,
-    384,
-    512,
-    640,
-    768,
-    896,
-    1024,
-    1152,
-    1280,
-)
 SAMPLE_SHUFFLE_SEED = 42
 INDO_EUROPEAN_URL = "https://dataverse.harvard.edu/api/access/datafile/10629469?version=1.2"
 ARCHIVE_PATH = DATA_DIR / "indo_european_dataset.tar.gz"
@@ -99,7 +86,7 @@ def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
     rng.shuffle(shuffled)
 
     sample_dir.mkdir(parents=True, exist_ok=True)
-    for size in SAMPLE_SIZES:
+    for size in RUNTIME_SAMPLE_SET_SIZES:
         subset = sorted(shuffled[:size])
         path = sample_dir / f"indo_european_samples_{size}.csv"
         path.write_text("\n".join(subset) + "\n")
@@ -111,7 +98,7 @@ def main() -> None:
     download_archive(INDO_EUROPEAN_URL, ARCHIVE_PATH)
     extract_required_files(ARCHIVE_PATH, DATA_DIR, RUNTIME_DATA_PREFIX)
     create_plink_dataset(RUNTIME_DATA_PREFIX)
-    generate_sample_sets(RUNTIME_DATA_PREFIX, SAMPLE_DIR)
+    generate_sample_sets(RUNTIME_DATA_PREFIX, RUNTIME_SAMPLE_SET_DIR)
 
 
 if __name__ == "__main__":

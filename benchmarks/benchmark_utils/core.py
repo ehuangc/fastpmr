@@ -17,6 +17,19 @@ AADR_RUNS = 1
 
 RUNTIME_DIR = BENCHMARKS_DIR / "runtime"
 RUNTIME_DATA_PREFIX = RUNTIME_DIR / "data" / "IEdata"
+RUNTIME_SAMPLE_SET_DIR = RUNTIME_DIR / "data" / "indo_european_sample_sets"
+RUNTIME_SAMPLE_SET_SIZES = (
+    128,
+    256,
+    384,
+    512,
+    640,
+    768,
+    896,
+    1024,
+    1152,
+    1280,
+)
 RUNTIME_RUNS = 3
 EIGENSTRAT_EXTS = (".ind", ".snp", ".geno")
 PLINK_EXTS = (".bed", ".bim", ".fam")

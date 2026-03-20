@@ -5,6 +5,8 @@ from benchmark_utils import (
     RUNTIME_DATA_PREFIX,
     RUNTIME_DIR,
     RUNTIME_RUNS,
+    RUNTIME_SAMPLE_SET_DIR,
+    RUNTIME_SAMPLE_SET_SIZES,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -12,7 +14,19 @@ from benchmark_utils import (
 
 # Keep threads constant to avoid fastpmr's automatic switch from single- to multi-threaded mode at 500 samples
 THREADS = 512
-SAMPLE_DIR = RUNTIME_DIR / "data" / "indo_european_sample_sets"
+
+
+def ensure_sample_set_data_present() -> None:
+    missing = [
+        RUNTIME_SAMPLE_SET_DIR / f"indo_european_samples_{size}.csv"
+        for size in RUNTIME_SAMPLE_SET_SIZES
+        if not (RUNTIME_SAMPLE_SET_DIR / f"indo_european_samples_{size}.csv").is_file()
+    ]
+    if missing:
+        missing_str = ", ".join(str(path) for path in missing)
+        raise SystemExit(
+            f"Missing sample set files: {missing_str}. Run `pixi run prepare-runtime-benchmarks` to generate them."
+        )
 
 
 def build_command(
@@ -33,14 +47,13 @@ def build_command(
 
 
 def main() -> None:
-    data_prefix = Path(RUNTIME_DATA_PREFIX)
-    sample_dir = Path(SAMPLE_DIR)
-    ensure_data_present(data_prefix)
+    ensure_data_present(RUNTIME_DATA_PREFIX)
+    ensure_sample_set_data_present()
 
     def sample_size(path: Path) -> int:
         return int(path.stem.rsplit("_", 1)[1])
 
-    csv_files = sorted(sample_dir.glob("indo_european_samples_*.csv"), key=sample_size)
+    csv_files = sorted(RUNTIME_SAMPLE_SET_DIR.glob("indo_european_samples_*.csv"), key=sample_size)
 
     results_dir = RUNTIME_DIR / "results"
     export_path = results_dir / "pair_count_benchmark.csv"
@@ -54,7 +67,7 @@ def main() -> None:
         sample_count = count_lines(csv_path)
         pair_count = sample_count * (sample_count - 1) // 2
         output_dir = tempfile.mkdtemp()
-        command = build_command(data_prefix, csv_path, output_dir)
+        command = build_command(RUNTIME_DATA_PREFIX, csv_path, output_dir)
         configs.append((f"samples={sample_count}_pairs={pair_count}", command))
     run_benchmark(configs, export_path, runs=RUNTIME_RUNS)
 
