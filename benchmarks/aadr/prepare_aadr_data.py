@@ -1,8 +1,9 @@
 import subprocess
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-DATA_DIR = SCRIPT_DIR / "data"
+from benchmark_utils import AADR_DIR
+
+DATA_DIR = AADR_DIR / "data"
 REMOTE_FILES = [
     (
         "v62.0_1240k_public.anno",

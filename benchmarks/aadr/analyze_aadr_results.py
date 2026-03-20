@@ -8,10 +8,11 @@ import numpy as np
 import pandas as pd
 from scipy.stats import beta
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-COUNTS_PATH = SCRIPT_DIR / "results" / "fastpmr" / "mismatch_counts.npz"
-METADATA_PATH = SCRIPT_DIR / "data" / "v62.0_1240k_public.anno"
-OUTPUT_DIR = SCRIPT_DIR / "results" / "analysis"
+from benchmark_utils import AADR_DIR
+
+COUNTS_PATH = AADR_DIR / "results" / "fastpmr" / "mismatch_counts.npz"
+METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
+OUTPUT_DIR = AADR_DIR / "results" / "analysis"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
 SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.png"
