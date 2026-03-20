@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import beta
 
-from benchmark_utils import AADR_DIR
+from eval_utils import AADR_DIR
 
 COUNTS_PATH = AADR_DIR / "results" / "fastpmr" / "mismatch_counts.npz"
 METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"

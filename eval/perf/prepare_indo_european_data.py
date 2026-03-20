@@ -4,7 +4,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from benchmark_utils import EIGENSTRAT_EXTS, PERF_DATA_PREFIX, PERF_SAMPLE_SET_DIR, PERF_SAMPLE_SET_SIZES
+from eval_utils import EIGENSTRAT_EXTS, PERF_DATA_PREFIX, PERF_SAMPLE_SET_DIR, PERF_SAMPLE_SET_SIZES
 
 DATA_DIR = PERF_DATA_PREFIX.parent
 SAMPLE_SHUFFLE_SEED = 42

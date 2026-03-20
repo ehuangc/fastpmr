@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from benchmark_utils import PERF_DIR
+from eval_utils import PERF_DIR
 
 RESULTS_DIR = PERF_DIR / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"

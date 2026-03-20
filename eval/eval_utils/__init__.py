@@ -1,11 +1,11 @@
-from benchmark_utils.core import (
+from eval_utils.core import (
     AADR_DATA_PREFIX,
     AADR_DIR,
     AADR_EXTS,
     AADR_RUNS,
-    BENCHMARKS_DIR,
     CSV_FIELDS,
     EIGENSTRAT_EXTS,
+    EVAL_DIR,
     PERF_DATA_PREFIX,
     PERF_DIR,
     PERF_RUNS,
@@ -23,7 +23,7 @@ __all__ = [
     "AADR_DIR",
     "AADR_EXTS",
     "AADR_RUNS",
-    "BENCHMARKS_DIR",
+    "EVAL_DIR",
     "CSV_FIELDS",
     "EIGENSTRAT_EXTS",
     "PLINK_EXTS",

@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from benchmark_utils import (
+from eval_utils import (
     PERF_DATA_PREFIX,
     PERF_DIR,
     PERF_RUNS,
@@ -24,9 +24,7 @@ def ensure_sample_set_data_present() -> None:
     ]
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
-        raise SystemExit(
-            f"Missing sample set files: {missing_str}. Run `pixi run prepare-perf-benchmarks` to generate them."
-        )
+        raise SystemExit(f"Missing sample set files: {missing_str}. Run `pixi run prepare-perf` to generate them.")
 
 
 def build_command(
