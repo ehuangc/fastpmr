@@ -28,10 +28,10 @@ def main() -> None:
     results_dir.mkdir(parents=True, exist_ok=True)
     fastpmr_output_dir = results_dir / "fastpmr"
     fastpmr_output_dir.mkdir(parents=True, exist_ok=True)
-    runtime_output_path = results_dir / "runtime" / "aadr_benchmark.csv"
+    benchmark_output_path = results_dir / "fastpmr" / "aadr_benchmark.csv"
 
     command = build_command(AADR_DATA_PREFIX, fastpmr_output_dir)
-    run_benchmark([("aadr", command)], runtime_output_path, AADR_RUNS)
+    run_benchmark([("aadr", command)], benchmark_output_path, AADR_RUNS)
     print(f"fastpmr outputs written under {fastpmr_output_dir}")
 
 
