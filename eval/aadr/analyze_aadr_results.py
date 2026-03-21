@@ -333,6 +333,8 @@ def main() -> None:
         NON_IDENTICAL_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
     )
+    rate_cols = ["mismatch_rate", "mismatch_rate_95_ci_lower", "mismatch_rate_95_ci_upper"]
+    high_pmr_pairs[rate_cols] = high_pmr_pairs[rate_cols].round(6)
     high_pmr_pairs.to_csv(SAME_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(high_pmr_pairs)} same-master-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
@@ -351,6 +353,7 @@ def main() -> None:
         IDENTICAL_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
     )
+    low_pmr_pairs[rate_cols] = low_pmr_pairs[rate_cols].round(6)
     low_pmr_pairs.to_csv(DIFF_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(low_pmr_pairs)} different-master-ID pairs with PMR < {IDENTICAL_PMR_THRESHOLD} "
