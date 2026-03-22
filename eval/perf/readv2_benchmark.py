@@ -41,7 +41,7 @@ def build_fastpmr_command(prefix: Path, output_dir: Path) -> str:
 
 
 def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> str:
-    return f"cd {quote_path(work_dir)} && pixi run python {quote_path(readv2_script)} -i {quote_path(prefix)}"
+    return f"cd {quote_path(work_dir)} && python {quote_path(readv2_script)} -i {quote_path(prefix)}"
 
 
 def main() -> None:
