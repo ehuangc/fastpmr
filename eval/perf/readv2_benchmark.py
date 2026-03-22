@@ -5,7 +5,7 @@ from pathlib import Path
 from eval_utils import (
     PERF_DATA_PREFIX,
     PERF_DIR,
-    PERF_READV2_RUNS,
+    PERF_RUNS,
     PLINK_EXTS,
     ensure_data_present,
     quote_path,
@@ -56,7 +56,7 @@ def main() -> None:
     fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, output_dir)
     readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
-    run_benchmark(configs, export_path, runs=PERF_READV2_RUNS)
+    run_benchmark(configs, export_path, runs=PERF_RUNS)
 
 
 if __name__ == "__main__":
