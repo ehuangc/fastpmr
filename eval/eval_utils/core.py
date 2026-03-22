@@ -31,6 +31,7 @@ PERF_SAMPLE_SET_SIZES = (
     1280,
 )
 PERF_RUNS = 3
+PERF_READV2_RUNS = 1
 EIGENSTRAT_EXTS = (".ind", ".snp", ".geno")
 PLINK_EXTS = (".bed", ".bim", ".fam")
 
