@@ -1,3 +1,4 @@
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -18,9 +19,11 @@ PLINK_PREFIX = COMPARISON_DATA_PREFIX
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
 
-def ensure_readv2(readv2_dir: Path) -> None:
-    if (readv2_dir / "READ2.py").exists():
-        return
+def clone_readv2(readv2_dir: Path) -> None:
+    if readv2_dir.exists():
+        print(f"Removing existing {readv2_dir}...")
+        shutil.rmtree(readv2_dir)
+
     readv2_dir.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
         ["git", "clone", "--depth", "1", READV2_REPO, str(readv2_dir)],
@@ -47,7 +50,7 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 def main() -> None:
     data_prefix = Path(COMPARISON_DATA_PREFIX)
     ensure_data_present(data_prefix, PLINK_EXTS)
-    ensure_readv2(READV2_DIR)
+    clone_readv2(READV2_DIR)
 
     export_path = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 
