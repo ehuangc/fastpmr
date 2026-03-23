@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from eval_utils import PERF_DIR
+from evaluation_utils import PERFORMANCE_DIR
 
-RESULTS_DIR = PERF_DIR / "results"
+RESULTS_DIR = PERFORMANCE_DIR / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
 
 THREADS_CSV = RESULTS_DIR / "thread_count_benchmark.csv"

@@ -3,17 +3,17 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "eval-utils"
+name = "evaluation-utils"
 version = "0.1.0"
 description = "Shared utilities for fastpmr evaluation scripts."
 requires-python = ">=3.10"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["eval_utils"]
+include = ["evaluation_utils"]
 
 [tool.pixi.workspace]
-name = "fastpmr-eval"
+name = "fastpmr-evaluation"
 version = "0.1.0"
 description = "Pixi environment for running fastpmr evaluations."
 channels = ["conda-forge", "bioconda"]
@@ -34,7 +34,7 @@ scipy = ">=1.17.0,<2"
 seaborn = ">=0.13.2,<0.14"
 
 [tool.pixi.pypi-dependencies]
-eval-utils = { path = ".", editable = true }
+evaluation-utils = { path = ".", editable = true }
 plinkio = ">=0.9.8, <0.10"
 
 [tool.pixi.tasks]
@@ -42,35 +42,35 @@ prepare-aadr = "python aadr/prepare_aadr_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr_aadr.py"
 analyze-aadr = "python aadr/analyze_aadr_results.py"
 
-prepare-perf = "python perf/prepare_indo_european_data.py"
-pairs-benchmark = "python perf/pair_count_benchmark.py"
-variants-benchmark = "python perf/variant_count_benchmark.py"
-threads-benchmark = "python perf/thread_count_benchmark.py"
-plot-perf = "python perf/plot_perf_results.py"
+prepare-performance = "python performance/prepare_indo_european_data.py"
+pairs-benchmark = "python performance/pair_count_benchmark.py"
+variants-benchmark = "python performance/variant_count_benchmark.py"
+threads-benchmark = "python performance/thread_count_benchmark.py"
+plot-performance = "python performance/plot_performance_results.py"
 
-readv2-benchmark = "python comp/run_readv2_benchmark.py"
-plot-comp = "python comp/plot_comp_results.py"
+readv2-benchmark = "python comparison/run_readv2_benchmark.py"
+plot-comparison = "python comparison/plot_comparison_results.py"
 
 aadr-pipeline = [
     { task = "prepare-aadr" },
     { task = "fastpmr-aadr" },
     { task = "analyze-aadr" },
 ]
-perf-pipeline = [
-    { task = "prepare-perf" },
+performance-pipeline = [
+    { task = "prepare-performance" },
     { task = "pairs-benchmark" },
     { task = "variants-benchmark" },
     { task = "threads-benchmark" },
-    { task = "plot-perf" },
+    { task = "plot-performance" },
 ]
-comp-pipeline = [
+comparison-pipeline = [
     { task = "readv2-benchmark" },
-    { task = "plot-comp" },
+    { task = "plot-comparison" },
 ]
 
 [tool.ruff]
 line-length = 120
-exclude = ["comp/READv2/READ2.py"]
+exclude = ["comparison/READv2/READ2.py"]
 
 [tool.ruff.lint]
 select = [

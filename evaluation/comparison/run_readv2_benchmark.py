@@ -2,9 +2,9 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from eval_utils import (
-    PERF_DATA_PREFIX,
-    PERF_RUNS,
+from evaluation_utils import (
+    PERFORMANCE_DATA_PREFIX,
+    PERFORMANCE_RUNS,
     PLINK_EXTS,
     ensure_data_present,
     quote_path,
@@ -14,7 +14,7 @@ from eval_utils import (
 READV2_REPO = "https://github.com/GuntherLab/READv2"
 READV2_DIR = Path(__file__).resolve().parent / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
-PLINK_PREFIX = PERF_DATA_PREFIX
+PLINK_PREFIX = PERFORMANCE_DATA_PREFIX
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
 
@@ -45,7 +45,7 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 
 
 def main() -> None:
-    data_prefix = Path(PERF_DATA_PREFIX)
+    data_prefix = Path(PERFORMANCE_DATA_PREFIX)
     ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
@@ -55,7 +55,7 @@ def main() -> None:
     fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, Path(output_dir))
     readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, Path(output_dir))
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
-    run_benchmark(configs, export_path, runs=PERF_RUNS)
+    run_benchmark(configs, export_path, runs=PERFORMANCE_RUNS)
 
 
 if __name__ == "__main__":

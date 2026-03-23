@@ -1,10 +1,10 @@
 import tempfile
 from pathlib import Path
 
-from eval_utils import (
-    PERF_DATA_PREFIX,
-    PERF_DIR,
-    PERF_RUNS,
+from evaluation_utils import (
+    PERFORMANCE_DATA_PREFIX,
+    PERFORMANCE_DIR,
+    PERFORMANCE_RUNS,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -40,10 +40,10 @@ def build_command(prefix: Path, spec: str, output_dir: Path) -> str:
 
 def main() -> None:
     variant_specs = list(VARIANT_SPECS)
-    data_prefix = Path(PERF_DATA_PREFIX)
+    data_prefix = Path(PERFORMANCE_DATA_PREFIX)
     ensure_data_present(data_prefix)
 
-    results_dir = PERF_DIR / "results"
+    results_dir = PERFORMANCE_DIR / "results"
     export_path = results_dir / "variant_count_benchmark.csv"
 
     configs = []
@@ -51,7 +51,7 @@ def main() -> None:
         output_dir = tempfile.mkdtemp()
         command = build_command(data_prefix, spec, output_dir)
         configs.append((f"variants={spec}", command))
-    run_benchmark(configs, export_path, runs=PERF_RUNS)
+    run_benchmark(configs, export_path, runs=PERFORMANCE_RUNS)
 
 
 if __name__ == "__main__":

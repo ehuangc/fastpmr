@@ -3,10 +3,10 @@
 .DS_Store
 archive/
 sandbox*/
-eval/aadr/data
-eval/aadr/results/fastpmr/*.npz
-eval/perf/data
-eval/perf/READv2
+evaluation/aadr/data
+evaluation/aadr/results/fastpmr/*.npz
+evaluation/performance/data
+evaluation/performance/READv2
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

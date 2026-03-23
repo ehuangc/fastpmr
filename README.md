@@ -59,4 +59,4 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_I
   - Arrays: `covered_snps`, `mismatches`, `totals`, `site_overlaps`
 
 ## Reproducibility
-We recommend using [`Pixi`](https://pixi.sh/) to reproduce evaluations. `Pixi` evaluation tasks can be found in `eval/pyproject.toml`.
+We recommend using [`Pixi`](https://pixi.sh/) to reproduce evaluations. `Pixi` evaluation tasks can be found in `evaluation/pyproject.toml`.

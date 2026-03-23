@@ -9,16 +9,16 @@ import time
 from multiprocessing.connection import Connection
 from pathlib import Path
 
-EVAL_DIR = Path(__file__).resolve().parent.parent
-AADR_DIR = EVAL_DIR / "aadr"
+EVALUATION_DIR = Path(__file__).resolve().parent.parent
+AADR_DIR = EVALUATION_DIR / "aadr"
 AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 
-PERF_DIR = EVAL_DIR / "perf"
-PERF_DATA_PREFIX = PERF_DIR / "data" / "IEdata"
-PERF_SAMPLE_SET_DIR = PERF_DIR / "data" / "indo_european_sample_sets"
-PERF_SAMPLE_SET_SIZES = (
+PERFORMANCE_DIR = EVALUATION_DIR / "performance"
+PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "IEdata"
+PERFORMANCE_SAMPLE_SET_DIR = PERFORMANCE_DIR / "data" / "indo_european_sample_sets"
+PERFORMANCE_SAMPLE_SET_SIZES = (
     128,
     256,
     384,
@@ -30,7 +30,7 @@ PERF_SAMPLE_SET_SIZES = (
     1152,
     1280,
 )
-PERF_RUNS = 3
+PERFORMANCE_RUNS = 3
 EIGENSTRAT_EXTS = (".ind", ".snp", ".geno")
 PLINK_EXTS = (".bed", ".bim", ".fam")
 
@@ -62,7 +62,7 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
             command = "pixi run prepare-aadr"
             dataset = "AADR dataset"
         else:
-            command = "pixi run prepare-perf"
+            command = "pixi run prepare-performance"
             dataset = "Indo-European dataset"
         raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to download and unpack the {dataset}.")
 

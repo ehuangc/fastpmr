@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from eval_utils import AADR_DIR
+from evaluation_utils import AADR_DIR
 
 DATA_DIR = AADR_DIR / "data"
 REMOTE_FILES = [
