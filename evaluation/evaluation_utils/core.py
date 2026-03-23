@@ -5,7 +5,9 @@ import shlex
 import statistics
 import subprocess
 import sys
+import tarfile
 import time
+import zipfile
 from multiprocessing.connection import Connection
 from pathlib import Path
 
@@ -55,6 +57,34 @@ def download_file(url: str, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["curl", "-L", "-#", "-o", str(destination), url], check=True)
     print(f"Downloaded {url} -> {destination}\n")
+
+
+def extract_files(archive_path: Path, destination: Path, prefix: Path, exts: tuple[str, ...]) -> None:
+    destination.mkdir(parents=True, exist_ok=True)
+    target_exts = set(exts)
+    extracted = []
+
+    if archive_path.suffix == ".zip":
+        with zipfile.ZipFile(archive_path) as zf:
+            for member in zf.namelist():
+                path = Path(member)
+                if path.suffix in target_exts:
+                    out_path = prefix.with_suffix(path.suffix)
+                    out_path.write_bytes(zf.read(member))
+                    extracted.append(out_path.name)
+    elif "".join(archive_path.suffixes[-2:]) == ".tar.gz":
+        with tarfile.open(archive_path, "r:gz") as tar:
+            for member in tar.getmembers():
+                path = Path(member.name)
+                if path.suffix in target_exts:
+                    out_path = prefix.with_suffix(path.suffix)
+                    file_obj = tar.extractfile(member)
+                    out_path.write_bytes(file_obj.read())
+                    extracted.append(out_path.name)
+    else:
+        raise ValueError(f"Unsupported archive format: {archive_path.suffix}")
+
+    print(f"Extracted {', '.join(sorted(extracted))} -> {destination}\n")
 
 
 def quote_path(path: Path) -> str:

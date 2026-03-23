@@ -1,5 +1,4 @@
 import random
-import tarfile
 from pathlib import Path
 
 from evaluation_utils import (
@@ -8,26 +7,13 @@ from evaluation_utils import (
     PERFORMANCE_SAMPLE_SET_DIR,
     PERFORMANCE_SAMPLE_SET_SIZES,
     download_file,
+    extract_files,
 )
 
 DATA_DIR = PERFORMANCE_DATA_PREFIX.parent
 SAMPLE_SHUFFLE_SEED = 42
 INDO_EUROPEAN_URL = "https://dataverse.harvard.edu/api/access/datafile/10629469?version=1.2"
 ARCHIVE_PATH = DATA_DIR / "indo_european_dataset.tar.gz"
-
-
-def extract_required_files(archive_path: Path, destination: Path, prefix: Path) -> None:
-    destination.mkdir(parents=True, exist_ok=True)
-    expected = {f"{prefix.name}{ext}": prefix.with_suffix(ext) for ext in EIGENSTRAT_EXTS}
-
-    with tarfile.open(archive_path, "r:gz") as tar:
-        for member in tar.getmembers():
-            name = Path(member.name).name
-            if name in expected:
-                file_obj = tar.extractfile(member)
-                expected[name].write_bytes(file_obj.read())
-
-    print(f"Extracted {', '.join(sorted(expected))} -> {destination}\n")
 
 
 def read_sample_ids(ind_path: Path) -> list[str]:
@@ -62,7 +48,7 @@ def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
 
 def main() -> None:
     download_file(INDO_EUROPEAN_URL, ARCHIVE_PATH)
-    extract_required_files(ARCHIVE_PATH, DATA_DIR, PERFORMANCE_DATA_PREFIX)
+    extract_files(ARCHIVE_PATH, DATA_DIR, PERFORMANCE_DATA_PREFIX, EIGENSTRAT_EXTS)
     generate_sample_sets(PERFORMANCE_DATA_PREFIX, PERFORMANCE_SAMPLE_SET_DIR)
 
 
