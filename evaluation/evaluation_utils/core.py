@@ -50,6 +50,13 @@ CSV_FIELDS = [
 ]
 
 
+def download_file(url: str, destination: Path) -> None:
+    print(f"Downloading {url}...")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["curl", "-L", "-#", "-o", str(destination), url], check=True)
+    print(f"Downloaded {url} -> {destination}\n")
+
+
 def quote_path(path: Path) -> str:
     return shlex.quote(str(path))
 

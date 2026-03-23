@@ -1,22 +1,15 @@
-import subprocess
 import zipfile
 from pathlib import Path
 
 from evaluation_utils import (
     COMPARISON_DATA_PREFIX,
     PLINK_EXTS,
+    download_file,
 )
 
 DATA_DIR = COMPARISON_DATA_PREFIX.parent
 ARGENTINA_URL = "https://dataverse.harvard.edu/api/access/datafile/12077020?version=2.0"
 ARCHIVE_PATH = DATA_DIR / "argentina_dataset.zip"
-
-
-def download_archive(url: str, destination: Path) -> None:
-    print(f"Downloading {url}...")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["curl", "-L", "-#", "-o", str(destination), url], check=True)
-    print(f"Downloaded {url} -> {destination}\n")
 
 
 def extract_plink_files(archive_path: Path, destination: Path, prefix: Path) -> None:
@@ -36,7 +29,7 @@ def extract_plink_files(archive_path: Path, destination: Path, prefix: Path) -> 
 
 
 def main() -> None:
-    download_archive(ARGENTINA_URL, ARCHIVE_PATH)
+    download_file(ARGENTINA_URL, ARCHIVE_PATH)
     extract_plink_files(ARCHIVE_PATH, DATA_DIR, COMPARISON_DATA_PREFIX)
 
 

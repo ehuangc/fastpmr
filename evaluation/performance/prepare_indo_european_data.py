@@ -1,5 +1,4 @@
 import random
-import subprocess
 import tarfile
 from pathlib import Path
 
@@ -8,19 +7,13 @@ from evaluation_utils import (
     PERFORMANCE_DATA_PREFIX,
     PERFORMANCE_SAMPLE_SET_DIR,
     PERFORMANCE_SAMPLE_SET_SIZES,
+    download_file,
 )
 
 DATA_DIR = PERFORMANCE_DATA_PREFIX.parent
 SAMPLE_SHUFFLE_SEED = 42
 INDO_EUROPEAN_URL = "https://dataverse.harvard.edu/api/access/datafile/10629469?version=1.2"
 ARCHIVE_PATH = DATA_DIR / "indo_european_dataset.tar.gz"
-
-
-def download_archive(url: str, destination: Path) -> None:
-    print(f"Downloading {url}...")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["curl", "-L", "-#", "-o", str(destination), url], check=True)
-    print(f"Downloaded {url} -> {destination}\n")
 
 
 def extract_required_files(archive_path: Path, destination: Path, prefix: Path) -> None:
@@ -68,7 +61,7 @@ def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
 
 
 def main() -> None:
-    download_archive(INDO_EUROPEAN_URL, ARCHIVE_PATH)
+    download_file(INDO_EUROPEAN_URL, ARCHIVE_PATH)
     extract_required_files(ARCHIVE_PATH, DATA_DIR, PERFORMANCE_DATA_PREFIX)
     generate_sample_sets(PERFORMANCE_DATA_PREFIX, PERFORMANCE_SAMPLE_SET_DIR)
 
