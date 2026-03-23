@@ -12,7 +12,6 @@ PLOTS_DIR = RESULTS_DIR / "plots"
 THREADS_CSV = RESULTS_DIR / "thread_count_benchmark.csv"
 VARIANTS_CSV = RESULTS_DIR / "variant_count_benchmark.csv"
 PAIRS_CSV = RESULTS_DIR / "pair_count_benchmark.csv"
-READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 
 
 def parse_thread_count(label: str) -> int:
@@ -181,27 +180,6 @@ def main() -> None:
         "Peak RSS (MB)",
         "Peak Memory vs. Sample Count",
         PLOTS_DIR / "sample_count_benchmark_memory.pdf",
-    )
-
-    readv2_df = pd.read_csv(READV2_CSV)
-    readv2_df = bytes_to_mb(readv2_df)
-    save_bar_plot(
-        readv2_df,
-        "label",
-        "mean_s",
-        "stddev_s",
-        "Mean Runtime (s)",
-        "Runtime: fastpmr vs. READv2",
-        PLOTS_DIR / "readv2_comparison_benchmark_runtime.pdf",
-    )
-    save_bar_plot(
-        readv2_df,
-        "label",
-        "mean_mb",
-        "stddev_mb",
-        "Peak RSS (MB)",
-        "Peak Memory: fastpmr vs. READv2",
-        PLOTS_DIR / "readv2_comparison_benchmark_memory.pdf",
     )
 
 

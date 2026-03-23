@@ -47,7 +47,7 @@ pairs-benchmark = "python perf/pair_count_benchmark.py"
 variants-benchmark = "python perf/variant_count_benchmark.py"
 threads-benchmark = "python perf/thread_count_benchmark.py"
 readv2-benchmark = "python perf/readv2_benchmark.py"
-plot-perf = "python perf/plot_benchmark_results.py"
+plot-perf = "python perf/plot_perf_results.py"
 
 aadr-pipeline = [
     { task = "prepare-aadr" },
