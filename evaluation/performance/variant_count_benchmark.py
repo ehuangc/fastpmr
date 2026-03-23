@@ -23,6 +23,7 @@ VARIANT_SPECS = (
     "1-1000000",
     "1-1100000",
     "1-1200000",
+    "1-1233013",  # Include all variants
 )
 
 
