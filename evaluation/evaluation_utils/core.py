@@ -15,6 +15,9 @@ AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 
+COMPARISON_DIR = EVALUATION_DIR / "comparison"
+COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "argentina"
+
 PERFORMANCE_DIR = EVALUATION_DIR / "performance"
 PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "IEdata"
 PERFORMANCE_SAMPLE_SET_DIR = PERFORMANCE_DIR / "data" / "indo_european_sample_sets"
@@ -31,9 +34,9 @@ PERFORMANCE_SAMPLE_SET_SIZES = (
     1280,
 )
 PERFORMANCE_RUNS = 3
+
 EIGENSTRAT_EXTS = (".ind", ".snp", ".geno")
 PLINK_EXTS = (".bed", ".bim", ".fam")
-
 CSV_FIELDS = [
     "label",
     "mean_s",
@@ -61,6 +64,9 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
         if prefix == AADR_DATA_PREFIX:
             command = "pixi run prepare-aadr"
             dataset = "AADR dataset"
+        elif prefix == COMPARISON_DATA_PREFIX:
+            command = "pixi run prepare-comparison"
+            dataset = "Argentina dataset"
         else:
             command = "pixi run prepare-performance"
             dataset = "Indo-European dataset"

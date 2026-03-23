@@ -5,6 +5,7 @@ archive/
 sandbox*/
 evaluation/aadr/data
 evaluation/aadr/results/fastpmr/*.npz
+evaluation/comparison/data
 evaluation/comparison/READv2
 evaluation/performance/data
 

@@ -3,7 +3,7 @@ import tempfile
 from pathlib import Path
 
 from evaluation_utils import (
-    PERFORMANCE_DATA_PREFIX,
+    COMPARISON_DATA_PREFIX,
     PERFORMANCE_RUNS,
     PLINK_EXTS,
     ensure_data_present,
@@ -14,7 +14,7 @@ from evaluation_utils import (
 READV2_REPO = "https://github.com/GuntherLab/READv2"
 READV2_DIR = Path(__file__).resolve().parent / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
-PLINK_PREFIX = PERFORMANCE_DATA_PREFIX
+PLINK_PREFIX = COMPARISON_DATA_PREFIX
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
 
@@ -45,7 +45,7 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
 
 
 def main() -> None:
-    data_prefix = Path(PERFORMANCE_DATA_PREFIX)
+    data_prefix = Path(COMPARISON_DATA_PREFIX)
     ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
