@@ -46,8 +46,10 @@ prepare-perf = "python perf/prepare_indo_european_data.py"
 pairs-benchmark = "python perf/pair_count_benchmark.py"
 variants-benchmark = "python perf/variant_count_benchmark.py"
 threads-benchmark = "python perf/thread_count_benchmark.py"
-readv2-benchmark = "python perf/readv2_benchmark.py"
 plot-perf = "python perf/plot_perf_results.py"
+
+readv2-benchmark = "python comp/run_readv2_benchmark.py"
+plot-comp = "python comp/plot_comp_results.py"
 
 aadr-pipeline = [
     { task = "prepare-aadr" },
@@ -59,13 +61,16 @@ perf-pipeline = [
     { task = "pairs-benchmark" },
     { task = "variants-benchmark" },
     { task = "threads-benchmark" },
-    { task = "readv2-benchmark" },
     { task = "plot-perf" },
+]
+comp-pipeline = [
+    { task = "readv2-benchmark" },
+    { task = "plot-comp" },
 ]
 
 [tool.ruff]
 line-length = 120
-exclude = ["perf/READv2/READ2.py"]
+exclude = ["comp/READv2/READ2.py"]
 
 [tool.ruff.lint]
 select = [

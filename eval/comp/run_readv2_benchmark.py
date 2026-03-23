@@ -4,7 +4,6 @@ from pathlib import Path
 
 from eval_utils import (
     PERF_DATA_PREFIX,
-    PERF_DIR,
     PERF_RUNS,
     PLINK_EXTS,
     ensure_data_present,
@@ -13,9 +12,10 @@ from eval_utils import (
 )
 
 READV2_REPO = "https://github.com/GuntherLab/READv2"
-READV2_DIR = PERF_DIR / "READv2"
+READV2_DIR = Path(__file__).resolve().parent / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
 PLINK_PREFIX = PERF_DATA_PREFIX
+RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
 
 def ensure_readv2(readv2_dir: Path) -> None:
@@ -49,12 +49,11 @@ def main() -> None:
     ensure_data_present(data_prefix, PLINK_EXTS)
     ensure_readv2(READV2_DIR)
 
-    results_dir = PERF_DIR / "results"
-    export_path = results_dir / "readv2_comparison_benchmark.csv"
+    export_path = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 
     output_dir = tempfile.mkdtemp()
-    fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, output_dir)
-    readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, output_dir)
+    fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, Path(output_dir))
+    readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, Path(output_dir))
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
     run_benchmark(configs, export_path, runs=PERF_RUNS)
 
