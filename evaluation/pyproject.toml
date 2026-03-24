@@ -48,7 +48,7 @@ variants-benchmark = "python performance/variant_count_benchmark.py"
 threads-benchmark = "python performance/thread_count_benchmark.py"
 plot-performance = "python performance/plot_performance_results.py"
 
-prepare-comparison = "python comparison/prepare_argentina_dataset.py"
+prepare-comparison = "python comparison/prepare_southern_cone_dataset.py"
 readv2-benchmark = "python comparison/run_readv2_benchmark.py"
 plot-comparison = "python comparison/plot_comparison_results.py"
 

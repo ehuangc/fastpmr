@@ -18,7 +18,7 @@ AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
-COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "argentina"
+COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "southern_cone"
 
 PERFORMANCE_DIR = EVALUATION_DIR / "performance"
 PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "IEdata"
@@ -103,7 +103,7 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
             dataset = "AADR dataset"
         elif prefix == COMPARISON_DATA_PREFIX:
             command = "pixi run prepare-comparison"
-            dataset = "Argentina dataset"
+            dataset = "Southern Cone dataset"
         else:
             command = "pixi run prepare-performance"
             dataset = "Indo-European dataset"
