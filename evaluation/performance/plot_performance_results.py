@@ -51,10 +51,11 @@ def save_line_plot(
     ylabel: str,
     title: str,
     output_path: Path,
+    x_scale: float = 1.0,
 ) -> None:
     fig, ax = plt.subplots(figsize=(5, 4), constrained_layout=True)
     ax.errorbar(
-        data[x_col],
+        data[x_col] / x_scale,
         data[y_col],
         yerr=data[err_col],
         fmt="-o",
@@ -113,20 +114,22 @@ def main() -> None:
         "variants",
         "mean_s",
         "stddev_s",
-        "Variant Count",
+        r"Variant Count ($\times 10^5$)",
         "Mean Runtime (s)",
         "Runtime vs. Variant Count",
         PLOTS_DIR / "variant_count_benchmark_runtime.pdf",
+        x_scale=1e5,
     )
     save_line_plot(
         variants_df,
         "variants",
         "mean_mb",
         "stddev_mb",
-        "Variant Count",
+        r"Variant Count ($\times 10^5$)",
         "Peak RSS (MB)",
         "Peak Memory vs. Variant Count",
         PLOTS_DIR / "variant_count_benchmark_memory.pdf",
+        x_scale=1e5,
     )
 
     pairs_df = pd.read_csv(PAIRS_CSV)
