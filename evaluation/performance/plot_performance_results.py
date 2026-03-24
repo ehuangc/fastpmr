@@ -52,6 +52,7 @@ def save_line_plot(
     title: str,
     output_path: Path,
     x_scale: float = 1.0,
+    x_left: float | None = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=(5, 4), constrained_layout=True)
     ax.errorbar(
@@ -69,7 +70,8 @@ def save_line_plot(
     ax.tick_params(axis="both", labelsize=14)
     ax.ticklabel_format(style="plain", axis="x")
     ax.grid(True, linewidth=0.8, alpha=0.4)
-    ax.set_xlim(left=0)
+    if x_left is not None:
+        ax.set_xlim(left=x_left)
     y_max = (data[y_col] + data[err_col]).max()
     ax.set_ylim(bottom=0, top=y_max * 1.08)
     sns.despine(ax=ax)
@@ -93,6 +95,7 @@ def main() -> None:
         "Mean Runtime (s)",
         "Runtime vs. Thread Count",
         PLOTS_DIR / "thread_count_benchmark_runtime.pdf",
+        x_left=-20,
     )
     save_line_plot(
         threads_df,
@@ -103,6 +106,7 @@ def main() -> None:
         "Peak RSS (MB)",
         "Peak Memory vs. Thread Count",
         PLOTS_DIR / "thread_count_benchmark_memory.pdf",
+        x_left=-20,
     )
 
     variants_df = pd.read_csv(VARIANTS_CSV)
