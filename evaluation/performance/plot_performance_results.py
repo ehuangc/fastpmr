@@ -35,6 +35,13 @@ def parse_pair_count(label: str) -> int:
     return fields["samples"]
 
 
+def bytes_to_mb(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["mean_mb"] = df["mean_bytes"] / (1024**2)
+    df["stddev_mb"] = df["stddev_bytes"] / (1024**2)
+    return df
+
+
 def save_line_plot(
     data: pd.DataFrame,
     x_col: str,
@@ -67,13 +74,6 @@ def save_line_plot(
     sns.despine(ax=ax)
     fig.savefig(output_path, bbox_inches="tight", dpi=600)
     plt.close(fig)
-
-
-def bytes_to_mb(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    df["mean_mb"] = df["mean_bytes"] / (1024**2)
-    df["stddev_mb"] = df["stddev_bytes"] / (1024**2)
-    return df
 
 
 def main() -> None:
