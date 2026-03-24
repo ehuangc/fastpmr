@@ -52,14 +52,14 @@ def save_line_plot(
     title: str,
     output_path: Path,
 ) -> None:
-    fig, ax = plt.subplots(figsize=(8, 5), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(5, 4), constrained_layout=True)
     ax.errorbar(
         data[x_col],
         data[y_col],
         yerr=data[err_col],
         fmt="-o",
-        capsize=9,
-        markersize=9,
+        capsize=8,
+        markersize=8,
         elinewidth=2,
     )
     ax.set_title(title, fontsize=16)
