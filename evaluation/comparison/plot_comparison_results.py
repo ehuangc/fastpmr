@@ -53,14 +53,14 @@ def save_bar_plot(
     output_path: Path,
     seconds_col: str | None = None,
 ) -> None:
-    fig, ax = plt.subplots(figsize=(8, 10), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True)
     ax.bar(
         data[label_col],
         data[y_col],
         yerr=data[err_col],
         width=0.6,
         capsize=14,
-        error_kw={"elinewidth": 2.5, "capthick": 1.5},
+        error_kw={"elinewidth": 2, "capthick": 1},
     )
     y_max = (data[y_col] + data[err_col]).max()
     for x, (y, err) in enumerate(zip(data[y_col], data[err_col], strict=True)):
@@ -71,7 +71,7 @@ def save_bar_plot(
             ann,
             ha="center",
             va="bottom",
-            fontsize=16,
+            fontsize=14,
         )
     ax.margins(x=0.2)
     ax.set_title(title, fontsize=16)
