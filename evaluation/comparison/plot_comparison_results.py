@@ -78,6 +78,8 @@ def save_bar_plot(
     ax.set_ylabel(ylabel, fontsize=16)
     ax.tick_params(axis="both", labelsize=16)
     ax.set_ylim(bottom=0)
+    y_max = (data[y_col] + data[err_col]).max()
+    ax.set_ylim(bottom=0, top=y_max * 1.08)
     ax.grid(True, axis="y", linewidth=0.8, alpha=0.4)
     sns.despine(ax=ax)
     fig.savefig(output_path, bbox_inches="tight", dpi=600)
