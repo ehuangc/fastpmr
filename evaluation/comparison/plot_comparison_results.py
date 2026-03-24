@@ -71,13 +71,13 @@ def save_bar_plot(
     y_max = (data[y_col] + data[err_col]).max()
     for x, (y, err) in enumerate(zip(data[y_col], data[err_col], strict=True)):
         if seconds_col:
-            ann = format_duration(data[seconds_col].iloc[x])
+            annotation = format_duration(data[seconds_col].iloc[x])
         else:
-            ann = format_memory(data[bytes_col].iloc[x])
+            annotation = format_memory(data[bytes_col].iloc[x])
         ax.text(
             x,
             y + err + y_max * 0.01,
-            ann,
+            annotation,
             ha="center",
             va="bottom",
             fontsize=14,
