@@ -730,7 +730,7 @@ packages:
 - pypi: ./
   name: evaluation-utils
   version: 0.1.0
-  sha256: 62d52993ce3ad337aa3053c0cfe0f73dbaa8adae95bf1c3b013d7e5401580f2e
+  sha256: 4316ba9ff7e783e46400472a3fba6d7a16c14d11d0924f7e4e31e8b78df91abb
   requires_python: '>=3.10'
 - conda: https://conda.anaconda.org/bioconda/linux-64/fastpmr-0.1.0-h79ce301_0.conda
   sha256: 089cf037641828a026fbee60ee521c22294b6f7d34c7ae640bc48843fbb2e3f5
