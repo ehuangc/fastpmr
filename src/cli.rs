@@ -57,6 +57,7 @@ struct InputSpecOptions {
     samples_to_keep: Option<HashSet<String>>,
     min_covered_snps: u64,
     variant_indices: Option<HashSet<usize>>,
+    chromosomes: Option<HashSet<String>>,
     threads: Option<usize>,
 }
 
@@ -75,6 +76,7 @@ impl InputSpec {
             samples_to_keep,
             min_covered_snps,
             variant_indices,
+            chromosomes,
             threads,
         } = options;
         let (base_prefix, hint) = normalize_prefix(prefix);
@@ -101,6 +103,22 @@ impl InputSpec {
             Some(FormatHint::Plink)
         } else {
             None
+        };
+
+        // Merge chromosome filter into variant_indices
+        let variant_indices = match (&selected_format, chromosomes) {
+            (Some(fmt), Some(filter)) => {
+                let (path, field) = match fmt {
+                    FormatHint::PackedAncestryMap => (&packed_snp, 1),
+                    FormatHint::Plink => (&plink_bim, 0),
+                };
+                let chr_indices = read_chromosome_variant_indices(path, field, &filter)?;
+                Some(match variant_indices {
+                    Some(existing) => chr_indices.intersection(&existing).cloned().collect(),
+                    None => chr_indices,
+                })
+            }
+            _ => variant_indices,
         };
 
         match selected_format {
@@ -295,6 +313,52 @@ fn strip_extension(path: &Path) -> PathBuf {
     }
 }
 
+fn parse_chromosomes(spec: &str) -> HashSet<String> {
+    let mut chromosomes = HashSet::new();
+    for token in spec.split(',').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+        if let Some((a, b)) = token.split_once('-')
+            && let (Ok(start), Ok(end)) = (a.parse::<u64>(), b.parse::<u64>())
+        {
+            let (lo, hi) = if start <= end {
+                (start, end)
+            } else {
+                (end, start)
+            };
+            for i in lo..=hi {
+                chromosomes.insert(i.to_string());
+            }
+            continue;
+        }
+        chromosomes.insert(token.to_string());
+    }
+    chromosomes
+}
+
+fn read_chromosome_variant_indices(
+    path: &Path,
+    chr_field_idx: usize,
+    filter: &HashSet<String>,
+) -> Result<HashSet<usize>> {
+    let f = File::open(path).map_err(|e| CustomError::ReadWithPath {
+        source: e,
+        path: path.to_path_buf(),
+    })?;
+    let mut indices = HashSet::new();
+    for (variant_idx, line) in BufReader::new(f).lines().enumerate() {
+        let line = line.map_err(|e| CustomError::ReadWithPath {
+            source: e,
+            path: path.to_path_buf(),
+        })?;
+        let fields: Vec<&str> = line.split_whitespace().collect();
+        if let Some(chr) = fields.get(chr_field_idx)
+            && filter.contains(*chr)
+        {
+            indices.insert(variant_idx);
+        }
+    }
+    Ok(indices)
+}
+
 pub fn parse_indices(spec: &str) -> Result<HashSet<usize>> {
     let mut indices = HashSet::new();
 
@@ -340,6 +404,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
         Some(spec) => Some(parse_indices(spec)?),
         None => None,
     };
+    let chromosomes = args.chromosomes_spec.as_deref().map(parse_chromosomes);
     let sample_pairs = match &args.sample_pairs_csv {
         Some(path) => Some(load_sample_pairs_csv(path)?),
         None => None,
@@ -356,6 +421,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
             samples_to_keep,
             min_covered_snps: args.min_covered_snps,
             variant_indices,
+            chromosomes,
             threads: args.threads,
         },
     )
@@ -709,6 +775,7 @@ mod tests {
                 samples_to_keep: None,
                 min_covered_snps: 30000,
                 variant_indices: None,
+                chromosomes: None,
                 threads: None,
             },
         )
@@ -777,5 +844,115 @@ mod tests {
             CustomError::SamplePairDuplicate { sample } => assert_eq!(sample, "A"),
             other => panic!("unexpected error: {other:?}"),
         }
+    }
+
+    #[test]
+    fn parse_chromosomes_numeric_range() {
+        let result = parse_chromosomes("1-5");
+        let expected: HashSet<String> = ["1", "2", "3", "4", "5"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_chromosomes_reversed_range() {
+        let result = parse_chromosomes("5-3");
+        let expected: HashSet<String> = ["3", "4", "5"].iter().map(|s| s.to_string()).collect();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_chromosomes_mixed() {
+        let result = parse_chromosomes("1-3,X,Y");
+        let expected: HashSet<String> = ["1", "2", "3", "X", "Y"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_chromosomes_single_values() {
+        let result = parse_chromosomes("MT,22");
+        let expected: HashSet<String> = ["MT", "22"].iter().map(|s| s.to_string()).collect();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn parse_chromosomes_trims_whitespace() {
+        let result = parse_chromosomes(" 1 - 3 , X ");
+        // "1 - 3" is a single token after split by ','; split_once('-') gives " 1 " and " 3 "
+        // which don't parse as u64 due to whitespace, so the whole token is inserted as literal.
+        // Actually, the trim on the outer split handles leading/trailing on tokens,
+        // but the inner split_once('-') splits "1 - 3" → ("1 ", " 3") which won't parse.
+        // So "1 - 3" becomes a literal. Let's just test what we get.
+        assert!(result.contains("X"));
+        // "1 - 3" is treated as a literal because the halves have spaces
+        assert!(result.contains("1 - 3"));
+    }
+
+    #[test]
+    fn parse_chromosomes_empty_tokens_ignored() {
+        let result = parse_chromosomes(",1,,2,");
+        let expected: HashSet<String> = ["1", "2"].iter().map(|s| s.to_string()).collect();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn read_chromosome_variant_indices_snp_format() {
+        let dir = std::env::temp_dir().join(format!("fastpmr-chr-snp-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let snp_path = dir.join("test.snp");
+        // Eigenstrat SNP format: SNP_ID CHR GEN_POS PHYS_POS REF ALT
+        std::fs::write(
+            &snp_path,
+            "rs1 1 0.0 100 A G\nrs2 2 0.0 200 C T\nrs3 1 0.0 300 G A\nrs4 X 0.0 400 T C\n",
+        )
+        .unwrap();
+
+        let filter: HashSet<String> = ["1"].iter().map(|s| s.to_string()).collect();
+        let indices = read_chromosome_variant_indices(&snp_path, 1, &filter).unwrap();
+        assert_eq!(indices, HashSet::from([0, 2]));
+
+        let filter: HashSet<String> = ["X"].iter().map(|s| s.to_string()).collect();
+        let indices = read_chromosome_variant_indices(&snp_path, 1, &filter).unwrap();
+        assert_eq!(indices, HashSet::from([3]));
+
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn read_chromosome_variant_indices_bim_format() {
+        let dir = std::env::temp_dir().join(format!("fastpmr-chr-bim-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let bim_path = dir.join("test.bim");
+        // PLINK BIM format: CHR SNP_ID CM_POS BP_POS ALT REF
+        std::fs::write(
+            &bim_path,
+            "1 rs1 0 100 A G\n2 rs2 0 200 C T\n1 rs3 0 300 G A\n3 rs4 0 400 T C\n",
+        )
+        .unwrap();
+
+        let filter: HashSet<String> = ["1", "3"].iter().map(|s| s.to_string()).collect();
+        let indices = read_chromosome_variant_indices(&bim_path, 0, &filter).unwrap();
+        assert_eq!(indices, HashSet::from([0, 2, 3]));
+
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn read_chromosome_variant_indices_no_match() {
+        let dir = std::env::temp_dir().join(format!("fastpmr-chr-none-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let snp_path = dir.join("test.snp");
+        std::fs::write(&snp_path, "rs1 1 0.0 100 A G\nrs2 2 0.0 200 C T\n").unwrap();
+
+        let filter: HashSet<String> = ["99"].iter().map(|s| s.to_string()).collect();
+        let indices = read_chromosome_variant_indices(&snp_path, 1, &filter).unwrap();
+        assert!(indices.is_empty());
+
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

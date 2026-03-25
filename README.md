@@ -18,7 +18,7 @@ conda activate fastpmr
 ## Usage
 
 ```bash
-fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_INDICES] [-m MIN_COVERED_SNPS] [-t THREADS]
+fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_INDICES] [-c CHROMOSOMES] [-m MIN_COVERED_SNPS] [-t THREADS]
 ```
 
 > [!NOTE]
@@ -39,6 +39,8 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_I
 **Minimum Covered SNPs** (`--min-covered-snps`) (*optional*): Exclude samples with too-few covered SNPs from PMR calculations. Defaults to `30000`. Set to `0` to disable.
 
 **Variant Indices** (`-v`, `--variant-indices`) (*optional*): 1-based inclusive variant index ranges to keep, e.g., `1,2,3000-5000,10000-20000`.
+
+**Chromosomes** (`-c`, `--chromosomes`) (*optional*): Chromosomes to include, as comma-separated values or numeric ranges, e.g., `1-22`, `1-22,X,Y`, `X,Y,MT`, `23,24,90`. Chromosome values are matched against the chromosome column in the `.snp` or `.bim` file. When used with `--variant-indices`, only variants matching both filters are kept.
 
 **Threads** (`-t`, `--threads`) (*optional*): Number of threads to use. Default behavior is:
 - `<500` samples: single-threaded

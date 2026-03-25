@@ -94,6 +94,58 @@ pub fn create_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
     Ok(Dataset { prefix, output_dir })
 }
 
+/// Like `create_dataset`, but the first `CORE_VARIANTS` variants are on chromosome 1 and the
+/// remaining variants are on chromosome 2. Used to test `--chromosomes` filtering.
+pub fn create_multichrom_dataset(format: GenoFormat, label: &str) -> io::Result<Dataset> {
+    let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
+    let base_dir = std::env::temp_dir().join("fastpmr-tests").join(format!(
+        "{}-{}-{}",
+        std::process::id(),
+        id,
+        label
+    ));
+    fs::create_dir_all(&base_dir)?;
+
+    let prefix = base_dir.join("dataset");
+    let output_dir = base_dir.join("output");
+
+    let variants = build_variants();
+    let sample_ids = sample_ids();
+    let variant_ids = variant_ids();
+    write_ind(prefix.with_extension("ind"), &sample_ids)?;
+    match format {
+        GenoFormat::Packed => {
+            write_snp_multichrom(prefix.with_extension("snp"))?;
+            write_geno(
+                prefix.with_extension("geno"),
+                &variants,
+                &sample_ids,
+                &variant_ids,
+            )?
+        }
+        GenoFormat::Transposed => {
+            write_snp_multichrom(prefix.with_extension("snp"))?;
+            write_tgeno(
+                prefix.with_extension("geno"),
+                &variants,
+                &sample_ids,
+                &variant_ids,
+            )?
+        }
+        GenoFormat::Plink => {
+            write_bed(prefix.with_extension("bed"), &variants)?;
+            write_bim_multichrom(prefix.with_extension("bim"), &variant_ids)?;
+            write_fam(prefix.with_extension("fam"), &sample_ids)?;
+        }
+        GenoFormat::Eigenstrat => {
+            write_snp_multichrom(prefix.with_extension("snp"))?;
+            write_unpacked_geno(prefix.with_extension("geno"), &variants)?
+        }
+    }
+
+    Ok(Dataset { prefix, output_dir })
+}
+
 pub fn expected_pair_stats_all_variants() -> BTreeMap<(String, String), PairStats> {
     build_pair_expectations(true)
 }
@@ -175,6 +227,15 @@ fn write_snp(path: impl AsRef<Path>) -> io::Result<()> {
     let mut file = File::create(path)?;
     for idx in 0..TOTAL_VARIANTS {
         writeln!(file, "rs{} 1 0.0 {} A G", idx + 1, idx + 1)?;
+    }
+    Ok(())
+}
+
+fn write_snp_multichrom(path: impl AsRef<Path>) -> io::Result<()> {
+    let mut file = File::create(path)?;
+    for idx in 0..TOTAL_VARIANTS {
+        let chr = if idx < CORE_VARIANTS { 1 } else { 2 };
+        writeln!(file, "rs{} {} 0.0 {} A G", idx + 1, chr, idx + 1)?;
     }
     Ok(())
 }
@@ -306,6 +367,15 @@ fn write_bim(path: impl AsRef<Path>, variant_ids: &[String]) -> io::Result<()> {
     let mut file = File::create(path)?;
     for (idx, variant) in variant_ids.iter().enumerate() {
         writeln!(file, "1 {variant} 0 {} A G", idx + 1)?;
+    }
+    Ok(())
+}
+
+fn write_bim_multichrom(path: impl AsRef<Path>, variant_ids: &[String]) -> io::Result<()> {
+    let mut file = File::create(path)?;
+    for (idx, variant) in variant_ids.iter().enumerate() {
+        let chr = if idx < CORE_VARIANTS { 1 } else { 2 };
+        writeln!(file, "{chr} {variant} 0 {} A G", idx + 1)?;
     }
     Ok(())
 }
