@@ -19,6 +19,7 @@ def build_command(prefix: Path, threads: int, output_dir: Path) -> str:
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--threads {threads}",
+        "--chromosomes 1-22",
         "--min-covered-snps 0",
         "-n",
     ]

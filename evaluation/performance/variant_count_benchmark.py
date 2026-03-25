@@ -22,8 +22,7 @@ VARIANT_SPECS = (
     "1-900000",
     "1-1000000",
     "1-1100000",
-    "1-1200000",
-    "1-1233013",  # Include all variants
+    "1-1150639",  # Run all autosomal variants
 )
 
 
@@ -33,6 +32,7 @@ def build_command(prefix: Path, spec: str, output_dir: Path) -> str:
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--variant-indices {spec}",
+        "--chromosomes 1-22",
         "--min-covered-snps 0",
         "-n",
     ]
