@@ -2,7 +2,7 @@ use crate::counts::Counts;
 use ndarray::Array2;
 
 const DEG_THRESHOLDS: [f32; 4] = [0.625, 0.8125, 0.90625, 0.953125];
-const THIRD_DEG_INFERENCE_EFFECTIVE_SNP_CUTOFF: f32 = 3000.0;
+const THIRD_DEG_INFERENCE_EXPECTED_MISMATCHES_CUTOFF: f32 = 3000.0;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -85,7 +85,7 @@ fn median(sorted: &[f32]) -> Option<f32> {
     }
 }
 
-fn classify_pair(normalized_mismatch_rate: f32, nsnps_x_norm: f32) -> Degree {
+fn classify_pair(normalized_mismatch_rate: f32, expected_mismatches: f32) -> Degree {
     if normalized_mismatch_rate.is_nan() {
         return Degree::Unrelated;
     }
@@ -96,7 +96,7 @@ fn classify_pair(normalized_mismatch_rate: f32, nsnps_x_norm: f32) -> Degree {
     } else if normalized_mismatch_rate < DEG_THRESHOLDS[2] {
         Degree::Second
     } else if normalized_mismatch_rate <= DEG_THRESHOLDS[3]
-        && nsnps_x_norm >= THIRD_DEG_INFERENCE_EFFECTIVE_SNP_CUTOFF
+        && expected_mismatches >= THIRD_DEG_INFERENCE_EXPECTED_MISMATCHES_CUTOFF
     {
         Degree::Third
     } else {
@@ -111,7 +111,7 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
     let overlaps = counts.site_overlaps();
 
     // Collect valid PMR values for median computation
-    let mut valid_pmrs: Vec<f32> = Vec::new();
+    let mut valid_mismatch_rates: Vec<f32> = Vec::new();
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
             if !counts.should_count_pair(i, j) {
@@ -120,18 +120,18 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
             let pair_idx = counts.idx(i, j);
             let rate = rates[pair_idx];
             if rate.is_finite() {
-                valid_pmrs.push(rate);
+                valid_mismatch_rates.push(rate);
             }
         }
     }
 
-    valid_pmrs.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    let norm_value = median(&valid_pmrs).unwrap_or(0.0);
+    valid_mismatch_rates.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let median_mismatch_rate = median(&valid_mismatch_rates).unwrap_or(0.0);
 
     let mut degrees = vec![Degree::Unrelated; size];
     let mut normalized_mismatch_rates = vec![f32::NAN; size];
 
-    if norm_value == 0.0 {
+    if median_mismatch_rate == 0.0 {
         return DegreeResults {
             degrees,
             normalized_mismatch_rates,
@@ -145,11 +145,11 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
             }
             let pair_idx = counts.idx(i, j);
             let rate = rates[pair_idx];
-            let normalized = rate / norm_value;
-            let nsnps_x_norm = overlaps[pair_idx] as f32 * norm_value;
+            let normalized_mismatch_rate = rate / median_mismatch_rate;
+            let expected_mismatches = overlaps[pair_idx] as f32 * median_mismatch_rate;
 
-            normalized_mismatch_rates[pair_idx] = normalized;
-            degrees[pair_idx] = classify_pair(normalized, nsnps_x_norm);
+            normalized_mismatch_rates[pair_idx] = normalized_mismatch_rate;
+            degrees[pair_idx] = classify_pair(normalized_mismatch_rate, expected_mismatches);
         }
     }
 
