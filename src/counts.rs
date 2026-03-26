@@ -206,30 +206,6 @@ impl Counts {
         rates
     }
 
-    pub fn mismatches_2d(&self) -> Array2<u64> {
-        let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
-        for i in 0..self.n_samples {
-            for j in (i + 1)..self.n_samples {
-                let pair_idx = self.pair_idx(i, j);
-                matrix[(i, j)] = self.mismatches[pair_idx];
-                matrix[(j, i)] = self.mismatches[pair_idx];
-            }
-        }
-        matrix
-    }
-
-    pub fn totals_2d(&self) -> Array2<u64> {
-        let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
-        for i in 0..self.n_samples {
-            for j in (i + 1)..self.n_samples {
-                let pair_idx = self.pair_idx(i, j);
-                matrix[(i, j)] = self.totals[pair_idx];
-                matrix[(j, i)] = self.totals[pair_idx];
-            }
-        }
-        matrix
-    }
-
     pub fn site_overlaps_2d(&self) -> Array2<u64> {
         let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
         for i in 0..self.n_samples {
@@ -237,6 +213,19 @@ impl Counts {
                 let pair_idx = self.pair_idx(i, j);
                 matrix[(i, j)] = self.totals[pair_idx] / 2;
                 matrix[(j, i)] = self.totals[pair_idx] / 2;
+            }
+        }
+        matrix
+    }
+
+    pub fn mismatch_rates_2d(&self) -> Array2<f32> {
+        let rates = self.mismatch_rates();
+        let mut matrix = Array2::from_elem((self.n_samples, self.n_samples), f32::NAN);
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                let pair_idx = self.pair_idx(i, j);
+                matrix[(i, j)] = rates[pair_idx];
+                matrix[(j, i)] = rates[pair_idx];
             }
         }
         matrix
@@ -393,17 +382,24 @@ mod tests {
             .consume_reader_parallel(&mut parallel_reader)
             .expect("parallel counts failed");
 
-        assert_eq!(serial.mismatches_2d(), parallel.mismatches_2d());
-        assert_eq!(serial.totals_2d(), parallel.totals_2d());
+        assert_eq!(serial.site_overlaps_2d(), parallel.site_overlaps_2d());
+        let serial_rates = serial.mismatch_rates_2d();
+        let parallel_rates = parallel.mismatch_rates_2d();
+        for (s, p) in serial_rates.iter().zip(parallel_rates.iter()) {
+            assert!(
+                (s.is_nan() && p.is_nan()) || (s - p).abs() < 1e-6,
+                "serial rate {s} != parallel rate {p}"
+            );
+        }
 
-        let mismatches = serial.mismatches_2d();
-        let totals = serial.totals_2d();
-        assert_eq!(totals[(0, 1)], 4);
-        assert_eq!(mismatches[(0, 1)], 1);
-        assert_eq!(totals[(0, 2)], 2);
-        assert_eq!(mismatches[(0, 2)], 2);
-        assert_eq!(totals[(1, 2)], 4);
-        assert_eq!(mismatches[(1, 2)], 2);
+        let overlaps = serial.site_overlaps_2d();
+        let rates = serial.mismatch_rates_2d();
+        assert_eq!(overlaps[(0, 1)], 2);
+        assert!((rates[(0, 1)] - 0.25).abs() < 1e-6);
+        assert_eq!(overlaps[(0, 2)], 1);
+        assert!((rates[(0, 2)] - 1.0).abs() < 1e-6);
+        assert_eq!(overlaps[(1, 2)], 2);
+        assert!((rates[(1, 2)] - 0.5).abs() < 1e-6);
     }
 
     #[test]

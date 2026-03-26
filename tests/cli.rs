@@ -1053,24 +1053,23 @@ fn assert_npz_outputs(
     let mut npz =
         NpzReader::new(File::open(&npz_path).expect("could not open mismatch_counts.npz"))
             .expect("invalid npz archive");
-    let mismatches: Array2<u64> = npz.by_name("mismatches").expect("missing mismatches array");
-    let totals: Array2<u64> = npz.by_name("totals").expect("missing totals array");
     let overlaps: Array2<u64> = npz
         .by_name("site_overlaps")
         .expect("missing site_overlaps array");
+    let mismatch_rates: Array2<f32> = npz
+        .by_name("mismatch_rates")
+        .expect("missing mismatch_rates array");
     let covered_snps: Array1<u64> = npz
         .by_name("covered_snps")
         .expect("missing covered_snps array");
     let expected_shape = &[common::N_SAMPLES, common::N_SAMPLES];
-    assert_eq!(mismatches.shape(), expected_shape);
-    assert_eq!(totals.shape(), expected_shape);
     assert_eq!(overlaps.shape(), expected_shape);
+    assert_eq!(mismatch_rates.shape(), expected_shape);
     assert_eq!(covered_snps.len(), common::N_SAMPLES);
 
     for idx in 0..common::N_SAMPLES {
-        assert_eq!(mismatches[[idx, idx]], 0);
-        assert_eq!(totals[[idx, idx]], 0);
         assert_eq!(overlaps[[idx, idx]], 0);
+        assert!(mismatch_rates[[idx, idx]].is_nan());
     }
 
     let samples = common::expected_sample_ids();
@@ -1093,33 +1092,21 @@ fn assert_npz_outputs(
                     samples[i], samples[j]
                 )
             });
-            assert_eq!(
-                mismatches[[i, j]],
-                expectation.mismatches,
-                "unexpected mismatches for {} / {}",
+            assert!(
+                (mismatch_rates[[i, j]] - expectation.mismatch_rate()).abs() < 1e-6,
+                "unexpected mismatch rate for {} / {}: got {} expected {}",
                 samples[i],
-                samples[j]
-            );
-            assert_eq!(
-                mismatches[[j, i]],
-                expectation.mismatches,
-                "unexpected symmetric mismatches for {} / {}",
                 samples[j],
-                samples[i]
+                mismatch_rates[[i, j]],
+                expectation.mismatch_rate()
             );
-            assert_eq!(
-                totals[[i, j]],
-                expectation.totals,
-                "unexpected totals for {} / {}",
+            assert!(
+                (mismatch_rates[[j, i]] - expectation.mismatch_rate()).abs() < 1e-6,
+                "unexpected symmetric mismatch rate for {} / {}: got {} expected {}",
+                samples[j],
                 samples[i],
-                samples[j]
-            );
-            assert_eq!(
-                totals[[j, i]],
-                expectation.totals,
-                "unexpected symmetric totals for {} / {}",
-                samples[j],
-                samples[i]
+                mismatch_rates[[j, i]],
+                expectation.mismatch_rate()
             );
             assert_eq!(
                 overlaps[[i, j]],

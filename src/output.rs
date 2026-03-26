@@ -104,16 +104,12 @@ pub fn write_counts_npz(
         npz.add_array("covered_snps", &covered_snps)?;
     }
     {
-        let mismatches = counts.mismatches_2d();
-        npz.add_array("mismatches", &mismatches)?;
-    }
-    {
-        let totals = counts.totals_2d();
-        npz.add_array("totals", &totals)?;
-    }
-    {
         let site_overlaps = counts.site_overlaps_2d();
         npz.add_array("site_overlaps", &site_overlaps)?;
+    }
+    {
+        let mismatch_rates = counts.mismatch_rates_2d();
+        npz.add_array("mismatch_rates", &mismatch_rates)?;
     }
     if let Some(dr) = degree_results {
         {
