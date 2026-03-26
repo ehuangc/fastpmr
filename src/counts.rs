@@ -14,7 +14,7 @@ pub struct Counts {
     mismatches: Vec<u64>,   // Flat (n x n) row-major
     totals: Vec<u64>,       // Flat (n x n) row-major
     covered_snps: Vec<u64>, // Length n
-    // If Some, only calculate PMRs for pairs where indices_to_count[idx(i, j)] is true
+    // If Some, only calculate PMRs for pairs where indices_to_count[pair_idx(i, j)] is true
     indices_to_count: Option<Vec<bool>>,
 }
 
@@ -50,7 +50,7 @@ impl Counts {
         }
     }
 
-    pub fn idx(&self, i: usize, j: usize) -> usize {
+    pub fn pair_idx(&self, i: usize, j: usize) -> usize {
         Self::idx_from_parts(self.n_samples, i, j)
     }
 
@@ -68,7 +68,7 @@ impl Counts {
         }
         self.indices_to_count
             .as_ref()
-            .is_none_or(|mask| mask[self.idx(i, j)])
+            .is_none_or(|mask| mask[self.pair_idx(i, j)])
     }
 
     pub fn consume_reader(mut self, reader: &mut dyn SiteReader) -> Result<Self> {
@@ -89,14 +89,14 @@ impl Counts {
 
             for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
                 for &(sample_idx_j, genotype_j) in &present[i + 1..] {
-                    let counter_idx = self.idx(sample_idx_i, sample_idx_j);
+                    let pair_idx = self.pair_idx(sample_idx_i, sample_idx_j);
                     if self
                         .indices_to_count
                         .as_ref()
-                        .is_none_or(|mask| mask[counter_idx])
+                        .is_none_or(|mask| mask[pair_idx])
                     {
-                        self.mismatches[counter_idx] += genotype_i.mismatch(genotype_j);
-                        self.totals[counter_idx] += 2; // Two alleles per site
+                        self.mismatches[pair_idx] += genotype_i.mismatch(genotype_j);
+                        self.totals[pair_idx] += 2; // Two alleles per site
                     }
                 }
             }
@@ -133,15 +133,15 @@ impl Counts {
 
             for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
                 for &(sample_idx_j, genotype_j) in &present[i + 1..] {
-                    let counter_idx = self.idx(sample_idx_i, sample_idx_j);
+                    let pair_idx = self.pair_idx(sample_idx_i, sample_idx_j);
                     if self
                         .indices_to_count
                         .as_ref()
-                        .is_none_or(|mask| mask[counter_idx])
+                        .is_none_or(|mask| mask[pair_idx])
                     {
-                        mismatches[counter_idx]
+                        mismatches[pair_idx]
                             .fetch_add(genotype_i.mismatch(genotype_j), Ordering::Relaxed);
-                        totals[counter_idx].fetch_add(2, Ordering::Relaxed);
+                        totals[pair_idx].fetch_add(2, Ordering::Relaxed);
                     }
                 }
             }
@@ -183,8 +183,8 @@ impl Counts {
         let mut pairs = vec![(String::new(), String::new()); self.n_samples * self.n_samples];
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
-                let idx = self.idx(i, j);
-                pairs[idx] = (self.samples[i].clone(), self.samples[j].clone());
+                let pair_idx = self.pair_idx(i, j);
+                pairs[pair_idx] = (self.samples[i].clone(), self.samples[j].clone());
             }
         }
         pairs
@@ -194,11 +194,12 @@ impl Counts {
         let mut rates = vec![0.0; self.n_samples * self.n_samples];
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
-                let idx = self.idx(i, j);
-                if self.totals[idx] == 0 {
-                    rates[idx] = f32::NAN;
+                let pair_idx = self.pair_idx(i, j);
+                if self.totals[pair_idx] == 0 {
+                    rates[pair_idx] = f32::NAN;
                 } else {
-                    rates[idx] = self.mismatches[idx] as f32 / self.totals[idx] as f32;
+                    rates[pair_idx] =
+                        self.mismatches[pair_idx] as f32 / self.totals[pair_idx] as f32;
                 }
             }
         }
@@ -209,9 +210,9 @@ impl Counts {
         let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
-                let idx = self.idx(i, j);
-                matrix[(i, j)] = self.mismatches[idx];
-                matrix[(j, i)] = self.mismatches[idx];
+                let pair_idx = self.pair_idx(i, j);
+                matrix[(i, j)] = self.mismatches[pair_idx];
+                matrix[(j, i)] = self.mismatches[pair_idx];
             }
         }
         matrix
@@ -221,9 +222,9 @@ impl Counts {
         let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
-                let idx = self.idx(i, j);
-                matrix[(i, j)] = self.totals[idx];
-                matrix[(j, i)] = self.totals[idx];
+                let pair_idx = self.pair_idx(i, j);
+                matrix[(i, j)] = self.totals[pair_idx];
+                matrix[(j, i)] = self.totals[pair_idx];
             }
         }
         matrix
@@ -233,9 +234,9 @@ impl Counts {
         let mut matrix = Array2::zeros((self.n_samples, self.n_samples));
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
-                let idx = self.idx(i, j);
-                matrix[(i, j)] = self.totals[idx] / 2;
-                matrix[(j, i)] = self.totals[idx] / 2;
+                let pair_idx = self.pair_idx(i, j);
+                matrix[(i, j)] = self.totals[pair_idx] / 2;
+                matrix[(j, i)] = self.totals[pair_idx] / 2;
             }
         }
         matrix
@@ -252,7 +253,7 @@ impl Counts {
 
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
-                let pair_idx = self.idx(i, j);
+                let pair_idx = self.pair_idx(i, j);
                 if site_overlaps[pair_idx] == 0 {
                     lower[pair_idx] = f32::NAN;
                     upper[pair_idx] = f32::NAN;
@@ -276,7 +277,7 @@ impl Counts {
                 if !self.should_count_pair(i, j) {
                     continue;
                 }
-                let pair_idx = self.idx(i, j);
+                let pair_idx = self.pair_idx(i, j);
                 matrix[(i, j)] = ci.lower[pair_idx];
                 matrix[(j, i)] = ci.lower[pair_idx];
             }
@@ -291,7 +292,7 @@ impl Counts {
                 if !self.should_count_pair(i, j) {
                     continue;
                 }
-                let pair_idx = self.idx(i, j);
+                let pair_idx = self.pair_idx(i, j);
                 matrix[(i, j)] = ci.upper[pair_idx];
                 matrix[(j, i)] = ci.upper[pair_idx];
             }
@@ -419,14 +420,14 @@ mod tests {
         // se = sqrt(0.25 * 0.75 / 2) = 0.30619
         // lower = max(0, 0.25 - 1.96 * 0.30619) = 0.0 (clamped)
         // upper = 0.25 + 1.96 * 0.30619 = 0.8501
-        let pair_idx_ab = counts.idx(0, 1);
+        let pair_idx_ab = counts.pair_idx(0, 1);
         assert!((ci.lower[pair_idx_ab] - 0.0).abs() < 1e-6);
         assert!((ci.upper[pair_idx_ab] - 0.8501).abs() < 1e-3);
 
         // Pair (A, C): mismatches=2, totals=2, site_overlaps=1, p=1.0
         // se = sqrt(1.0 * 0.0 / 1) = 0.0
         // lower = 1.0, upper = 1.0
-        let pair_idx_ac = counts.idx(0, 2);
+        let pair_idx_ac = counts.pair_idx(0, 2);
         assert!((ci.lower[pair_idx_ac] - 1.0).abs() < 1e-6);
         assert!((ci.upper[pair_idx_ac] - 1.0).abs() < 1e-6);
 
@@ -434,7 +435,7 @@ mod tests {
         // se = sqrt(0.5 * 0.5 / 2) = 0.35355
         // lower = max(0, 0.5 - 1.96 * 0.35355) = 0.0 (clamped)
         // upper = min(1, 0.5 + 1.96 * 0.35355) = 1.0 (clamped)
-        let pair_idx_bc = counts.idx(1, 2);
+        let pair_idx_bc = counts.pair_idx(1, 2);
         assert!((ci.lower[pair_idx_bc] - 0.0).abs() < 1e-6);
         assert!((ci.upper[pair_idx_bc] - 1.0).abs() < 1e-6);
     }
@@ -444,8 +445,8 @@ mod tests {
         let samples = vec!["A".to_string(), "B".to_string()];
         let counts = Counts::new(samples, None, vec![0; 2]);
         let ci = counts.confidence_intervals_95();
-        let idx = counts.idx(0, 1);
-        assert!(ci.lower[idx].is_nan());
-        assert!(ci.upper[idx].is_nan());
+        let pair_idx = counts.pair_idx(0, 1);
+        assert!(ci.lower[pair_idx].is_nan());
+        assert!(ci.upper[pair_idx].is_nan());
     }
 }

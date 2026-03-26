@@ -51,7 +51,7 @@ impl DegreeResults {
                 if !counts.should_count_pair(i, j) {
                     continue;
                 }
-                let pair_idx = counts.idx(i, j);
+                let pair_idx = counts.pair_idx(i, j);
                 matrix[(i, j)] = self.normalized_mismatch_rates[pair_idx];
                 matrix[(j, i)] = self.normalized_mismatch_rates[pair_idx];
             }
@@ -66,7 +66,7 @@ impl DegreeResults {
                 if !counts.should_count_pair(i, j) {
                     continue;
                 }
-                let pair_idx = counts.idx(i, j);
+                let pair_idx = counts.pair_idx(i, j);
                 matrix[(i, j)] = self.degrees[pair_idx] as u8;
                 matrix[(j, i)] = self.degrees[pair_idx] as u8;
             }
@@ -119,7 +119,7 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let pair_idx = counts.idx(i, j);
+            let pair_idx = counts.pair_idx(i, j);
             let rate = rates[pair_idx];
             if rate.is_finite() {
                 valid_mismatch_rates.push(rate);
@@ -145,7 +145,7 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let pair_idx = counts.idx(i, j);
+            let pair_idx = counts.pair_idx(i, j);
             let rate = rates[pair_idx];
             let normalized_mismatch_rate = rate / median_mismatch_rate;
             let expected_mismatches = overlaps[pair_idx] as f32 * median_mismatch_rate;

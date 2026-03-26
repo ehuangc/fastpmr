@@ -54,7 +54,7 @@ pub fn write_mismatch_rates(
 
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
-            let pair_idx = counts.idx(i, j);
+            let pair_idx = counts.pair_idx(i, j);
             if !counts.should_count_pair(i, j) {
                 continue;
             }
@@ -176,7 +176,7 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<(
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let pair_idx = counts.idx(i, j);
+            let pair_idx = counts.pair_idx(i, j);
             let overlap = overlaps[pair_idx];
             let rate = rates[pair_idx];
             if overlap >= 30000 && rate.is_finite() {
