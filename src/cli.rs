@@ -28,6 +28,7 @@ pub enum InputSpec {
         snp: PathBuf,
         output_dir: PathBuf,
         npz: bool,
+        degrees: bool,
         sample_pairs: Option<Vec<(String, String)>>,
         samples_to_keep: Option<HashSet<String>>,
         min_covered_snps: u64,
@@ -41,6 +42,7 @@ pub enum InputSpec {
         fam: PathBuf,
         output_dir: PathBuf,
         npz: bool,
+        degrees: bool,
         sample_pairs: Option<Vec<(String, String)>>,
         samples_to_keep: Option<HashSet<String>>,
         min_covered_snps: u64,
@@ -53,6 +55,7 @@ pub enum InputSpec {
 struct InputSpecOptions {
     output_dir: PathBuf,
     npz: bool,
+    degrees: bool,
     sample_pairs: Option<Vec<(String, String)>>,
     samples_to_keep: Option<HashSet<String>>,
     min_covered_snps: u64,
@@ -72,6 +75,7 @@ impl InputSpec {
         let InputSpecOptions {
             output_dir,
             npz,
+            degrees,
             sample_pairs,
             samples_to_keep,
             min_covered_snps,
@@ -128,6 +132,7 @@ impl InputSpec {
                 snp: packed_snp,
                 output_dir,
                 npz,
+                degrees,
                 sample_pairs,
                 samples_to_keep,
                 min_covered_snps,
@@ -140,6 +145,7 @@ impl InputSpec {
                 fam: plink_fam,
                 output_dir,
                 npz,
+                degrees,
                 sample_pairs,
                 samples_to_keep,
                 min_covered_snps,
@@ -254,6 +260,14 @@ impl InputSpec {
     pub fn npz(&self) -> bool {
         match self {
             InputSpec::PackedAncestryMap { npz, .. } | InputSpec::Plink { npz, .. } => *npz,
+        }
+    }
+
+    pub fn degrees(&self) -> bool {
+        match self {
+            InputSpec::PackedAncestryMap { degrees, .. } | InputSpec::Plink { degrees, .. } => {
+                *degrees
+            }
         }
     }
 
@@ -417,6 +431,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
         InputSpecOptions {
             output_dir: PathBuf::from(&args.output_directory),
             npz: args.npz,
+            degrees: args.degrees,
             sample_pairs,
             samples_to_keep,
             min_covered_snps: args.min_covered_snps,
@@ -702,13 +717,19 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
         counts = counts.consume_reader_parallel(reader.as_mut())?;
     }
 
+    let degree_results = if input_spec.degrees() {
+        Some(crate::degrees::classify_degrees(&counts))
+    } else {
+        None
+    };
+
     if input_spec.npz() {
         let npz_path = input_spec.output_dir().join("mismatch_counts.npz");
         println!(
             "Writing pairwise mismatch counts to {}...",
             npz_path.display()
         );
-        write_counts_npz(&counts, &npz_path)?;
+        write_counts_npz(&counts, degree_results.as_ref(), &npz_path)?;
     } else {
         let coverage_path = input_spec.output_dir().join("covered_snps.csv");
         println!(
@@ -722,7 +743,7 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
             "Writing pairwise mismatch rates to {}...",
             rates_path.display()
         );
-        write_mismatch_rates(&counts, &rates_path)?;
+        write_mismatch_rates(&counts, degree_results.as_ref(), &rates_path)?;
     }
 
     let plot_path = input_spec.output_dir().join("mismatch_rates.png");
@@ -771,6 +792,7 @@ mod tests {
             InputSpecOptions {
                 output_dir,
                 npz: false,
+                degrees: false,
                 sample_pairs: None,
                 samples_to_keep: None,
                 min_covered_snps: 30000,

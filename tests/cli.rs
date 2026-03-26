@@ -18,7 +18,7 @@ fn packedancestrymap_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, None, false, None, None, None);
+    let output = run_fastpmr(&dataset, RunOptions::default());
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -43,7 +43,7 @@ fn transposed_packedancestrymap_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, None, false, None, None, None);
+    let output = run_fastpmr(&dataset, RunOptions::default());
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -68,7 +68,7 @@ fn eigenstrat_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, None, false, None, None, None);
+    let output = run_fastpmr(&dataset, RunOptions::default());
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -93,7 +93,7 @@ fn plink_cli_generates_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, None, false, None, None, None);
+    let output = run_fastpmr(&dataset, RunOptions::default());
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -118,7 +118,13 @@ fn packedancestrymap_cli_generates_outputs_with_threads() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, None, false, None, None, Some(2));
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            threads: Some(2),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -143,7 +149,13 @@ fn packedancestrymap_cli_generates_npz_outputs() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, None, true, None, None, None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            npz: true,
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -151,7 +163,85 @@ fn packedancestrymap_cli_generates_npz_outputs() {
         String::from_utf8_lossy(&output.stderr)
     );
 
-    assert_npz_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
+    assert_npz_outputs(
+        &dataset.output_dir,
+        &expected_pairs,
+        &expected_coverage,
+        false,
+    );
+}
+
+#[test]
+fn csv_outputs_include_degrees() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-degrees-csv").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_all_variants();
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            degrees: true,
+            ..Default::default()
+        },
+    );
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
+    assert_eq!(
+        records.len(),
+        expected_pairs.len(),
+        "unexpected number of pairwise records"
+    );
+    for record in &records {
+        assert!(
+            record.degree.is_some(),
+            "expected degree column when --degrees is set"
+        );
+        assert!(
+            record.normalized_mismatch_rate.is_some(),
+            "expected normalized_mismatch_rate column when --degrees is set"
+        );
+    }
+}
+
+#[test]
+fn npz_outputs_include_degrees() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-degrees-npz").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_all_variants();
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            npz: true,
+            degrees: true,
+            ..Default::default()
+        },
+    );
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    assert_npz_outputs(
+        &dataset.output_dir,
+        &expected_pairs,
+        &expected_coverage,
+        true,
+    );
 }
 
 #[test]
@@ -163,7 +253,14 @@ fn variant_indices_limit_sites() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), None, false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            variant_spec: Some("1-30000"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -189,7 +286,14 @@ fn eigenstrat_variant_indices_limit_sites() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), None, false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            variant_spec: Some("1-30000"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -214,7 +318,14 @@ fn plink_variant_indices_limit_sites() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, Some("1-30000"), None, false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            variant_spec: Some("1-30000"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -243,7 +354,13 @@ fn sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, None, false, Some(&csv_path), None, None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            sample_pairs_csv: Some(&csv_path),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -293,7 +410,13 @@ fn eigenstrat_sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, None, false, Some(&csv_path), None, None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            sample_pairs_csv: Some(&csv_path),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -342,7 +465,13 @@ fn plink_sample_pairs_csv_runs_successfully() {
     )
     .unwrap();
 
-    let output = run_fastpmr(&dataset, None, None, false, Some(&csv_path), None, None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            sample_pairs_csv: Some(&csv_path),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -386,7 +515,13 @@ fn sample_list_csv_runs_successfully() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(&csv_path, "Sample1\nSample3\nSample4\n").unwrap();
 
-    let output = run_fastpmr(&dataset, None, None, false, Some(&csv_path), None, None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            sample_pairs_csv: Some(&csv_path),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -429,7 +564,13 @@ fn sample_pairs_csv_with_unknown_sample_fails() {
     let csv_path = dataset.prefix.with_extension("pairs.csv");
     fs::write(&csv_path, "Sample1,Unknown\n").unwrap();
 
-    let output = run_fastpmr(&dataset, None, None, false, Some(&csv_path), None, None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            sample_pairs_csv: Some(&csv_path),
+            ..Default::default()
+        },
+    );
     assert!(
         !output.status.success(),
         "fastpmr unexpectedly succeeded: stdout={} stderr={}",
@@ -455,7 +596,14 @@ fn chromosomes_filter_sites_packed() {
     // same results as --variant-indices 1-30000.
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, None, Some("1"), false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            chromosomes_spec: Some("1"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -482,7 +630,14 @@ fn chromosomes_filter_sites_eigenstrat() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, None, Some("1"), false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            chromosomes_spec: Some("1"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -508,7 +663,14 @@ fn chromosomes_filter_sites_plink() {
 
     let expected_pairs = common::expected_pair_stats_filtered_variants();
     let expected_coverage = common::expected_covered_snps_filtered_variants();
-    let output = run_fastpmr(&dataset, None, Some("1"), false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            chromosomes_spec: Some("1"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -535,7 +697,14 @@ fn chromosomes_range_includes_all() {
 
     let expected_pairs = common::expected_pair_stats_all_variants();
     let expected_coverage = common::expected_covered_snps_all_variants();
-    let output = run_fastpmr(&dataset, None, Some("1-2"), false, None, Some(0), None);
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            chromosomes_spec: Some("1-2"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
+    );
     assert!(
         output.status.success(),
         "fastpmr failed: stdout={} stderr={}",
@@ -564,12 +733,12 @@ fn chromosomes_intersects_with_variant_indices() {
 
     let output = run_fastpmr(
         &dataset,
-        Some("1-15000"),
-        Some("1"),
-        false,
-        None,
-        Some(0),
-        None,
+        RunOptions {
+            variant_spec: Some("1-15000"),
+            chromosomes_spec: Some("1"),
+            min_covered_snps: Some(0),
+            ..Default::default()
+        },
     );
     assert!(
         output.status.success(),
@@ -601,37 +770,43 @@ fn chromosomes_intersects_with_variant_indices() {
     }
 }
 
-fn run_fastpmr(
-    dataset: &common::Dataset,
-    variant_spec: Option<&str>,
-    chromosomes_spec: Option<&str>,
+#[derive(Default)]
+struct RunOptions<'a> {
+    variant_spec: Option<&'a str>,
+    chromosomes_spec: Option<&'a str>,
     npz: bool,
-    sample_pairs_csv: Option<&Path>,
+    degrees: bool,
+    sample_pairs_csv: Option<&'a Path>,
     min_covered_snps: Option<u64>,
     threads: Option<usize>,
-) -> std::process::Output {
+}
+
+fn run_fastpmr(dataset: &common::Dataset, opts: RunOptions) -> std::process::Output {
     let mut command = Command::new(env!("CARGO_BIN_EXE_fastpmr"));
     command
         .arg("--prefix")
         .arg(dataset.prefix.as_os_str())
         .arg("--output-directory")
         .arg(dataset.output_dir.as_os_str());
-    if let Some(spec) = variant_spec {
+    if let Some(spec) = opts.variant_spec {
         command.arg("--variant-indices").arg(spec);
     }
-    if let Some(spec) = chromosomes_spec {
+    if let Some(spec) = opts.chromosomes_spec {
         command.arg("--chromosomes").arg(spec);
     }
-    if npz {
+    if opts.npz {
         command.arg("--npz");
     }
-    if let Some(path) = sample_pairs_csv {
+    if opts.degrees {
+        command.arg("--degrees");
+    }
+    if let Some(path) = opts.sample_pairs_csv {
         command.arg("--sample-pairs-csv").arg(path);
     }
-    if let Some(min) = min_covered_snps {
+    if let Some(min) = opts.min_covered_snps {
         command.arg("--min-covered-snps").arg(min.to_string());
     }
-    if let Some(n) = threads {
+    if let Some(n) = opts.threads {
         command.arg("--threads").arg(n.to_string());
     }
     command.output().expect("failed to run fastpmr")
@@ -643,6 +818,8 @@ struct OutputRecord {
     id2: String,
     overlap: u64,
     rate: f32,
+    normalized_mismatch_rate: Option<f64>,
+    degree: Option<String>,
 }
 
 fn assert_outputs(
@@ -705,6 +882,7 @@ fn assert_npz_outputs(
     output_dir: &Path,
     expected_pairs: &BTreeMap<(String, String), common::PairStats>,
     expected_coverage: &BTreeMap<String, u64>,
+    degrees: bool,
 ) {
     let csv_path = output_dir.join("mismatch_rates.csv");
     assert!(
@@ -821,20 +999,73 @@ fn assert_npz_outputs(
         expected_pairs.len()
     );
 
+    if degrees {
+        let normalized: Array2<f32> = npz
+            .by_name("normalized_mismatch_rates")
+            .expect("missing normalized_mismatch_rates array");
+        let degree_codes: Array2<u8> = npz.by_name("degrees").expect("missing degrees array");
+        assert_eq!(normalized.shape(), expected_shape);
+        assert_eq!(degree_codes.shape(), expected_shape);
+
+        for i in 0..common::N_SAMPLES {
+            for j in (i + 1)..common::N_SAMPLES {
+                assert_eq!(
+                    degree_codes[[i, j]],
+                    degree_codes[[j, i]],
+                    "degree matrix not symmetric at ({i}, {j})"
+                );
+                assert!(
+                    degree_codes[[i, j]] <= 4,
+                    "invalid degree code {} at ({i}, {j})",
+                    degree_codes[[i, j]]
+                );
+                assert!(
+                    (normalized[[i, j]] - normalized[[j, i]]).abs() < 1e-10
+                        || (normalized[[i, j]].is_nan() && normalized[[j, i]].is_nan()),
+                    "normalized_mismatch_rates not symmetric at ({i}, {j})"
+                );
+            }
+        }
+    }
+
     drop(npz);
 
     let mut archive = ZipArchive::new(File::open(&npz_path).expect("could not reopen npz archive"))
         .expect("failed to read npz as zip");
-    let mut samples_file = archive
-        .by_name("samples.json")
-        .expect("missing samples.json in npz");
-    let mut json = String::new();
-    samples_file
-        .read_to_string(&mut json)
-        .expect("failed to read samples.json");
-    let samples: Vec<String> =
-        serde_json::from_str(&json).expect("invalid JSON in samples.json inside npz");
-    assert_eq!(samples, common::expected_sample_ids());
+    {
+        let mut samples_file = archive
+            .by_name("samples.json")
+            .expect("missing samples.json in npz");
+        let mut json = String::new();
+        samples_file
+            .read_to_string(&mut json)
+            .expect("failed to read samples.json");
+        let samples: Vec<String> =
+            serde_json::from_str(&json).expect("invalid JSON in samples.json inside npz");
+        assert_eq!(samples, common::expected_sample_ids());
+    }
+
+    if degrees {
+        let mut labels_file = archive
+            .by_name("degree_labels.json")
+            .expect("missing degree_labels.json in npz");
+        let mut labels_json = String::new();
+        labels_file
+            .read_to_string(&mut labels_json)
+            .expect("failed to read degree_labels.json");
+        let labels: Vec<String> =
+            serde_json::from_str(&labels_json).expect("invalid JSON in degree_labels.json");
+        assert_eq!(
+            labels,
+            vec![
+                "Identical/Twin",
+                "First Degree",
+                "Second Degree",
+                "Third Degree",
+                "Unrelated"
+            ]
+        );
+    }
 
     let plot_path = output_dir.join("mismatch_rates.png");
     let metadata = fs::metadata(plot_path).expect("missing plot output");
@@ -856,7 +1087,19 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
     let content = fs::read_to_string(path).expect("could not read mismatch rates");
     let mut lines = content.lines();
     let header = lines.next().expect("missing header").trim_end_matches('\r');
-    assert_eq!(header, "id1,id2,n_site_overlaps,mismatch_rate");
+    let has_degrees =
+        header == "id1,id2,n_site_overlaps,mismatch_rate,normalized_mismatch_rate,degree";
+    if !has_degrees {
+        assert_eq!(header, "id1,id2,n_site_overlaps,mismatch_rate");
+    }
+
+    let valid_degrees = [
+        "Identical/Twin",
+        "First Degree",
+        "Second Degree",
+        "Third Degree",
+        "Unrelated",
+    ];
 
     let mut records = Vec::new();
     for line in lines {
@@ -864,28 +1107,46 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
         if trimmed.is_empty() {
             continue;
         }
-        let mut fields = trimmed.split(',');
-        let id1 = fields.next().expect("missing id1 field").to_string();
-        let id2 = fields.next().expect("missing id2 field").to_string();
-        let overlap: u64 = fields
-            .next()
-            .expect("missing overlap field")
-            .parse()
-            .expect("invalid overlap value");
-        let rate: f32 = fields
-            .next()
-            .expect("missing mismatch rate field")
-            .parse()
-            .expect("invalid mismatch rate value");
-        assert!(
-            fields.next().is_none(),
-            "unexpected extra columns in record: {trimmed}"
-        );
+        let fields: Vec<&str> = trimmed.split(',').collect();
+        if has_degrees {
+            assert_eq!(
+                fields.len(),
+                6,
+                "unexpected column count in degree record: {trimmed}"
+            );
+        } else {
+            assert_eq!(
+                fields.len(),
+                4,
+                "unexpected column count in record: {trimmed}"
+            );
+        }
+        let id1 = fields[0].to_string();
+        let id2 = fields[1].to_string();
+        let overlap: u64 = fields[2].parse().expect("invalid overlap value");
+        let rate: f32 = fields[3].parse().expect("invalid mismatch rate value");
+
+        let (normalized_mismatch_rate, degree) = if has_degrees {
+            let nmr: f64 = fields[4]
+                .parse()
+                .expect("invalid normalized_mismatch_rate value");
+            let deg = fields[5].to_string();
+            assert!(
+                valid_degrees.contains(&deg.as_str()),
+                "invalid degree: {deg}"
+            );
+            (Some(nmr), Some(deg))
+        } else {
+            (None, None)
+        };
+
         records.push(OutputRecord {
             id1,
             id2,
             overlap,
             rate,
+            normalized_mismatch_rate,
+            degree,
         });
     }
     records

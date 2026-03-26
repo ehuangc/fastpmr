@@ -1,4 +1,5 @@
 use crate::counts::Counts;
+use crate::degrees::{Degree, DegreeResults};
 use crate::error::{CustomError, Result};
 use ndarray::Array1;
 use plotters::coord::combinators::IntoLogRange;
@@ -26,13 +27,28 @@ pub fn write_covered_snps(counts: &Counts, path: &impl AsRef<Path>) -> Result<()
     Ok(())
 }
 
-pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
+pub fn write_mismatch_rates(
+    counts: &Counts,
+    degree_results: Option<&DegreeResults>,
+    path: &impl AsRef<Path>,
+) -> Result<()> {
     let n_samples = counts.n_samples();
     let overlaps = counts.site_overlaps();
     let (pairs, rates) = counts.mismatch_rates();
 
     let mut wtr = csv::Writer::from_path(path)?;
-    wtr.write_record(["id1", "id2", "n_site_overlaps", "mismatch_rate"])?;
+    if degree_results.is_some() {
+        wtr.write_record([
+            "id1",
+            "id2",
+            "n_site_overlaps",
+            "mismatch_rate",
+            "normalized_mismatch_rate",
+            "degree",
+        ])?;
+    } else {
+        wtr.write_record(["id1", "id2", "n_site_overlaps", "mismatch_rate"])?;
+    }
 
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
@@ -42,12 +58,23 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
             }
             let overlap = overlaps[counter_idx];
             let rate = rates[counter_idx];
-            wtr.serialize((
-                pairs[counter_idx].0.as_str(),
-                pairs[counter_idx].1.as_str(),
-                overlap,
-                rate,
-            ))?;
+            if let Some(dr) = degree_results {
+                wtr.serialize((
+                    pairs[counter_idx].0.as_str(),
+                    pairs[counter_idx].1.as_str(),
+                    overlap,
+                    rate,
+                    dr.normalized_mismatch_rates[counter_idx],
+                    dr.degrees[counter_idx].to_string(),
+                ))?;
+            } else {
+                wtr.serialize((
+                    pairs[counter_idx].0.as_str(),
+                    pairs[counter_idx].1.as_str(),
+                    overlap,
+                    rate,
+                ))?;
+            }
         }
     }
     wtr.flush().map_err(|e| CustomError::Write {
@@ -57,7 +84,11 @@ pub fn write_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<
     Ok(())
 }
 
-pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
+pub fn write_counts_npz(
+    counts: &Counts,
+    degree_results: Option<&DegreeResults>,
+    path: &impl AsRef<Path>,
+) -> Result<()> {
     let mut npz =
         ndarray_npy::NpzWriter::new_compressed(std::fs::File::create(path).map_err(|e| {
             CustomError::Write {
@@ -82,9 +113,19 @@ pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> 
         let site_overlaps = counts.site_overlaps_2d();
         npz.add_array("site_overlaps", &site_overlaps)?;
     }
+    if let Some(dr) = degree_results {
+        {
+            let normalized = dr.normalized_mismatch_rates_2d(counts.n_samples(), counts);
+            npz.add_array("normalized_mismatch_rates", &normalized)?;
+        }
+        {
+            let degrees = dr.degrees_2d(counts.n_samples(), counts);
+            npz.add_array("degrees", &degrees)?;
+        }
+    }
     npz.finish()?;
 
-    // Reopen file and append JSON with sample IDs
+    // Reopen file and append JSON metadata
     let samples = counts.samples();
     let file = OpenOptions::new()
         .read(true)
@@ -101,6 +142,14 @@ pub fn write_counts_npz(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> 
             source: e,
             path: path.as_ref().into(),
         })?;
+    if degree_results.is_some() {
+        zip.start_file("degree_labels.json", SimpleFileOptions::default())?;
+        zip.write_all(serde_json::to_string(&Degree::LABELS)?.as_bytes())
+            .map_err(|e| CustomError::Write {
+                source: e,
+                path: path.as_ref().into(),
+            })?;
+    }
     zip.finish()?;
     Ok(())
 }

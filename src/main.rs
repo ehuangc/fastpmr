@@ -1,5 +1,6 @@
 mod cli;
 mod counts;
+mod degrees;
 mod error;
 mod model;
 mod output;
@@ -54,6 +55,10 @@ pub struct Args {
     /// Examples: "1-22", "1-22,X,Y", "X,Y,MT", "23,24,90".
     #[arg(short, long = "chromosomes")]
     chromosomes_spec: Option<String>,
+
+    /// Call degrees of relatedness for each sample pair.
+    #[arg(short, long, default_value_t = false)]
+    degrees: bool,
 
     /// Number of threads to use. When run with fewer than 500 samples, defaults to 1.
     /// When run with 500 or more samples, defaults to the number of logical cores.
