@@ -55,18 +55,18 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 **Always written**:
 - `mismatch_rates.png`: histogram of pairwise mismatch rates (%), including only pairs with `n_site_overlaps >= 30000`.
 
-**When `--npz` is not set**:
+**When `--npz/-n` is not set**:
 - `covered_snps.csv`
 - `mismatch_rates.csv`
-  - When `--ci` is set, includes additional `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper` columns
-  - When `--degrees` is set, includes additional `normalized_mismatch_rate` and `degree` columns
+  - When `--ci/-i` is set, includes additional `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper` columns
+  - When `--degrees/-d` is set, includes additional `normalized_mismatch_rate` and `degree` columns
 
-**When `--npz` is set**:
+**When `--npz/-n` is set**:
 - `mismatch_counts.npz`
   - Sample list: `samples.json`
   - Arrays: `covered_snps`, `mismatches`, `totals`, `site_overlaps`
-  - When `--ci` is set, includes additional arrays `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper`
-  - When `--degrees` is set, includes additional arrays `normalized_mismatch_rates`, `degrees`, and a `degree_labels.json` mapping
+  - When `--ci/-i` is set, includes additional arrays `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper`
+  - When `--degrees/-d` is set, includes additional arrays `normalized_mismatch_rates`, `degrees`, and a `degree_labels.json` mapping
 
 ## Reproducibility
 We recommend using [`Pixi`](https://pixi.sh/) to reproduce evaluations. `Pixi` evaluation tasks can be found in `evaluation/pyproject.toml`.
