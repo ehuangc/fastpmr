@@ -4,7 +4,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use crate::error::{CustomError, Result};
-use crate::model::{Allele, Site};
+use crate::model::{Genotype, Site};
 use crate::reader::SiteReader;
 use crate::reader::common::{read_eigenstrat_ind, read_eigenstrat_snp, select_samples};
 
@@ -134,7 +134,7 @@ fn parse_variant_row(
     cleaned_line: &str,
     n_samples: usize,
     indices_to_keep: Option<&[usize]>,
-) -> Vec<Allele> {
+) -> Vec<Genotype> {
     let n_genotypes = match indices_to_keep {
         Some(indices) => indices.len(),
         None => n_samples,
@@ -148,14 +148,14 @@ fn parse_variant_row(
         };
 
         if keep {
-            let allele = match c {
-                '0' => Allele::Alt,
-                '1' => Allele::Het,
-                '2' => Allele::Ref,
-                '9' => Allele::Missing,
+            let genotype = match c {
+                '0' => Genotype::Alt,
+                '1' => Genotype::Het,
+                '2' => Genotype::Ref,
+                '9' => Genotype::Missing,
                 _ => unreachable!(),
             };
-            genotypes.push(allele);
+            genotypes.push(genotype);
         }
     }
     genotypes

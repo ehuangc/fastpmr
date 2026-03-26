@@ -1,7 +1,7 @@
 use crate::Args;
 use crate::counts::Counts;
 use crate::error::{CustomError, Result};
-use crate::model::Allele;
+use crate::model::Genotype;
 use crate::output::{
     plot_mismatch_rates, write_counts_npz, write_covered_snps, write_mismatch_rates,
 };
@@ -671,8 +671,8 @@ fn count_covered_snps(reader: &mut dyn SiteReader) -> Result<Vec<u64>> {
     let mut covered = vec![0u64; n_samples];
     for site in reader {
         let site = site?;
-        for (idx, allele) in site.genotypes.iter().enumerate() {
-            if *allele != Allele::Missing {
+        for (idx, genotype) in site.genotypes.iter().enumerate() {
+            if *genotype != Genotype::Missing {
                 covered[idx] += 1;
             }
         }
@@ -685,8 +685,8 @@ fn count_covered_snps_parallel(reader: &mut dyn SiteReader) -> Result<Vec<u64>> 
     let covered: Vec<AtomicU64> = (0..n_samples).map(|_| AtomicU64::new(0)).collect();
     reader.par_bridge().try_for_each(|site| -> Result<()> {
         let site = site?;
-        for (idx, allele) in site.genotypes.iter().enumerate() {
-            if *allele != Allele::Missing {
+        for (idx, genotype) in site.genotypes.iter().enumerate() {
+            if *genotype != Genotype::Missing {
                 covered[idx].fetch_add(1, Ordering::Relaxed);
             }
         }

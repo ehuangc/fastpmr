@@ -1,13 +1,13 @@
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Allele {
+pub enum Genotype {
     Ref = 0,
     Het = 1,
     Alt = 2,
     Missing,
 }
 
-impl Allele {
+impl Genotype {
     pub fn mismatch(self, other: Self) -> u64 {
         const MISMATCH: [[u64; 4]; 4] = [
             [0, 1, 2, 0], // Ref vs. *
@@ -20,5 +20,5 @@ impl Allele {
 }
 
 pub struct Site {
-    pub genotypes: Vec<Allele>,
+    pub genotypes: Vec<Genotype>,
 }

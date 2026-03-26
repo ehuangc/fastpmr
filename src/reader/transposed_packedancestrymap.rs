@@ -5,7 +5,7 @@ use std::fs::File;
 use std::path::Path;
 
 use crate::error::{CustomError, Result};
-use crate::model::{Allele, Site};
+use crate::model::{Genotype, Site};
 use crate::reader::SiteReader;
 use crate::reader::common::{
     header_hash, read_eigenstrat_ind, read_eigenstrat_snp, select_samples,
@@ -137,7 +137,7 @@ impl TransposedPackedAncestryMapReader {
         })
     }
 
-    fn genotypes_for_variant(&self, variant_idx: usize) -> Vec<Allele> {
+    fn genotypes_for_variant(&self, variant_idx: usize) -> Vec<Genotype> {
         match self.sample_indices_to_keep.as_deref() {
             Some(indices) => {
                 let mut genotypes = Vec::with_capacity(indices.len());
@@ -156,7 +156,7 @@ impl TransposedPackedAncestryMapReader {
         }
     }
 
-    fn decode_sample(&self, sample_idx: usize, variant_idx: usize) -> Allele {
+    fn decode_sample(&self, sample_idx: usize, variant_idx: usize) -> Genotype {
         // For a given sample block, byte (variant_idx / 4) holds 4 genotypes (2 bits each)
         // We shift by 6, 4, 2, or 0 to get the relevant 2 right-most bits
         let byte_idx = variant_idx / 4;
@@ -168,10 +168,10 @@ impl TransposedPackedAncestryMapReader {
         let byte = genotype_matrix[genotype_matrix_idx];
         let code = (byte >> shift) & 0b11;
         match code {
-            0b00 => Allele::Alt,
-            0b01 => Allele::Het,
-            0b10 => Allele::Ref,
-            0b11 => Allele::Missing,
+            0b00 => Genotype::Alt,
+            0b01 => Genotype::Het,
+            0b10 => Genotype::Ref,
+            0b11 => Genotype::Missing,
             _ => unreachable!(),
         }
     }

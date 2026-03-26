@@ -5,7 +5,7 @@ use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
 
 use crate::error::{CustomError, Result};
-use crate::model::{Allele, Site};
+use crate::model::{Genotype, Site};
 use crate::reader::SiteReader;
 use crate::reader::common::select_samples;
 
@@ -217,7 +217,7 @@ fn parse_variant_block(
     block: &[u8],
     n_samples: usize,
     indices_to_keep: Option<&[usize]>,
-) -> Vec<Allele> {
+) -> Vec<Genotype> {
     match indices_to_keep {
         Some(indices) => {
             let mut genotypes = Vec::with_capacity(indices.len());
@@ -236,16 +236,16 @@ fn parse_variant_block(
     }
 }
 
-fn decode_sample(bytes: &[u8], sample_idx: usize) -> Allele {
+fn decode_sample(bytes: &[u8], sample_idx: usize) -> Genotype {
     // PLINK stores genotypes little-endian within the byte; sample 0 uses the lowest two bits
     let byte_idx = sample_idx / 4;
     let shift = (sample_idx % 4) * 2;
     let code = (bytes[byte_idx] >> shift) & 0b11;
     match code {
-        0b00 => Allele::Ref,
-        0b01 => Allele::Missing,
-        0b10 => Allele::Het,
-        0b11 => Allele::Alt,
+        0b00 => Genotype::Ref,
+        0b01 => Genotype::Missing,
+        0b10 => Genotype::Het,
+        0b11 => Genotype::Alt,
         _ => unreachable!(),
     }
 }

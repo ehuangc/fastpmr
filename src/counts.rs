@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::model::Allele;
+use crate::model::Genotype;
 use crate::reader::SiteReader;
 use indicatif::{ProgressBar, ProgressStyle};
 use ndarray::Array2;
@@ -79,12 +79,12 @@ impl Counts {
 
         for site in reader {
             let site = site?;
-            let present: Vec<(usize, Allele)> = site
+            let present: Vec<(usize, Genotype)> = site
                 .genotypes
                 .iter()
                 .copied()
                 .enumerate()
-                .filter(|&(_, a)| a != Allele::Missing)
+                .filter(|&(_, a)| a != Genotype::Missing)
                 .collect();
 
             for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
@@ -123,12 +123,12 @@ impl Counts {
 
         reader.par_bridge().try_for_each(|site| -> Result<()> {
             let site = site?;
-            let present: Vec<(usize, Allele)> = site
+            let present: Vec<(usize, Genotype)> = site
                 .genotypes
                 .iter()
                 .copied()
                 .enumerate()
-                .filter(|&(_, a)| a != Allele::Missing)
+                .filter(|&(_, a)| a != Genotype::Missing)
                 .collect();
 
             for (i, &(sample_idx_i, genotype_i)) in present.iter().enumerate() {
@@ -333,12 +333,12 @@ mod tests {
     #[derive(Clone)]
     struct TestReader {
         samples: Vec<String>,
-        sites: Vec<Vec<Allele>>,
+        sites: Vec<Vec<Genotype>>,
         index: usize,
     }
 
     impl TestReader {
-        fn new(samples: Vec<String>, sites: Vec<Vec<Allele>>) -> Self {
+        fn new(samples: Vec<String>, sites: Vec<Vec<Genotype>>) -> Self {
             Self {
                 samples,
                 sites,
@@ -373,9 +373,9 @@ mod tests {
     fn build_test_reader() -> TestReader {
         let samples = vec!["A".to_string(), "B".to_string(), "C".to_string()];
         let sites = vec![
-            vec![Allele::Ref, Allele::Het, Allele::Alt],
-            vec![Allele::Missing, Allele::Het, Allele::Alt],
-            vec![Allele::Ref, Allele::Ref, Allele::Missing],
+            vec![Genotype::Ref, Genotype::Het, Genotype::Alt],
+            vec![Genotype::Missing, Genotype::Het, Genotype::Alt],
+            vec![Genotype::Ref, Genotype::Ref, Genotype::Missing],
         ];
         TestReader::new(samples, sites)
     }

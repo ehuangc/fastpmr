@@ -5,7 +5,7 @@ use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
 
 use crate::error::{CustomError, Result};
-use crate::model::{Allele, Site};
+use crate::model::{Genotype, Site};
 use crate::reader::SiteReader;
 use crate::reader::common::{
     header_hash, read_eigenstrat_ind, read_eigenstrat_snp, select_samples,
@@ -217,7 +217,7 @@ fn parse_variant_block(
     block: &[u8],
     n_samples: usize,
     indices_to_keep: Option<&[usize]>,
-) -> Vec<Allele> {
+) -> Vec<Genotype> {
     let bytes_needed = n_samples.div_ceil(4);
     let bytes = &block[..bytes_needed];
 
@@ -239,16 +239,16 @@ fn parse_variant_block(
     }
 }
 
-fn decode_sample(bytes: &[u8], sample_idx: usize) -> Allele {
+fn decode_sample(bytes: &[u8], sample_idx: usize) -> Genotype {
     let byte = bytes[sample_idx / 4];
     // Extract the two bits of the i-th sample
     let shift = 6 - 2 * (sample_idx % 4);
     let code = (byte >> shift) & 0b11;
     match code {
-        0b00 => Allele::Alt,
-        0b01 => Allele::Het,
-        0b10 => Allele::Ref,
-        0b11 => Allele::Missing,
+        0b00 => Genotype::Alt,
+        0b01 => Genotype::Het,
+        0b10 => Genotype::Ref,
+        0b11 => Genotype::Missing,
         _ => unreachable!(),
     }
 }
