@@ -7,11 +7,6 @@ use rayon::prelude::*;
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-pub struct ConfidenceIntervals {
-    pub lower: Vec<f32>,
-    pub upper: Vec<f32>,
-}
-
 pub struct Counts {
     samples: Vec<String>,
     n_samples: usize,
@@ -21,6 +16,11 @@ pub struct Counts {
     covered_snps: Vec<u64>, // Length n
     // If Some, only calculate PMRs for pairs where indices_to_count[idx(i, j)] is true
     indices_to_count: Option<Vec<bool>>,
+}
+
+pub struct ConfidenceIntervals {
+    pub lower: Vec<f32>,
+    pub upper: Vec<f32>,
 }
 
 impl Counts {
