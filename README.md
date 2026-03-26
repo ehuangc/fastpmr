@@ -46,9 +46,7 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 
 **Chromosomes** (`-c`, `--chromosomes`) (*optional*): Chromosomes to include, as comma-separated values or numeric ranges, e.g., `1-22`, `1-22,X,Y`, `X,Y,MT`, `23,24,90`. Chromosome values are matched against the chromosome column in the `.snp` or `.bim` file. When used with `--variant-indices`, only variants matching both filters are kept.
 
-**Threads** (`-t`, `--threads`) (*optional*): Number of threads to use. Default behavior is:
-- `<500` samples: single-threaded
-- `>=500` samples: uses logical core count
+**Threads** (`-t`, `--threads`) (*optional*): Number of threads to use. Defaults to 1 (single-threaded) for datasets with fewer than 500 individuals and the number of logical cores for datasets with 500 or more individuals.
 
 ### Outputs
 
