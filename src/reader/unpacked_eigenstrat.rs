@@ -135,15 +135,11 @@ fn parse_variant_row(
     n_samples: usize,
     indices_to_keep: Option<&[usize]>,
 ) -> Vec<Allele> {
-    let mut genotypes: Vec<Allele>;
-    match indices_to_keep {
-        Some(indices) => {
-            genotypes = Vec::with_capacity(indices.len());
-        }
-        None => {
-            genotypes = Vec::with_capacity(n_samples);
-        }
-    }
+    let n_genotypes = match indices_to_keep {
+        Some(indices) => indices.len(),
+        None => n_samples,
+    };
+    let mut genotypes = Vec::with_capacity(n_genotypes);
 
     for (idx, c) in cleaned_line.chars().enumerate() {
         let keep = match indices_to_keep {
