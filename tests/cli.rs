@@ -250,10 +250,12 @@ fn expected_ci(stats: &common::PairStats) -> (f32, f32) {
     }
     let n = (stats.totals / 2) as f64;
     let p = stats.mismatches as f64 / stats.totals as f64;
-    let se = (p * (1.0 - p) / n).sqrt();
-    let lower = (p - 1.96 * se).max(0.0) as f32;
-    let upper = (p + 1.96 * se).min(1.0) as f32;
-    (lower, upper)
+    let z = 1.96_f64;
+    let z_squared = z * z;
+    let denom = 1.0 + z_squared / n;
+    let center = (p + z_squared / (2.0 * n)) / denom;
+    let margin = z * (p * (1.0 - p) / n + z_squared / (4.0 * n * n)).sqrt() / denom;
+    ((center - margin) as f32, (center + margin) as f32)
 }
 
 #[test]

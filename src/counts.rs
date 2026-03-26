@@ -231,14 +231,15 @@ impl Counts {
         matrix
     }
 
-    // Compute 95% binomial confidence intervals for pairwise mismatch rates using the Wald method,
+    // Compute 95% Wilson score confidence intervals for pairwise mismatch rates,
     // assuming pseudohaploid data where each site is one independent observation
-    // CI = p̂ ± 1.96 × √(p̂(1 − p̂) / n), clamped to [0, 1], where n = number of site overlaps
     pub fn confidence_intervals_95(&self) -> ConfidenceIntervals {
         let size = self.n_samples * self.n_samples;
         let site_overlaps = self.site_overlaps();
         let mut lower = vec![0.0f32; size];
         let mut upper = vec![0.0f32; size];
+        let z = 1.96_f64;
+        let z_squared = z * z;
 
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
@@ -250,9 +251,11 @@ impl Counts {
                     // For n, assume pseudohaploid data where each site is one independent observation
                     let n = site_overlaps[pair_idx] as f64;
                     let p = self.mismatches[pair_idx] as f64 / self.totals[pair_idx] as f64;
-                    let se = (p * (1.0 - p) / n).sqrt();
-                    lower[pair_idx] = (p - 1.96 * se).max(0.0) as f32;
-                    upper[pair_idx] = (p + 1.96 * se).min(1.0) as f32;
+                    let denom = 1.0 + z_squared / n;
+                    let center = (p + z_squared / (2.0 * n)) / denom;
+                    let margin = z * (p * (1.0 - p) / n + z_squared / (4.0 * n * n)).sqrt() / denom;
+                    lower[pair_idx] = (center - margin) as f32;
+                    upper[pair_idx] = (center + margin) as f32;
                 }
             }
         }
@@ -412,28 +415,28 @@ mod tests {
 
         let ci = counts.confidence_intervals_95();
 
-        // Pair (A, B): mismatches=1, totals=4, site_overlaps=2, p=0.25
-        // se = sqrt(0.25 * 0.75 / 2) = 0.30619
-        // lower = max(0, 0.25 - 1.96 * 0.30619) = 0.0 (clamped)
-        // upper = 0.25 + 1.96 * 0.30619 = 0.8501
+        // Wilson score intervals with z=1.96, z²=3.8416
+        // Pair (A, B): n=2, p=0.25
+        // denom = 1 + 3.8416/2 = 2.9208
+        // center = (0.25 + 0.9604) / 2.9208 = 0.4144
+        // margin = 1.96 * sqrt(0.25*0.75/2 + 3.8416/16) / 2.9208 = 0.3878
         let pair_idx_ab = counts.pair_idx(0, 1);
-        assert!((ci.lower[pair_idx_ab] - 0.0).abs() < 1e-6);
-        assert!((ci.upper[pair_idx_ab] - 0.8501).abs() < 1e-3);
+        assert!((ci.lower[pair_idx_ab] - 0.0266).abs() < 1e-3);
+        assert!((ci.upper[pair_idx_ab] - 0.8022).abs() < 1e-3);
 
-        // Pair (A, C): mismatches=2, totals=2, site_overlaps=1, p=1.0
-        // se = sqrt(1.0 * 0.0 / 1) = 0.0
-        // lower = 1.0, upper = 1.0
+        // Pair (A, C): n=1, p=1.0
+        // denom = 1 + 3.8416 = 4.8416
+        // center = (1.0 + 1.9208) / 4.8416 = 0.6033
+        // margin = 1.96 * sqrt(0 + 0.9604) / 4.8416 = 0.3967
         let pair_idx_ac = counts.pair_idx(0, 2);
-        assert!((ci.lower[pair_idx_ac] - 1.0).abs() < 1e-6);
-        assert!((ci.upper[pair_idx_ac] - 1.0).abs() < 1e-6);
+        assert!((ci.lower[pair_idx_ac] - 0.2065).abs() < 1e-3);
+        assert!((ci.upper[pair_idx_ac] - 1.0).abs() < 1e-3);
 
-        // Pair (B, C): mismatches=2, totals=4, site_overlaps=2, p=0.5
-        // se = sqrt(0.5 * 0.5 / 2) = 0.35355
-        // lower = max(0, 0.5 - 1.96 * 0.35355) = 0.0 (clamped)
-        // upper = min(1, 0.5 + 1.96 * 0.35355) = 1.0 (clamped)
+        // Pair (B, C): n=2, p=0.5
+        // denom = 2.9208, center = 0.5, margin = 0.4055
         let pair_idx_bc = counts.pair_idx(1, 2);
-        assert!((ci.lower[pair_idx_bc] - 0.0).abs() < 1e-6);
-        assert!((ci.upper[pair_idx_bc] - 1.0).abs() < 1e-6);
+        assert!((ci.lower[pair_idx_bc] - 0.0945).abs() < 1e-3);
+        assert!((ci.upper[pair_idx_bc] - 0.9055).abs() < 1e-3);
     }
 
     #[test]
