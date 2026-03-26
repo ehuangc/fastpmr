@@ -49,9 +49,9 @@ impl DegreeResults {
                 if !counts.should_count_pair(i, j) {
                     continue;
                 }
-                let idx = counts.idx(i, j);
-                matrix[(i, j)] = self.normalized_mismatch_rates[idx];
-                matrix[(j, i)] = self.normalized_mismatch_rates[idx];
+                let pair_idx = counts.idx(i, j);
+                matrix[(i, j)] = self.normalized_mismatch_rates[pair_idx];
+                matrix[(j, i)] = self.normalized_mismatch_rates[pair_idx];
             }
         }
         matrix
@@ -64,9 +64,9 @@ impl DegreeResults {
                 if !counts.should_count_pair(i, j) {
                     continue;
                 }
-                let idx = counts.idx(i, j);
-                matrix[(i, j)] = self.degrees[idx] as u8;
-                matrix[(j, i)] = self.degrees[idx] as u8;
+                let pair_idx = counts.idx(i, j);
+                matrix[(i, j)] = self.degrees[pair_idx] as u8;
+                matrix[(j, i)] = self.degrees[pair_idx] as u8;
             }
         }
         matrix
@@ -117,8 +117,8 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let idx = counts.idx(i, j);
-            let rate = rates[idx];
+            let pair_idx = counts.idx(i, j);
+            let rate = rates[pair_idx];
             if rate.is_finite() {
                 valid_pmrs.push(rate);
             }
@@ -143,13 +143,13 @@ pub fn classify_degrees(counts: &Counts) -> DegreeResults {
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let idx = counts.idx(i, j);
-            let rate = rates[idx];
+            let pair_idx = counts.idx(i, j);
+            let rate = rates[pair_idx];
             let normalized = rate / norm_value;
-            let nsnps_x_norm = overlaps[idx] as f32 * norm_value;
+            let nsnps_x_norm = overlaps[pair_idx] as f32 * norm_value;
 
-            normalized_mismatch_rates[idx] = normalized;
-            degrees[idx] = classify_pair(normalized, nsnps_x_norm);
+            normalized_mismatch_rates[pair_idx] = normalized;
+            degrees[pair_idx] = classify_pair(normalized, nsnps_x_norm);
         }
     }
 

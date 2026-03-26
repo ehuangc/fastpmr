@@ -52,25 +52,25 @@ pub fn write_mismatch_rates(
 
     for i in 0..n_samples {
         for j in (i + 1)..n_samples {
-            let counter_idx = counts.idx(i, j);
+            let pair_idx = counts.idx(i, j);
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let overlap = overlaps[counter_idx];
-            let rate = rates[counter_idx];
+            let overlap = overlaps[pair_idx];
+            let rate = rates[pair_idx];
             if let Some(dr) = degree_results {
                 wtr.serialize((
-                    pairs[counter_idx].0.as_str(),
-                    pairs[counter_idx].1.as_str(),
+                    pairs[pair_idx].0.as_str(),
+                    pairs[pair_idx].1.as_str(),
                     overlap,
                     rate,
-                    dr.normalized_mismatch_rates[counter_idx],
-                    dr.degrees[counter_idx].to_string(),
+                    dr.normalized_mismatch_rates[pair_idx],
+                    dr.degrees[pair_idx].to_string(),
                 ))?;
             } else {
                 wtr.serialize((
-                    pairs[counter_idx].0.as_str(),
-                    pairs[counter_idx].1.as_str(),
+                    pairs[pair_idx].0.as_str(),
+                    pairs[pair_idx].1.as_str(),
                     overlap,
                     rate,
                 ))?;
@@ -164,9 +164,9 @@ pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<(
             if !counts.should_count_pair(i, j) {
                 continue;
             }
-            let idx = counts.idx(i, j);
-            let overlap = overlaps[idx];
-            let rate = rates[idx];
+            let pair_idx = counts.idx(i, j);
+            let overlap = overlaps[pair_idx];
+            let rate = rates[pair_idx];
             if overlap >= 30000 && rate.is_finite() {
                 filtered_percentages.push(rate * 100.0);
             }
