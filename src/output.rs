@@ -40,7 +40,7 @@ pub fn write_mismatch_rates(
 
     let mut wtr = csv::Writer::from_path(path)?;
     {
-        let mut header = vec!["id1", "id2", "n_site_overlaps", "mismatch_rate"];
+        let mut header = vec!["id1", "id2", "n_site_overlap", "mismatch_rate"];
         if ci_results.is_some() {
             header.push("mismatch_rate_95_ci_lower");
             header.push("mismatch_rate_95_ci_upper");

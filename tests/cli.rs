@@ -899,7 +899,7 @@ fn chromosomes_intersects_with_variant_indices() {
             let mut fields = l.split(',');
             fields.next(); // id1
             fields.next(); // id2
-            fields.next().unwrap().parse::<u64>().unwrap() // n_site_overlaps
+            fields.next().unwrap().parse::<u64>().unwrap() // n_site_overlap
         })
         .collect();
     assert!(!overlaps.is_empty(), "no pairs in output");
