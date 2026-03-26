@@ -105,7 +105,7 @@ pub fn write_counts_npz(
     }
     {
         let site_overlaps = counts.site_overlaps_2d();
-        npz.add_array("site_overlaps", &site_overlaps)?;
+        npz.add_array("n_site_overlaps", &site_overlaps)?;
     }
     {
         let mismatch_rates = counts.mismatch_rates_2d();
@@ -124,11 +124,11 @@ pub fn write_counts_npz(
     if let Some(ci) = ci_results {
         {
             let lower = counts.ci_lower_2d(ci);
-            npz.add_array("mismatch_rate_95_ci_lower", &lower)?;
+            npz.add_array("mismatch_rates_95_ci_lower", &lower)?;
         }
         {
             let upper = counts.ci_upper_2d(ci);
-            npz.add_array("mismatch_rate_95_ci_upper", &upper)?;
+            npz.add_array("mismatch_rates_95_ci_upper", &upper)?;
         }
     }
     npz.finish()?;

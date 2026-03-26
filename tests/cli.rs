@@ -344,11 +344,11 @@ fn npz_outputs_include_ci() {
     let mut npz = NpzReader::new(File::open(&npz_path).expect("could not open npz"))
         .expect("invalid npz archive");
     let ci_lower: Array2<f32> = npz
-        .by_name("mismatch_rate_95_ci_lower")
-        .expect("missing mismatch_rate_95_ci_lower array");
+        .by_name("mismatch_rates_95_ci_lower")
+        .expect("missing mismatch_rates_95_ci_lower array");
     let ci_upper: Array2<f32> = npz
-        .by_name("mismatch_rate_95_ci_upper")
-        .expect("missing mismatch_rate_95_ci_upper array");
+        .by_name("mismatch_rates_95_ci_upper")
+        .expect("missing mismatch_rates_95_ci_upper array");
     let expected_shape = &[common::N_SAMPLES, common::N_SAMPLES];
     assert_eq!(ci_lower.shape(), expected_shape);
     assert_eq!(ci_upper.shape(), expected_shape);
@@ -1054,8 +1054,8 @@ fn assert_npz_outputs(
         NpzReader::new(File::open(&npz_path).expect("could not open mismatch_counts.npz"))
             .expect("invalid npz archive");
     let overlaps: Array2<u64> = npz
-        .by_name("site_overlaps")
-        .expect("missing site_overlaps array");
+        .by_name("n_site_overlaps")
+        .expect("missing n_site_overlaps array");
     let mismatch_rates: Array2<f32> = npz
         .by_name("mismatch_rates")
         .expect("missing mismatch_rates array");
