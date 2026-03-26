@@ -262,7 +262,7 @@ impl Counts {
         ConfidenceIntervals { lower, upper }
     }
 
-    pub fn ci_lower_2d(&self, ci: &ConfidenceIntervals) -> Array2<f32> {
+    pub fn ci_95_lower_2d(&self, ci: &ConfidenceIntervals) -> Array2<f32> {
         let mut matrix = Array2::from_elem((self.n_samples, self.n_samples), f32::NAN);
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
@@ -277,7 +277,7 @@ impl Counts {
         matrix
     }
 
-    pub fn ci_upper_2d(&self, ci: &ConfidenceIntervals) -> Array2<f32> {
+    pub fn ci_95_upper_2d(&self, ci: &ConfidenceIntervals) -> Array2<f32> {
         let mut matrix = Array2::from_elem((self.n_samples, self.n_samples), f32::NAN);
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {

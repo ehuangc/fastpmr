@@ -123,11 +123,11 @@ pub fn write_counts_npz(
     }
     if let Some(ci) = ci_results {
         {
-            let lower = counts.ci_lower_2d(ci);
+            let lower = counts.ci_95_lower_2d(ci);
             npz.add_array("mismatch_rates_95_ci_lower", &lower)?;
         }
         {
-            let upper = counts.ci_upper_2d(ci);
+            let upper = counts.ci_95_upper_2d(ci);
             npz.add_array("mismatch_rates_95_ci_upper", &upper)?;
         }
     }
