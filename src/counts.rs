@@ -231,9 +231,9 @@ impl Counts {
         matrix
     }
 
-    // Compute 95% confidence intervals for pairwise mismatch rates using the Wald method,
+    // Compute 95% binomial confidence intervals for pairwise mismatch rates using the Wald method,
     // assuming pseudohaploid data where each site is one independent observation
-    // CI = p̂ ± 1.96 × √(p̂(1 − p̂) / n), where n = number of site overlaps, clamped to [0, 1]
+    // CI = p̂ ± 1.96 × √(p̂(1 − p̂) / n), clamped to [0, 1], where n = number of site overlaps
     pub fn confidence_intervals_95(&self) -> ConfidenceIntervals {
         let size = self.n_samples * self.n_samples;
         let site_overlaps = self.site_overlaps();
