@@ -179,13 +179,22 @@ impl Counts {
         self.totals.iter().map(|x| x / 2).collect()
     }
 
-    pub fn pairs_and_mismatch_rates(&self) -> (Vec<(String, String)>, Vec<f32>) {
+    pub fn pairs(&self) -> Vec<(String, String)> {
         let mut pairs = vec![(String::new(), String::new()); self.n_samples * self.n_samples];
-        let mut rates = vec![0.0; self.n_samples * self.n_samples];
         for i in 0..self.n_samples {
             for j in (i + 1)..self.n_samples {
                 let idx = self.idx(i, j);
                 pairs[idx] = (self.samples[i].clone(), self.samples[j].clone());
+            }
+        }
+        pairs
+    }
+
+    pub fn mismatch_rates(&self) -> Vec<f32> {
+        let mut rates = vec![0.0; self.n_samples * self.n_samples];
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                let idx = self.idx(i, j);
                 if self.totals[idx] == 0 {
                     rates[idx] = f32::NAN;
                 } else {
@@ -193,7 +202,7 @@ impl Counts {
                 }
             }
         }
-        (pairs, rates)
+        rates
     }
 
     pub fn mismatches_2d(&self) -> Array2<u64> {

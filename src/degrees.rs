@@ -109,7 +109,7 @@ fn classify_pair(normalized_mismatch_rate: f32, expected_mismatches: f32) -> Deg
 pub fn classify_degrees(counts: &Counts) -> DegreeResults {
     let n_samples = counts.n_samples();
     let size = n_samples * n_samples;
-    let (_pairs, rates) = counts.pairs_and_mismatch_rates();
+    let rates = counts.mismatch_rates();
     let overlaps = counts.site_overlaps();
 
     // Collect valid PMR values for median computation
