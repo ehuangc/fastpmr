@@ -179,7 +179,7 @@ impl Counts {
         self.totals.iter().map(|x| x / 2).collect()
     }
 
-    pub fn mismatch_rates(&self) -> (Vec<(String, String)>, Vec<f32>) {
+    pub fn pairs_and_mismatch_rates(&self) -> (Vec<(String, String)>, Vec<f32>) {
         let mut pairs = vec![(String::new(), String::new()); self.n_samples * self.n_samples];
         let mut rates = vec![0.0; self.n_samples * self.n_samples];
         for i in 0..self.n_samples {

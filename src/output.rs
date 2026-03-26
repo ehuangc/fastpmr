@@ -35,7 +35,7 @@ pub fn write_mismatch_rates(
 ) -> Result<()> {
     let n_samples = counts.n_samples();
     let overlaps = counts.site_overlaps();
-    let (pairs, rates) = counts.mismatch_rates();
+    let (pairs, rates) = counts.pairs_and_mismatch_rates();
 
     let mut wtr = csv::Writer::from_path(path)?;
     {
@@ -166,7 +166,7 @@ pub fn write_counts_npz(
 }
 
 pub fn plot_mismatch_rates(counts: &Counts, path: &impl AsRef<Path>) -> Result<()> {
-    let (_pairs, rates) = counts.mismatch_rates();
+    let (_pairs, rates) = counts.pairs_and_mismatch_rates();
     let overlaps = counts.site_overlaps();
     let n_samples = counts.n_samples();
     let mut filtered_percentages = Vec::new();
