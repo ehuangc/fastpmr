@@ -126,11 +126,11 @@ pub fn write_counts_npz(
     }
     if let Some(ci) = ci_results {
         {
-            let lower = ci.lower_2d(counts.n_samples(), counts);
+            let lower = counts.ci_lower_2d(ci);
             npz.add_array("mismatch_rate_95_ci_lower", &lower)?;
         }
         {
-            let upper = ci.upper_2d(counts.n_samples(), counts);
+            let upper = counts.ci_upper_2d(ci);
             npz.add_array("mismatch_rate_95_ci_upper", &upper)?;
         }
     }

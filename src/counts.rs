@@ -259,34 +259,32 @@ impl Counts {
         }
         ConfidenceIntervals { lower, upper }
     }
-}
 
-impl ConfidenceIntervals {
-    pub fn lower_2d(&self, n_samples: usize, counts: &Counts) -> Array2<f32> {
-        let mut matrix = Array2::from_elem((n_samples, n_samples), f32::NAN);
-        for i in 0..n_samples {
-            for j in (i + 1)..n_samples {
-                if !counts.should_count_pair(i, j) {
+    pub fn ci_lower_2d(&self, ci: &ConfidenceIntervals) -> Array2<f32> {
+        let mut matrix = Array2::from_elem((self.n_samples, self.n_samples), f32::NAN);
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                if !self.should_count_pair(i, j) {
                     continue;
                 }
-                let pair_idx = counts.idx(i, j);
-                matrix[(i, j)] = self.lower[pair_idx];
-                matrix[(j, i)] = self.lower[pair_idx];
+                let pair_idx = self.idx(i, j);
+                matrix[(i, j)] = ci.lower[pair_idx];
+                matrix[(j, i)] = ci.lower[pair_idx];
             }
         }
         matrix
     }
 
-    pub fn upper_2d(&self, n_samples: usize, counts: &Counts) -> Array2<f32> {
-        let mut matrix = Array2::from_elem((n_samples, n_samples), f32::NAN);
-        for i in 0..n_samples {
-            for j in (i + 1)..n_samples {
-                if !counts.should_count_pair(i, j) {
+    pub fn ci_upper_2d(&self, ci: &ConfidenceIntervals) -> Array2<f32> {
+        let mut matrix = Array2::from_elem((self.n_samples, self.n_samples), f32::NAN);
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                if !self.should_count_pair(i, j) {
                     continue;
                 }
-                let pair_idx = counts.idx(i, j);
-                matrix[(i, j)] = self.upper[pair_idx];
-                matrix[(j, i)] = self.upper[pair_idx];
+                let pair_idx = self.idx(i, j);
+                matrix[(i, j)] = ci.upper[pair_idx];
+                matrix[(j, i)] = ci.upper[pair_idx];
             }
         }
         matrix
