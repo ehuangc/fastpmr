@@ -244,6 +244,147 @@ fn npz_outputs_include_degrees() {
     );
 }
 
+fn expected_ci(stats: &common::PairStats) -> (f32, f32) {
+    if stats.totals == 0 {
+        return (f32::NAN, f32::NAN);
+    }
+    let n = (stats.totals / 2) as f64;
+    let p = stats.mismatches as f64 / stats.totals as f64;
+    let se = (p * (1.0 - p) / n).sqrt();
+    let lower = (p - 1.96 * se).max(0.0) as f32;
+    let upper = (p + 1.96 * se).min(1.0) as f32;
+    (lower, upper)
+}
+
+#[test]
+fn csv_outputs_include_ci() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-ci-csv").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_all_variants();
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            ci: true,
+            ..Default::default()
+        },
+    );
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let records = assert_outputs(&dataset.output_dir, &expected_pairs, &expected_coverage);
+    for record in &records {
+        let lo = record
+            .ci_lower
+            .expect("expected ci_lower column when --ci is set");
+        let hi = record
+            .ci_upper
+            .expect("expected ci_upper column when --ci is set");
+        let key = (record.id1.clone(), record.id2.clone());
+        let stats = &expected_pairs[&key];
+        let (expected_lo, expected_hi) = expected_ci(stats);
+        assert!(
+            (lo - expected_lo).abs() < 1e-6,
+            "ci_lower mismatch for {} / {}: got {}, expected {}",
+            record.id1,
+            record.id2,
+            lo,
+            expected_lo
+        );
+        assert!(
+            (hi - expected_hi).abs() < 1e-6,
+            "ci_upper mismatch for {} / {}: got {}, expected {}",
+            record.id1,
+            record.id2,
+            hi,
+            expected_hi
+        );
+    }
+}
+
+#[test]
+fn npz_outputs_include_ci() {
+    let dataset = common::create_dataset(common::GenoFormat::Packed, "packed-ci-npz").unwrap();
+    if dataset.output_dir.exists() {
+        fs::remove_dir_all(&dataset.output_dir).unwrap();
+    }
+
+    let expected_pairs = common::expected_pair_stats_all_variants();
+    let expected_coverage = common::expected_covered_snps_all_variants();
+    let output = run_fastpmr(
+        &dataset,
+        RunOptions {
+            npz: true,
+            ci: true,
+            ..Default::default()
+        },
+    );
+    assert!(
+        output.status.success(),
+        "fastpmr failed: stdout={} stderr={}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    assert_npz_outputs(
+        &dataset.output_dir,
+        &expected_pairs,
+        &expected_coverage,
+        false,
+    );
+
+    let npz_path = dataset.output_dir.join("mismatch_counts.npz");
+    let mut npz = NpzReader::new(File::open(&npz_path).expect("could not open npz"))
+        .expect("invalid npz archive");
+    let ci_lower: Array2<f32> = npz
+        .by_name("mismatch_rate_95_ci_lower")
+        .expect("missing mismatch_rate_95_ci_lower array");
+    let ci_upper: Array2<f32> = npz
+        .by_name("mismatch_rate_95_ci_upper")
+        .expect("missing mismatch_rate_95_ci_upper array");
+    let expected_shape = &[common::N_SAMPLES, common::N_SAMPLES];
+    assert_eq!(ci_lower.shape(), expected_shape);
+    assert_eq!(ci_upper.shape(), expected_shape);
+
+    let samples = common::expected_sample_ids();
+    for i in 0..common::N_SAMPLES {
+        for j in (i + 1)..common::N_SAMPLES {
+            assert!(
+                (ci_lower[[i, j]] - ci_lower[[j, i]]).abs() < 1e-10
+                    || (ci_lower[[i, j]].is_nan() && ci_lower[[j, i]].is_nan()),
+                "ci_lower not symmetric at ({i}, {j})"
+            );
+            assert!(
+                (ci_upper[[i, j]] - ci_upper[[j, i]]).abs() < 1e-10
+                    || (ci_upper[[i, j]].is_nan() && ci_upper[[j, i]].is_nan()),
+                "ci_upper not symmetric at ({i}, {j})"
+            );
+            let key = (samples[i].clone(), samples[j].clone());
+            let stats = &expected_pairs[&key];
+            let (exp_lo, exp_hi) = expected_ci(stats);
+            assert!(
+                (ci_lower[[i, j]] - exp_lo).abs() < 1e-6,
+                "ci_lower mismatch at ({i}, {j}): got {}, expected {}",
+                ci_lower[[i, j]],
+                exp_lo
+            );
+            assert!(
+                (ci_upper[[i, j]] - exp_hi).abs() < 1e-6,
+                "ci_upper mismatch at ({i}, {j}): got {}, expected {}",
+                ci_upper[[i, j]],
+                exp_hi
+            );
+        }
+    }
+}
+
 #[test]
 fn variant_indices_limit_sites() {
     let dataset = common::create_dataset(common::GenoFormat::Packed, "filtered").unwrap();
@@ -776,6 +917,7 @@ struct RunOptions<'a> {
     chromosomes_spec: Option<&'a str>,
     npz: bool,
     degrees: bool,
+    ci: bool,
     sample_pairs_csv: Option<&'a Path>,
     min_covered_snps: Option<u64>,
     threads: Option<usize>,
@@ -800,6 +942,9 @@ fn run_fastpmr(dataset: &common::Dataset, opts: RunOptions) -> std::process::Out
     if opts.degrees {
         command.arg("--degrees");
     }
+    if opts.ci {
+        command.arg("--ci");
+    }
     if let Some(path) = opts.sample_pairs_csv {
         command.arg("--sample-pairs-csv").arg(path);
     }
@@ -818,6 +963,8 @@ struct OutputRecord {
     id2: String,
     overlap: u64,
     rate: f32,
+    ci_lower: Option<f32>,
+    ci_upper: Option<f32>,
     normalized_mismatch_rate: Option<f64>,
     degree: Option<String>,
 }
@@ -1087,11 +1234,10 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
     let content = fs::read_to_string(path).expect("could not read mismatch rates");
     let mut lines = content.lines();
     let header = lines.next().expect("missing header").trim_end_matches('\r');
-    let has_degrees =
-        header == "id1,id2,n_site_overlaps,mismatch_rate,normalized_mismatch_rate,degree";
-    if !has_degrees {
-        assert_eq!(header, "id1,id2,n_site_overlaps,mismatch_rate");
-    }
+    let columns: Vec<&str> = header.split(',').collect();
+
+    let has_ci = columns.contains(&"mismatch_rate_95_ci_lower");
+    let has_degrees = columns.contains(&"normalized_mismatch_rate");
 
     let valid_degrees = [
         "Identical/Twin",
@@ -1101,6 +1247,8 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
         "Unrelated",
     ];
 
+    let expected_cols = 4 + if has_ci { 2 } else { 0 } + if has_degrees { 2 } else { 0 };
+
     let mut records = Vec::new();
     for line in lines {
         let trimmed = line.trim_end_matches('\r');
@@ -1108,29 +1256,32 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
             continue;
         }
         let fields: Vec<&str> = trimmed.split(',').collect();
-        if has_degrees {
-            assert_eq!(
-                fields.len(),
-                6,
-                "unexpected column count in degree record: {trimmed}"
-            );
-        } else {
-            assert_eq!(
-                fields.len(),
-                4,
-                "unexpected column count in record: {trimmed}"
-            );
-        }
+        assert_eq!(
+            fields.len(),
+            expected_cols,
+            "unexpected column count in record: {trimmed}"
+        );
         let id1 = fields[0].to_string();
         let id2 = fields[1].to_string();
         let overlap: u64 = fields[2].parse().expect("invalid overlap value");
         let rate: f32 = fields[3].parse().expect("invalid mismatch rate value");
 
+        let mut col = 4;
+
+        let (ci_lower, ci_upper) = if has_ci {
+            let lo: f32 = fields[col].parse().expect("invalid ci_lower value");
+            let hi: f32 = fields[col + 1].parse().expect("invalid ci_upper value");
+            col += 2;
+            (Some(lo), Some(hi))
+        } else {
+            (None, None)
+        };
+
         let (normalized_mismatch_rate, degree) = if has_degrees {
-            let nmr: f64 = fields[4]
+            let nmr: f64 = fields[col]
                 .parse()
                 .expect("invalid normalized_mismatch_rate value");
-            let deg = fields[5].to_string();
+            let deg = fields[col + 1].to_string();
             assert!(
                 valid_degrees.contains(&deg.as_str()),
                 "invalid degree: {deg}"
@@ -1145,6 +1296,8 @@ fn read_records(path: &Path) -> Vec<OutputRecord> {
             id2,
             overlap,
             rate,
+            ci_lower,
+            ci_upper,
             normalized_mismatch_rate,
             degree,
         });

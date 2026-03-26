@@ -60,6 +60,10 @@ pub struct Args {
     #[arg(short, long, default_value_t = false)]
     degrees: bool,
 
+    /// Compute 95% confidence intervals for pairwise mismatch rates using the Wald method.
+    #[arg(short = 'i', long, default_value_t = false)]
+    ci: bool,
+
     /// Number of threads to use. When run with fewer than 500 samples, defaults to 1.
     /// When run with 500 or more samples, defaults to the number of logical cores.
     #[arg(short, long)]

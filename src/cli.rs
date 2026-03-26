@@ -29,6 +29,7 @@ pub enum InputSpec {
         output_dir: PathBuf,
         npz: bool,
         degrees: bool,
+        ci: bool,
         sample_pairs: Option<Vec<(String, String)>>,
         samples_to_keep: Option<HashSet<String>>,
         min_covered_snps: u64,
@@ -43,6 +44,7 @@ pub enum InputSpec {
         output_dir: PathBuf,
         npz: bool,
         degrees: bool,
+        ci: bool,
         sample_pairs: Option<Vec<(String, String)>>,
         samples_to_keep: Option<HashSet<String>>,
         min_covered_snps: u64,
@@ -56,6 +58,7 @@ struct InputSpecOptions {
     output_dir: PathBuf,
     npz: bool,
     degrees: bool,
+    ci: bool,
     sample_pairs: Option<Vec<(String, String)>>,
     samples_to_keep: Option<HashSet<String>>,
     min_covered_snps: u64,
@@ -76,6 +79,7 @@ impl InputSpec {
             output_dir,
             npz,
             degrees,
+            ci,
             sample_pairs,
             samples_to_keep,
             min_covered_snps,
@@ -133,6 +137,7 @@ impl InputSpec {
                 output_dir,
                 npz,
                 degrees,
+                ci,
                 sample_pairs,
                 samples_to_keep,
                 min_covered_snps,
@@ -146,6 +151,7 @@ impl InputSpec {
                 output_dir,
                 npz,
                 degrees,
+                ci,
                 sample_pairs,
                 samples_to_keep,
                 min_covered_snps,
@@ -268,6 +274,12 @@ impl InputSpec {
             InputSpec::PackedAncestryMap { degrees, .. } | InputSpec::Plink { degrees, .. } => {
                 *degrees
             }
+        }
+    }
+
+    pub fn ci(&self) -> bool {
+        match self {
+            InputSpec::PackedAncestryMap { ci, .. } | InputSpec::Plink { ci, .. } => *ci,
         }
     }
 
@@ -432,6 +444,7 @@ pub fn build_input_spec(args: &Args) -> Result<InputSpec> {
             output_dir: PathBuf::from(&args.output_directory),
             npz: args.npz,
             degrees: args.degrees,
+            ci: args.ci,
             sample_pairs,
             samples_to_keep,
             min_covered_snps: args.min_covered_snps,
@@ -723,13 +736,24 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
         None
     };
 
+    let ci_results = if input_spec.ci() {
+        Some(counts.confidence_intervals_95())
+    } else {
+        None
+    };
+
     if input_spec.npz() {
         let npz_path = input_spec.output_dir().join("mismatch_counts.npz");
         println!(
             "Writing pairwise mismatch counts to {}...",
             npz_path.display()
         );
-        write_counts_npz(&counts, degree_results.as_ref(), &npz_path)?;
+        write_counts_npz(
+            &counts,
+            degree_results.as_ref(),
+            ci_results.as_ref(),
+            &npz_path,
+        )?;
     } else {
         let coverage_path = input_spec.output_dir().join("covered_snps.csv");
         println!(
@@ -743,7 +767,12 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
             "Writing pairwise mismatch rates to {}...",
             rates_path.display()
         );
-        write_mismatch_rates(&counts, degree_results.as_ref(), &rates_path)?;
+        write_mismatch_rates(
+            &counts,
+            degree_results.as_ref(),
+            ci_results.as_ref(),
+            &rates_path,
+        )?;
     }
 
     let plot_path = input_spec.output_dir().join("mismatch_rates.png");
@@ -793,6 +822,7 @@ mod tests {
                 output_dir,
                 npz: false,
                 degrees: false,
+                ci: false,
                 sample_pairs: None,
                 samples_to_keep: None,
                 min_covered_snps: 30000,

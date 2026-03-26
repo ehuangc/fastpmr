@@ -7,6 +7,11 @@ use rayon::prelude::*;
 use std::collections::HashSet;
 use std::sync::atomic::{AtomicU64, Ordering};
 
+pub struct ConfidenceIntervals {
+    pub lower: Vec<f32>,
+    pub upper: Vec<f32>,
+}
+
 pub struct Counts {
     samples: Vec<String>,
     n_samples: usize,
@@ -226,6 +231,66 @@ impl Counts {
         }
         matrix
     }
+
+    // Compute 95% confidence intervals for pairwise mismatch rates using the Wald method,
+    // assuming pseudohaploid data where each site is one independent observation
+    // CI = p̂ ± 1.96 × √(p̂(1 − p̂) / n), where n = number of site overlaps, clamped to [0, 1]
+    pub fn confidence_intervals_95(&self) -> ConfidenceIntervals {
+        let size = self.n_samples * self.n_samples;
+        let site_overlaps = self.site_overlaps();
+        let mut lower = vec![0.0f32; size];
+        let mut upper = vec![0.0f32; size];
+
+        for i in 0..self.n_samples {
+            for j in (i + 1)..self.n_samples {
+                let pair_idx = self.idx(i, j);
+                if site_overlaps[pair_idx] == 0 {
+                    lower[pair_idx] = f32::NAN;
+                    upper[pair_idx] = f32::NAN;
+                } else {
+                    // For n, assume pseudohaploid data where each site is one independent observation
+                    let n = site_overlaps[pair_idx] as f64;
+                    let p = self.mismatches[pair_idx] as f64 / self.totals[pair_idx] as f64;
+                    let se = (p * (1.0 - p) / n).sqrt();
+                    lower[pair_idx] = (p - 1.96 * se).max(0.0) as f32;
+                    upper[pair_idx] = (p + 1.96 * se).min(1.0) as f32;
+                }
+            }
+        }
+        ConfidenceIntervals { lower, upper }
+    }
+}
+
+impl ConfidenceIntervals {
+    pub fn lower_2d(&self, n_samples: usize, counts: &Counts) -> Array2<f32> {
+        let mut matrix = Array2::from_elem((n_samples, n_samples), f32::NAN);
+        for i in 0..n_samples {
+            for j in (i + 1)..n_samples {
+                if !counts.should_count_pair(i, j) {
+                    continue;
+                }
+                let pair_idx = counts.idx(i, j);
+                matrix[(i, j)] = self.lower[pair_idx];
+                matrix[(j, i)] = self.lower[pair_idx];
+            }
+        }
+        matrix
+    }
+
+    pub fn upper_2d(&self, n_samples: usize, counts: &Counts) -> Array2<f32> {
+        let mut matrix = Array2::from_elem((n_samples, n_samples), f32::NAN);
+        for i in 0..n_samples {
+            for j in (i + 1)..n_samples {
+                if !counts.should_count_pair(i, j) {
+                    continue;
+                }
+                let pair_idx = counts.idx(i, j);
+                matrix[(i, j)] = self.upper[pair_idx];
+                matrix[(j, i)] = self.upper[pair_idx];
+            }
+        }
+        matrix
+    }
 }
 
 #[cfg(test)]
@@ -331,5 +396,49 @@ mod tests {
         assert_eq!(mismatches[(0, 2)], 2);
         assert_eq!(totals[(1, 2)], 4);
         assert_eq!(mismatches[(1, 2)], 2);
+    }
+
+    #[test]
+    fn confidence_intervals_95_basic() {
+        let samples = vec!["A".to_string(), "B".to_string(), "C".to_string()];
+        let mut reader = build_test_reader();
+        let counts = Counts::new(samples.clone(), None, vec![0; samples.len()])
+            .consume_reader(&mut reader)
+            .expect("counts failed");
+
+        let ci = counts.confidence_intervals_95();
+
+        // Pair (A, B): mismatches=1, totals=4, site_overlaps=2, p=0.25
+        // se = sqrt(0.25 * 0.75 / 2) = 0.30619
+        // lower = max(0, 0.25 - 1.96 * 0.30619) = 0.0 (clamped)
+        // upper = 0.25 + 1.96 * 0.30619 = 0.8501
+        let pair_idx_ab = counts.idx(0, 1);
+        assert!((ci.lower[pair_idx_ab] - 0.0).abs() < 1e-6);
+        assert!((ci.upper[pair_idx_ab] - 0.8501).abs() < 1e-3);
+
+        // Pair (A, C): mismatches=2, totals=2, site_overlaps=1, p=1.0
+        // se = sqrt(1.0 * 0.0 / 1) = 0.0
+        // lower = 1.0, upper = 1.0
+        let pair_idx_ac = counts.idx(0, 2);
+        assert!((ci.lower[pair_idx_ac] - 1.0).abs() < 1e-6);
+        assert!((ci.upper[pair_idx_ac] - 1.0).abs() < 1e-6);
+
+        // Pair (B, C): mismatches=2, totals=4, site_overlaps=2, p=0.5
+        // se = sqrt(0.5 * 0.5 / 2) = 0.35355
+        // lower = max(0, 0.5 - 1.96 * 0.35355) = 0.0 (clamped)
+        // upper = min(1, 0.5 + 1.96 * 0.35355) = 1.0 (clamped)
+        let pair_idx_bc = counts.idx(1, 2);
+        assert!((ci.lower[pair_idx_bc] - 0.0).abs() < 1e-6);
+        assert!((ci.upper[pair_idx_bc] - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn confidence_intervals_95_nan_for_zero_totals() {
+        let samples = vec!["A".to_string(), "B".to_string()];
+        let counts = Counts::new(samples, None, vec![0; 2]);
+        let ci = counts.confidence_intervals_95();
+        let idx = counts.idx(0, 1);
+        assert!(ci.lower[idx].is_nan());
+        assert!(ci.upper[idx].is_nan());
     }
 }

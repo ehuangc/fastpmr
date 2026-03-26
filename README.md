@@ -18,7 +18,7 @@ conda activate fastpmr
 ## Usage
 
 ```bash
-fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_INDICES] [-c CHROMOSOMES] [-m MIN_COVERED_SNPS] [-t THREADS]
+fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v VARIANT_INDICES] [-c CHROMOSOMES] [-m MIN_COVERED_SNPS] [-t THREADS]
 ```
 
 > [!NOTE]
@@ -35,6 +35,8 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-s SAMPLE_PAIRS_CSV] [-v VARI
 **NPZ Output** (`-n`, `--npz`) (*flag*): Write compressed count matrices to `mismatch_counts.npz` instead of CSV count outputs. Recommended for large sample sets.
 
 **Degrees** (`-d`, `--degrees`) (*flag*): Call degrees of relatedness for each sample pair. Each pair is classified as Identical/Twin, First Degree, Second Degree, Third Degree, or Unrelated based on normalized mismatch rates (mismatch rate divided by the median across all pairs). Third degree inference additionally requires an effective SNP count of at least 3000.
+
+**Confidence Intervals** (`-i`, `--ci`) (*flag*): Compute 95% confidence intervals for pairwise mismatch rates using the Wald method.
 
 **Sample Pairs CSV** (`-s`, `--sample-pairs-csv`) (*optional*): CSV with no header that controls which sample pairs are computed. This parameter accepts 1-column CSVs and 2-column CSVs. 1-column CSVs specify a sample list, and PMRs for all pairs of these samples are computed. 2-column CSVs specify the exact sample pairs for which PMRs are computed.
 
@@ -56,12 +58,14 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-s SAMPLE_PAIRS_CSV] [-v VARI
 **When `--npz` is not set**:
 - `covered_snps.csv`
 - `mismatch_rates.csv`
+  - When `--ci` is set, includes additional `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper` columns
   - When `--degrees` is set, includes additional `normalized_mismatch_rate` and `degree` columns
 
 **When `--npz` is set**:
 - `mismatch_counts.npz`
   - Sample list: `samples.json`
   - Arrays: `covered_snps`, `mismatches`, `totals`, `site_overlaps`
+  - When `--ci` is set, includes additional arrays `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper`
   - When `--degrees` is set, includes additional arrays `normalized_mismatch_rates`, `degrees`, and a `degree_labels.json` mapping
 
 ## Reproducibility

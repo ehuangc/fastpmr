@@ -1,4 +1,4 @@
-use crate::counts::Counts;
+use crate::counts::{ConfidenceIntervals, Counts};
 use crate::degrees::{Degree, DegreeResults};
 use crate::error::{CustomError, Result};
 use ndarray::Array1;
@@ -30,6 +30,7 @@ pub fn write_covered_snps(counts: &Counts, path: &impl AsRef<Path>) -> Result<()
 pub fn write_mismatch_rates(
     counts: &Counts,
     degree_results: Option<&DegreeResults>,
+    ci_results: Option<&ConfidenceIntervals>,
     path: &impl AsRef<Path>,
 ) -> Result<()> {
     let n_samples = counts.n_samples();
@@ -37,17 +38,17 @@ pub fn write_mismatch_rates(
     let (pairs, rates) = counts.mismatch_rates();
 
     let mut wtr = csv::Writer::from_path(path)?;
-    if degree_results.is_some() {
-        wtr.write_record([
-            "id1",
-            "id2",
-            "n_site_overlaps",
-            "mismatch_rate",
-            "normalized_mismatch_rate",
-            "degree",
-        ])?;
-    } else {
-        wtr.write_record(["id1", "id2", "n_site_overlaps", "mismatch_rate"])?;
+    {
+        let mut header = vec!["id1", "id2", "n_site_overlaps", "mismatch_rate"];
+        if ci_results.is_some() {
+            header.push("mismatch_rate_95_ci_lower");
+            header.push("mismatch_rate_95_ci_upper");
+        }
+        if degree_results.is_some() {
+            header.push("normalized_mismatch_rate");
+            header.push("degree");
+        }
+        wtr.write_record(&header)?;
     }
 
     for i in 0..n_samples {
@@ -58,23 +59,22 @@ pub fn write_mismatch_rates(
             }
             let overlap = overlaps[pair_idx];
             let rate = rates[pair_idx];
-            if let Some(dr) = degree_results {
-                wtr.serialize((
-                    pairs[pair_idx].0.as_str(),
-                    pairs[pair_idx].1.as_str(),
-                    overlap,
-                    rate,
-                    dr.normalized_mismatch_rates[pair_idx],
-                    dr.degrees[pair_idx].to_string(),
-                ))?;
-            } else {
-                wtr.serialize((
-                    pairs[pair_idx].0.as_str(),
-                    pairs[pair_idx].1.as_str(),
-                    overlap,
-                    rate,
-                ))?;
+
+            let mut record = vec![
+                pairs[pair_idx].0.clone(),
+                pairs[pair_idx].1.clone(),
+                overlap.to_string(),
+                rate.to_string(),
+            ];
+            if let Some(ci) = ci_results {
+                record.push(ci.lower[pair_idx].to_string());
+                record.push(ci.upper[pair_idx].to_string());
             }
+            if let Some(dr) = degree_results {
+                record.push(dr.normalized_mismatch_rates[pair_idx].to_string());
+                record.push(dr.degrees[pair_idx].to_string());
+            }
+            wtr.write_record(&record)?;
         }
     }
     wtr.flush().map_err(|e| CustomError::Write {
@@ -87,6 +87,7 @@ pub fn write_mismatch_rates(
 pub fn write_counts_npz(
     counts: &Counts,
     degree_results: Option<&DegreeResults>,
+    ci_results: Option<&ConfidenceIntervals>,
     path: &impl AsRef<Path>,
 ) -> Result<()> {
     let mut npz =
@@ -121,6 +122,16 @@ pub fn write_counts_npz(
         {
             let degrees = dr.degrees_2d(counts.n_samples(), counts);
             npz.add_array("degrees", &degrees)?;
+        }
+    }
+    if let Some(ci) = ci_results {
+        {
+            let lower = ci.lower_2d(counts.n_samples(), counts);
+            npz.add_array("mismatch_rate_95_ci_lower", &lower)?;
+        }
+        {
+            let upper = ci.upper_2d(counts.n_samples(), counts);
+            npz.add_array("mismatch_rate_95_ci_upper", &upper)?;
         }
     }
     npz.finish()?;
