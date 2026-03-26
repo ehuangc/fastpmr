@@ -1,3 +1,5 @@
+// Degree-calling procedure replicates that of READv2
+// (Kuhn et al. 2018, https://doi.org/10.1186/s13059-024-03350-3)
 use crate::counts::Counts;
 use ndarray::Array2;
 
