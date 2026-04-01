@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 from evaluation_utils import (
+    FASTPMR_BIN,
     PERFORMANCE_DATA_PREFIX,
     PERFORMANCE_DIR,
     PERFORMANCE_RUNS,
@@ -35,7 +36,7 @@ def build_command(
     output_dir: Path,
 ) -> str:
     parts = [
-        "fastpmr",
+        FASTPMR_BIN,
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--sample-pairs-csv {quote_path(csv_path)}",

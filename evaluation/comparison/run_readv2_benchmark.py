@@ -5,6 +5,7 @@ from pathlib import Path
 
 from evaluation_utils import (
     COMPARISON_DATA_PREFIX,
+    FASTPMR_BIN,
     PERFORMANCE_RUNS,
     PLINK_EXTS,
     ensure_data_present,
@@ -33,7 +34,7 @@ def clone_readv2(readv2_dir: Path) -> None:
 
 def build_fastpmr_command(prefix: Path, output_dir: Path) -> str:
     parts = [
-        "fastpmr",
+        FASTPMR_BIN,
         # Ensure we test fastpmr on PLINK dataset, not EIGENSTRAT
         f"--prefix {quote_path(prefix.with_suffix('.bed'))}",
         f"--output-directory {quote_path(output_dir)}",

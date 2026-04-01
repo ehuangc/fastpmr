@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 from evaluation_utils import (
+    FASTPMR_BIN,
     PERFORMANCE_DATA_PREFIX,
     PERFORMANCE_DIR,
     PERFORMANCE_RUNS,
@@ -28,7 +29,7 @@ VARIANT_SPECS = (
 
 def build_command(prefix: Path, spec: str, output_dir: Path) -> str:
     parts = [
-        "fastpmr",
+        FASTPMR_BIN,
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--variant-indices {spec}",

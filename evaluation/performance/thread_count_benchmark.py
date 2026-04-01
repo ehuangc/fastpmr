@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 from evaluation_utils import (
+    FASTPMR_BIN,
     PERFORMANCE_DATA_PREFIX,
     PERFORMANCE_DIR,
     PERFORMANCE_RUNS,
@@ -15,7 +16,7 @@ THREAD_COUNTS = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512)
 
 def build_command(prefix: Path, threads: int, output_dir: Path) -> str:
     parts = [
-        "fastpmr",
+        FASTPMR_BIN,
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         f"--threads {threads}",

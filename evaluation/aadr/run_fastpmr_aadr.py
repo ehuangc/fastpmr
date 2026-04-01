@@ -5,6 +5,7 @@ from evaluation_utils import (
     AADR_DIR,
     AADR_EXTS,
     AADR_RUNS,
+    FASTPMR_BIN,
     ensure_data_present,
     quote_path,
     run_benchmark,
@@ -13,7 +14,7 @@ from evaluation_utils import (
 
 def build_command(prefix: Path, output_dir: Path) -> str:
     parts = [
-        "fastpmr",
+        FASTPMR_BIN,
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         "--chromosomes 1-22",
