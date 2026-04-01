@@ -41,6 +41,7 @@ def build_fastpmr_command(prefix: Path, output_dir: Path) -> str:
         "--chromosomes 1-22",
         "--min-covered-snps 0",
         "-n",
+        "--degrees",
     ]
     return " ".join(parts)
 
