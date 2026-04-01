@@ -891,8 +891,8 @@ fn chromosomes_intersects_with_variant_indices() {
     );
 
     // Verify that the overlap counts are less than the chr-1-only case (30000 sites).
-    let csv_path = dataset.output_dir.join("mismatch_rates.csv");
-    let content = fs::read_to_string(&csv_path).expect("could not read mismatch_rates.csv");
+    let csv_path = dataset.output_dir.join("fastpmr_pair_results.csv");
+    let content = fs::read_to_string(&csv_path).expect("could not read fastpmr_pair_results.csv");
     let overlaps: Vec<u64> = content
         .lines()
         .skip(1)
@@ -976,7 +976,7 @@ fn assert_outputs(
     expected_pairs: &BTreeMap<(String, String), common::PairStats>,
     expected_coverage: &BTreeMap<String, u64>,
 ) -> Vec<OutputRecord> {
-    let csv_path = output_dir.join("mismatch_rates.csv");
+    let csv_path = output_dir.join("fastpmr_pair_results.csv");
     let records = read_records(&csv_path);
     assert!(
         !records.is_empty(),
@@ -1033,16 +1033,16 @@ fn assert_npz_outputs(
     expected_coverage: &BTreeMap<String, u64>,
     degrees: bool,
 ) {
-    let csv_path = output_dir.join("mismatch_rates.csv");
+    let csv_path = output_dir.join("fastpmr_pair_results.csv");
     assert!(
         !csv_path.exists(),
-        "unexpected mismatch_rates.csv output alongside npz"
+        "unexpected fastpmr_pair_results.csv output alongside npz"
     );
 
-    let coverage_path = output_dir.join("covered_snps.csv");
+    let coverage_path = output_dir.join("fastpmr_covered_snps.csv");
     assert!(
         !coverage_path.exists(),
-        "unexpected covered_snps.csv output alongside npz"
+        "unexpected fastpmr_covered_snps.csv output alongside npz"
     );
 
     let npz_path = output_dir.join("fastpmr_results.npz");
@@ -1209,7 +1209,7 @@ fn assert_npz_outputs(
 }
 
 fn assert_covered_snps(output_dir: &Path, expected: &BTreeMap<String, u64>) {
-    let coverage_path = output_dir.join("covered_snps.csv");
+    let coverage_path = output_dir.join("fastpmr_covered_snps.csv");
     let coverage = read_covered_snps(&coverage_path);
     assert_eq!(
         coverage,

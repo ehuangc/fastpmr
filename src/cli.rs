@@ -755,14 +755,14 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
             &npz_path,
         )?;
     } else {
-        let coverage_path = input_spec.output_dir().join("covered_snps.csv");
+        let coverage_path = input_spec.output_dir().join("fastpmr_covered_snps.csv");
         println!(
             "Writing covered SNP counts to {}...",
             coverage_path.display()
         );
         write_covered_snps(&counts, &coverage_path)?;
 
-        let rates_path = input_spec.output_dir().join("mismatch_rates.csv");
+        let rates_path = input_spec.output_dir().join("fastpmr_pair_results.csv");
         println!(
             "Writing pairwise mismatch rates to {}...",
             rates_path.display()

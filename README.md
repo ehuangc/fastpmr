@@ -54,8 +54,8 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 - `mismatch_rates.png`: histogram of pairwise mismatch rates (%), including only pairs with `n_site_overlaps >= 30000`.
 
 **When `--npz/-n` is not set**:
-- `covered_snps.csv`
-- `mismatch_rates.csv`
+- `fastpmr_covered_snps.csv`
+- `fastpmr_pair_results.csv`
   - When `--ci/-i` is set, includes additional `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper` columns
   - When `--degrees/-d` is set, includes additional `normalized_mismatch_rate` and `degree` columns
 
