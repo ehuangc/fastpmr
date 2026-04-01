@@ -744,10 +744,7 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
 
     if input_spec.npz() {
         let npz_path = input_spec.output_dir().join("fastpmr_results.npz");
-        println!(
-            "Writing pairwise mismatch counts to {}...",
-            npz_path.display()
-        );
+        println!("Writing results to {}...", npz_path.display());
         write_counts_npz(
             &counts,
             degree_results.as_ref(),
@@ -763,10 +760,7 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
         write_covered_snps(&counts, &coverage_path)?;
 
         let rates_path = input_spec.output_dir().join("fastpmr_pair_results.csv");
-        println!(
-            "Writing pairwise mismatch rates to {}...",
-            rates_path.display()
-        );
+        println!("Writing pairwise results to {}...", rates_path.display());
         write_mismatch_rates(
             &counts,
             degree_results.as_ref(),
