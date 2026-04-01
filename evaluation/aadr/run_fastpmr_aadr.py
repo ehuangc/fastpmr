@@ -34,7 +34,6 @@ def main() -> None:
 
     command = build_command(AADR_DATA_PREFIX, fastpmr_output_dir)
     run_benchmark([("aadr", command)], benchmark_output_path, AADR_RUNS)
-    print(f"fastpmr outputs written under {fastpmr_output_dir}")
 
 
 if __name__ == "__main__":
