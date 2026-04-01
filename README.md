@@ -32,7 +32,7 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 
 **Output Directory** (`-o`, `--output-directory`) (*optional*): Directory for outputs. Defaults to `./fastpmr_output_<timestamp>`.
 
-**NPZ Output** (`-n`, `--npz`) (*flag*): Write compressed count matrices to `fastpmr_results.npz` instead of CSV count outputs. Recommended for large sample sets.
+**NPZ Output** (`-n`, `--npz`) (*flag*): Write outputs as compressed `numpy` arrays to `fastpmr_results.npz` instead of as CSV files. Recommended for large sample sets.
 
 **Degrees** (`-d`, `--degrees`) (*flag*): Call degrees of relatedness for each sample pair, using the procedure described in [READv2](https://doi.org/10.1186/s13059-024-03350-3) (Kuhn et al. 2018). Each pair is classified as Identical/Twin, First Degree, Second Degree, Third Degree, or Unrelated based on normalized mismatch rates (mismatch rate divided by the median across all pairs). Third degree inference additionally requires an "expected mismatch" count of at least 3000.
 
