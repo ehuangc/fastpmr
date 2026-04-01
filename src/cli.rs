@@ -743,7 +743,7 @@ pub fn run(input_spec: &InputSpec) -> Result<()> {
     };
 
     if input_spec.npz() {
-        let npz_path = input_spec.output_dir().join("mismatch_counts.npz");
+        let npz_path = input_spec.output_dir().join("fastpmr_results.npz");
         println!(
             "Writing pairwise mismatch counts to {}...",
             npz_path.display()

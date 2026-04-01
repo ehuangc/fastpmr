@@ -29,7 +29,7 @@ pub struct Args {
     output_directory: String,
 
     /// Flag to write outputs in compressed .npz format. If true, count matrices, covered
-    /// SNP counts, and a samples.json will be written to mismatch_counts.npz. We recommend
+    /// SNP counts, and a samples.json will be written to fastpmr_results.npz. We recommend
     /// setting this flag to true for large sample sizes. Defaults to false.
     #[arg(short, long, default_value_t = false)]
     npz: bool,

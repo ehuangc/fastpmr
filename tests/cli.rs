@@ -342,7 +342,7 @@ fn npz_outputs_include_ci() {
         false,
     );
 
-    let npz_path = dataset.output_dir.join("mismatch_counts.npz");
+    let npz_path = dataset.output_dir.join("fastpmr_results.npz");
     let mut npz = NpzReader::new(File::open(&npz_path).expect("could not open npz"))
         .expect("invalid npz archive");
     let ci_lower: Array2<f32> = npz
@@ -1045,15 +1045,15 @@ fn assert_npz_outputs(
         "unexpected covered_snps.csv output alongside npz"
     );
 
-    let npz_path = output_dir.join("mismatch_counts.npz");
+    let npz_path = output_dir.join("fastpmr_results.npz");
     assert!(
         npz_path.exists(),
-        "missing mismatch_counts.npz output: looked at {}",
+        "missing fastpmr_results.npz output: looked at {}",
         npz_path.display()
     );
 
     let mut npz =
-        NpzReader::new(File::open(&npz_path).expect("could not open mismatch_counts.npz"))
+        NpzReader::new(File::open(&npz_path).expect("could not open fastpmr_results.npz"))
             .expect("invalid npz archive");
     let overlaps: Array2<u64> = npz
         .by_name("n_site_overlaps")
