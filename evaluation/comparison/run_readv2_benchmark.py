@@ -40,6 +40,7 @@ def build_fastpmr_command(prefix: Path, output_dir: Path) -> str:
         f"--output-directory {quote_path(output_dir)}",
         "--chromosomes 1-22",
         "--min-covered-snps 0",
+        "--ci",
         "--degrees",
         "--npz",
     ]
