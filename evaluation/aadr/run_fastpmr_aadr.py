@@ -18,7 +18,7 @@ def build_command(prefix: Path, output_dir: Path) -> str:
         f"--prefix {quote_path(prefix)}",
         f"--output-directory {quote_path(output_dir)}",
         "--chromosomes 1-22",
-        "-n",
+        "--npz",
     ]
     return " ".join(parts)
 

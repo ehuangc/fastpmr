@@ -22,7 +22,7 @@ def build_command(prefix: Path, threads: int, output_dir: Path) -> str:
         f"--threads {threads}",
         "--chromosomes 1-22",
         "--min-covered-snps 0",
-        "-n",
+        "--npz",
     ]
     return " ".join(parts)
 

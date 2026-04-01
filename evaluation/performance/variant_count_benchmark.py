@@ -35,7 +35,7 @@ def build_command(prefix: Path, spec: str, output_dir: Path) -> str:
         f"--variant-indices {spec}",
         "--chromosomes 1-22",
         "--min-covered-snps 0",
-        "-n",
+        "--npz",
     ]
     return " ".join(parts)
 

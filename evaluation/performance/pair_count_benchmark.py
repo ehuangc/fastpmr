@@ -43,7 +43,7 @@ def build_command(
         f"--threads {THREADS}",
         "--chromosomes 1-22",
         "--min-covered-snps 0",
-        "-n",
+        "--npz",
     ]
     return " ".join(parts)
 
