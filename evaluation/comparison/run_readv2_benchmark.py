@@ -1,6 +1,5 @@
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
 from evaluation_utils import (
@@ -18,6 +17,7 @@ READV2_DIR = Path(__file__).resolve().parent / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
 PLINK_PREFIX = COMPARISON_DATA_PREFIX
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
+OUTPUTS_DIR = RESULTS_DIR / "outputs"
 
 
 def clone_readv2(readv2_dir: Path) -> None:
@@ -54,11 +54,15 @@ def main() -> None:
     ensure_data_present(data_prefix, PLINK_EXTS)
     clone_readv2(READV2_DIR)
 
+    fastpmr_output_dir = OUTPUTS_DIR / "fastpmr"
+    readv2_output_dir = OUTPUTS_DIR / "readv2"
+    fastpmr_output_dir.mkdir(parents=True, exist_ok=True)
+    readv2_output_dir.mkdir(parents=True, exist_ok=True)
+
     export_path = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 
-    output_dir = tempfile.mkdtemp()
-    fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, Path(output_dir))
-    readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, Path(output_dir))
+    fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, fastpmr_output_dir)
+    readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, readv2_output_dir)
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
     run_benchmark(configs, export_path, runs=PERFORMANCE_RUNS)
 
