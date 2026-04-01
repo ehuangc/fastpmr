@@ -6,11 +6,10 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.stats import beta
 
 from evaluation_utils import AADR_DIR
 
-COUNTS_PATH = AADR_DIR / "results" / "fastpmr" / "mismatch_counts.npz"
+NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
 OUTPUT_DIR = AADR_DIR / "results" / "analysis"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
@@ -22,8 +21,8 @@ NON_IDENTICAL_PMR_THRESHOLD = 0.17
 OVERLAP_THRESHOLD = 30000
 
 
-def ensure_counts_data_present(counts_path: Path, metadata_path: Path) -> None:
-    missing = [path for path in (counts_path, metadata_path) if not path.is_file()]
+def ensure_npz_data_present(npz_path: Path, metadata_path: Path) -> None:
+    missing = [path for path in (npz_path, metadata_path) if not path.is_file()]
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
         raise SystemExit(
@@ -49,59 +48,26 @@ def load_metadata(metadata_path: Path) -> dict[str, dict[str, str]]:
     return metadata
 
 
-def load_mismatch_counts(
+def load_fastpmr_results(
     npz_path: Path,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[str]]:
+) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     with np.load(npz_path, allow_pickle=False) as npz:
-        mismatches = npz["mismatches"]
-        totals = npz["totals"]
-        site_overlaps = npz["site_overlaps"]
+        site_overlaps = npz["n_site_overlaps"]
+        mismatch_rates = npz["mismatch_rates"]
+        mismatch_rates_95_ci_lower = npz["mismatch_rates_95_ci_lower"]
+        mismatch_rates_95_ci_upper = npz["mismatch_rates_95_ci_upper"]
     samples = load_samples(npz_path)
-    return mismatches, totals, site_overlaps, samples
-
-
-def compute_mismatch_rates(mismatches: np.ndarray, totals: np.ndarray) -> np.ndarray:
-    rates = np.full(mismatches.shape, np.nan, dtype=np.float64)
-    np.divide(mismatches, totals, out=rates, where=totals != 0)
-    return rates
-
-
-def compute_mismatch_rate_cis(
-    mismatches: np.ndarray, totals: np.ndarray, confidence_level: float = 0.95
-) -> tuple[np.ndarray, np.ndarray]:
-    # Assume pseudohaploid data, so 1 potential mismatch per site instead of 2
-    # Note that this gives us conservative estimates for diploid data
-    pseudo_mismatches = mismatches.astype(np.float64) / 2.0
-    pseudo_totals = totals.astype(np.float64) / 2.0
-    lower = np.full(pseudo_mismatches.shape, np.nan, dtype=np.float64)
-    upper = np.full(pseudo_mismatches.shape, np.nan, dtype=np.float64)
-
-    alpha = 1.0 - confidence_level
-    valid = pseudo_totals > 0
-
-    zero = valid & (pseudo_mismatches <= 0)
-    non_zero = valid & (pseudo_mismatches > 0)
-    lower[zero] = 0.0
-    lower[non_zero] = beta.ppf(
-        alpha / 2, pseudo_mismatches[non_zero], pseudo_totals[non_zero] - pseudo_mismatches[non_zero] + 1
-    )
-
-    one = valid & (pseudo_mismatches >= pseudo_totals)
-    non_one = valid & (pseudo_mismatches < pseudo_totals)
-    upper[one] = 1.0
-    upper[non_one] = beta.ppf(
-        1 - alpha / 2, pseudo_mismatches[non_one] + 1, pseudo_totals[non_one] - pseudo_mismatches[non_one]
-    )
-    return lower, upper
+    return samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper
 
 
 def filter_samples(
-    mismatches: np.ndarray,
-    totals: np.ndarray,
-    site_overlaps: np.ndarray,
     samples: list[str],
+    site_overlaps: np.ndarray,
+    mismatch_rates: np.ndarray,
+    mismatch_rates_95_ci_lower: np.ndarray,
+    mismatch_rates_95_ci_upper: np.ndarray,
     metadata: dict[str, dict[str, str]],
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[str]]:
+) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     keep_indices: list[int] = []
     for idx, sample in enumerate(samples):
         # Exclude archaic humans
@@ -115,10 +81,11 @@ def filter_samples(
 
     keep = np.array(keep_indices, dtype=int)
     return (
-        mismatches[np.ix_(keep, keep)],
-        totals[np.ix_(keep, keep)],
-        site_overlaps[np.ix_(keep, keep)],
         [samples[idx] for idx in keep],
+        site_overlaps[np.ix_(keep, keep)],
+        mismatch_rates[np.ix_(keep, keep)],
+        mismatch_rates_95_ci_lower[np.ix_(keep, keep)],
+        mismatch_rates_95_ci_upper[np.ix_(keep, keep)],
     )
 
 
@@ -149,10 +116,9 @@ def find_same_master_id_high_pmr_pairs(
     samples: list[str],
     master_ids: list[str],
     site_overlaps: np.ndarray,
-    mismatches: np.ndarray,
-    rates: np.ndarray,
-    rates_ci_lower: np.ndarray,
-    rates_ci_upper: np.ndarray,
+    mismatch_rates: np.ndarray,
+    mismatch_rates_95_ci_lower: np.ndarray,
+    mismatch_rates_95_ci_upper: np.ndarray,
     threshold: float,
     overlap_threshold: int,
 ) -> pd.DataFrame:
@@ -168,9 +134,7 @@ def find_same_master_id_high_pmr_pairs(
             continue
         for offset, idx_i in enumerate(indices[:-1]):
             for idx_j in indices[offset + 1 :]:
-                pmr = rates[idx_i, idx_j]
-                lower = rates_ci_lower[idx_i, idx_j]
-                upper = rates_ci_upper[idx_i, idx_j]
+                pmr = mismatch_rates[idx_i, idx_j]
                 if np.isnan(pmr):
                     continue
                 n_overlap = int(site_overlaps[idx_i, idx_j])
@@ -182,11 +146,9 @@ def find_same_master_id_high_pmr_pairs(
                         "genetic_id1": samples[idx_i],
                         "genetic_id2": samples[idx_j],
                         "site_overlap": n_overlap,
-                        # Up to 2 mismatches per site, so divide by 2 for "per-site" mismatches
-                        "site_mismatches": mismatches[idx_i, idx_j].astype(np.float64) / 2.0,
                         "mismatch_rate": pmr,
-                        "mismatch_rate_95_ci_lower": lower,
-                        "mismatch_rate_95_ci_upper": upper,
+                        "mismatch_rate_95_ci_lower": mismatch_rates_95_ci_lower[idx_i, idx_j],
+                        "mismatch_rate_95_ci_upper": mismatch_rates_95_ci_upper[idx_i, idx_j],
                     }
                     row.update(get_pair_metadata(metadata, samples[idx_i], samples[idx_j]))
                     rows.append(row)
@@ -199,10 +161,9 @@ def find_diff_master_id_low_pmr_pairs(
     samples: list[str],
     master_ids: list[str],
     site_overlaps: np.ndarray,
-    mismatches: np.ndarray,
-    rates: np.ndarray,
-    rates_ci_lower: np.ndarray,
-    rates_ci_upper: np.ndarray,
+    mismatch_rates: np.ndarray,
+    mismatch_rates_95_ci_lower: np.ndarray,
+    mismatch_rates_95_ci_upper: np.ndarray,
     threshold: float,
     overlap_threshold: int,
 ) -> pd.DataFrame:
@@ -212,9 +173,8 @@ def find_diff_master_id_low_pmr_pairs(
         master_id_i = master_ids_array[idx_i]
         if not master_id_i:
             continue
-        row_rates = rates[idx_i, idx_i + 1 :]
+        row_rates = mismatch_rates[idx_i, idx_i + 1 :]
         row_overlaps = site_overlaps[idx_i, idx_i + 1 :]
-        row_mismatches = mismatches[idx_i, idx_i + 1 :]
         row_master_ids = master_ids_array[idx_i + 1 :]
         mask = (
             (row_master_ids != "")
@@ -226,19 +186,15 @@ def find_diff_master_id_low_pmr_pairs(
         match_offsets = np.nonzero(mask)[0]
         for offset in match_offsets:
             idx_j = idx_i + 1 + int(offset)
-            lower = rates_ci_lower[idx_i, idx_j]
-            upper = rates_ci_upper[idx_i, idx_j]
             row = {
                 "master_id1": master_id_i,
                 "master_id2": row_master_ids[offset],
                 "genetic_id1": samples[idx_i],
                 "genetic_id2": samples[idx_j],
-                "site_overlap": row_overlaps[offset],
-                # Up to 2 mismatches per site, so divide by 2 for "per-site" mismatches
-                "site_mismatches": row_mismatches[offset].astype(np.float64) / 2.0,
+                "site_overlap": int(row_overlaps[offset]),
                 "mismatch_rate": row_rates[offset],
-                "mismatch_rate_95_ci_lower": lower,
-                "mismatch_rate_95_ci_upper": upper,
+                "mismatch_rate_95_ci_lower": mismatch_rates_95_ci_lower[idx_i, idx_j],
+                "mismatch_rate_95_ci_upper": mismatch_rates_95_ci_upper[idx_i, idx_j],
             }
             row.update(get_pair_metadata(metadata, samples[idx_i], samples[idx_j]))
             rows.append(row)
@@ -249,13 +205,13 @@ def find_diff_master_id_low_pmr_pairs(
 def collect_pairwise_mismatch_rates(
     master_ids: list[str],
     rates: np.ndarray,
-    totals: np.ndarray,
+    site_overlaps: np.ndarray,
     overlap_threshold: int,
 ) -> tuple[np.ndarray, np.ndarray]:
     master_ids_array = np.asarray(master_ids, dtype=object)
     pair_i, pair_j = np.triu_indices(len(master_ids_array), k=1)
     pair_rates = rates[pair_i, pair_j]
-    pair_site_overlaps = totals[pair_i, pair_j] / 2
+    pair_site_overlaps = site_overlaps[pair_i, pair_j]
     master_i = master_ids_array[pair_i]
     master_j = master_ids_array[pair_j]
 
@@ -297,22 +253,28 @@ def plot_pairwise_mismatch_rate_histograms(
 
 
 def main() -> None:
-    ensure_counts_data_present(COUNTS_PATH, METADATA_PATH)
-    mismatches, totals, site_overlaps, samples = load_mismatch_counts(COUNTS_PATH)
+    ensure_npz_data_present(NPZ_PATH, METADATA_PATH)
+    samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper = (
+        load_fastpmr_results(NPZ_PATH)
+    )
     metadata = load_metadata(METADATA_PATH)
     matched = sum(sample in metadata for sample in samples)
-    assert len(samples) == len(metadata) == matched == mismatches.shape[0] == totals.shape[0] == site_overlaps.shape[0]
+    assert len(samples) == len(metadata) == matched == mismatch_rates.shape[0] == site_overlaps.shape[0]
 
-    filtered_mismatches, filtered_totals, filtered_site_overlaps, filtered_samples = filter_samples(
-        mismatches, totals, site_overlaps, samples, metadata
+    (
+        filtered_samples,
+        filtered_site_overlaps,
+        filtered_mismatch_rates,
+        filtered_mismatch_rates_95_ci_lower,
+        filtered_mismatch_rates_95_ci_upper,
+    ) = filter_samples(
+        samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper, metadata
     )
     filtered_master_ids = [metadata[sample]["Master ID"] for sample in filtered_samples]
-    filtered_rates = compute_mismatch_rates(filtered_mismatches, filtered_totals)
-    filtered_rates_ci_lower, filtered_rates_ci_upper = compute_mismatch_rate_cis(filtered_mismatches, filtered_totals)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     same_rates, diff_rates = collect_pairwise_mismatch_rates(
-        filtered_master_ids, filtered_rates, filtered_totals, OVERLAP_THRESHOLD
+        filtered_master_ids, filtered_mismatch_rates, filtered_site_overlaps, OVERLAP_THRESHOLD
     )
     plot_pairwise_mismatch_rate_histograms(
         same_rates, diff_rates, SAME_MASTER_HISTOGRAM_PATH, DIFF_MASTER_HISTOGRAM_PATH
@@ -326,10 +288,9 @@ def main() -> None:
         filtered_samples,
         filtered_master_ids,
         filtered_site_overlaps,
-        filtered_mismatches,
-        filtered_rates,
-        filtered_rates_ci_lower,
-        filtered_rates_ci_upper,
+        filtered_mismatch_rates,
+        filtered_mismatch_rates_95_ci_lower,
+        filtered_mismatch_rates_95_ci_upper,
         NON_IDENTICAL_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
     )
@@ -346,10 +307,9 @@ def main() -> None:
         filtered_samples,
         filtered_master_ids,
         filtered_site_overlaps,
-        filtered_mismatches,
-        filtered_rates,
-        filtered_rates_ci_lower,
-        filtered_rates_ci_upper,
+        filtered_mismatch_rates,
+        filtered_mismatch_rates_95_ci_lower,
+        filtered_mismatch_rates_95_ci_upper,
         IDENTICAL_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
     )
