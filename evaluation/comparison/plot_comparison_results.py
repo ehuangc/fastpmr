@@ -161,12 +161,20 @@ def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
     # Reindex to canonical degree order (fill missing with 0)
     ct = ct.reindex(index=DEGREE_ORDER, columns=DEGREE_ORDER, fill_value=0)
 
+    # Mask zero cells so they render as a neutral background; apply LogNorm
+    # to the remaining non-zero cells to keep small counts visible alongside
+    # the dominant diagonal. Annotations still display "0" in masked cells.
+    mask = ct == 0
+    cmap = plt.get_cmap("Blues").copy()
+    cmap.set_bad(color="#f2f2f2")
+
     fig, ax = plt.subplots(figsize=(7, 6), constrained_layout=True)
     sns.heatmap(
         ct,
         annot=True,
         fmt="d",
-        cmap="Blues",
+        cmap=cmap,
+        mask=mask,
         norm=LogNorm(vmin=1, vmax=ct.values.max()),
         linewidths=0.5,
         linecolor="white",
@@ -174,6 +182,19 @@ def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
         cbar_kws={"label": "Number of Pairs"},
         ax=ax,
     )
+    # Redraw annotations for the masked (zero) cells, which seaborn skips.
+    for i in range(ct.shape[0]):
+        for j in range(ct.shape[1]):
+            if mask.iat[i, j]:
+                ax.text(
+                    j + 0.5,
+                    i + 0.5,
+                    "0",
+                    ha="center",
+                    va="center",
+                    color="#999999",
+                    fontsize=10,
+                )
     ax.set_xlabel("fastpmr", fontsize=14)
     ax.set_ylabel("READv2", fontsize=14)
     ax.set_title("Degree Classification Confusion Matrix", fontsize=15)
