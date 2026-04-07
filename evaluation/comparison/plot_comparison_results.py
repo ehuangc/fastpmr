@@ -176,7 +176,7 @@ def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
     )
     ax.set_xlabel("fastpmr", fontsize=14)
     ax.set_ylabel("READv2", fontsize=14)
-    ax.set_title("Degree Classification: fastpmr vs. READv2", fontsize=15)
+    ax.set_title("Degree Classification Confusion Matrix", fontsize=15)
     ax.tick_params(axis="both", labelsize=11)
     # Rotate labels for readability
     ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha="right")
