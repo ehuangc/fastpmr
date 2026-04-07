@@ -13,6 +13,7 @@ READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 OUTPUTS_DIR = RESULTS_DIR / "outputs"
 FASTPMR_NPZ = OUTPUTS_DIR / "fastpmr" / "fastpmr_results.npz"
 READV2_TSV = OUTPUTS_DIR / "readv2" / "Read_Results.tsv"
+PMR_TOLERANCE = 1e-6
 
 DEGREE_ORDER = [
     "Identical/Twin",
@@ -118,12 +119,13 @@ def save_bar_plot(
     plt.close(fig)
 
 
-def build_degree_comparison() -> pd.DataFrame:
+def build_pair_comparison() -> pd.DataFrame:
     # Load fastpmr results
     npz = np.load(FASTPMR_NPZ, allow_pickle=True)
     samples = json.loads(npz["samples.json"])
     degree_labels = json.loads(npz["degree_labels.json"])
     degrees = npz["degrees"]
+    mismatch_rates = npz["mismatch_rates"]
 
     # Map IID -> sample index (READv2 uses IID from the .fam file)
     iid_to_idx = {}
@@ -139,16 +141,21 @@ def build_degree_comparison() -> pd.DataFrame:
         id_a, id_b = row["PairIndividuals"].split(",")
         idx_a = iid_to_idx[id_a]
         idx_b = iid_to_idx[id_b]
-        fastpmr_deg = degree_labels[degrees[idx_a, idx_b]]
-        readv2_deg = READV2_DEGREE_MAP[row["Rel"]]
-        rows.append({"fastpmr": fastpmr_deg, "READv2": readv2_deg})
+        rows.append(
+            {
+                "fastpmr_degree": degree_labels[degrees[idx_a, idx_b]],
+                "READv2_degree": READV2_DEGREE_MAP[row["Rel"]],
+                "fastpmr_mismatch_rate": float(mismatch_rates[idx_a, idx_b]),
+                "READv2_mismatch_rate": float(row["Nonnormalized_P0"]),
+            }
+        )
     return pd.DataFrame(rows)
 
 
 def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
     ct = pd.crosstab(
-        comparison["READv2"],
-        comparison["fastpmr"],
+        comparison["READv2_degree"],
+        comparison["fastpmr_degree"],
         dropna=False,
     )
     # Reindex to canonical degree order (fill missing with 0)
@@ -179,11 +186,21 @@ def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
+def check_pmr_agreement(comparison: pd.DataFrame) -> None:
+    diffs = (comparison["fastpmr_mismatch_rate"] - comparison["READv2_mismatch_rate"]).abs()
+    max_diff = float(diffs.max())
+    if max_diff < PMR_TOLERANCE:
+        print(f"All mismatch rates match within {PMR_TOLERANCE} (max diff = {max_diff:.2e}).")
+    else:
+        print(f"Some mismatch rates differ by more than {PMR_TOLERANCE} (max diff = {max_diff:.2e}).")
+
+
 def main() -> None:
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    degree_comparison = build_degree_comparison()
-    save_confusion_matrix(degree_comparison, PLOTS_DIR / "degree_classification_confusion_matrix.pdf")
+    pair_comparison = build_pair_comparison()
+    save_confusion_matrix(pair_comparison, PLOTS_DIR / "degree_classification_confusion_matrix.pdf")
+    check_pmr_agreement(pair_comparison)
 
     readv2_df = pd.read_csv(READV2_CSV)
     readv2_df = bytes_to_gb(readv2_df)
