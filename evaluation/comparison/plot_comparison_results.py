@@ -1,12 +1,35 @@
+import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.colors import LogNorm
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
 READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"
+OUTPUTS_DIR = RESULTS_DIR / "outputs"
+FASTPMR_NPZ = OUTPUTS_DIR / "fastpmr" / "fastpmr_results.npz"
+READV2_TSV = OUTPUTS_DIR / "readv2" / "Read_Results.tsv"
+
+DEGREE_ORDER = [
+    "Identical/Twin",
+    "First Degree",
+    "Second Degree",
+    "Third Degree",
+    "Unrelated",
+]
+
+READV2_DEGREE_MAP = {
+    "IdenticalTwins/SameIndividual": "Identical/Twin",
+    "First Degree": "First Degree",
+    "Second Degree": "Second Degree",
+    "Third Degree": "Third Degree",
+    "Unrelated/Consistent with Third Degree": "Unrelated",
+    "Unrelated": "Unrelated",
+}
 
 
 def seconds_to_minutes(df: pd.DataFrame) -> pd.DataFrame:
@@ -95,8 +118,72 @@ def save_bar_plot(
     plt.close(fig)
 
 
+def build_degree_comparison() -> pd.DataFrame:
+    # Load fastpmr results
+    npz = np.load(FASTPMR_NPZ, allow_pickle=True)
+    samples = json.loads(npz["samples.json"])
+    degree_labels = json.loads(npz["degree_labels.json"])
+    degrees = npz["degrees"]
+
+    # Map IID -> sample index (READv2 uses IID from the .fam file)
+    iid_to_idx = {}
+    for idx, name in enumerate(samples):
+        iid = name.split(":", 1)[1]
+        iid_to_idx[iid] = idx
+
+    # Load READv2 results
+    readv2_df = pd.read_csv(READV2_TSV, sep="\t")
+
+    rows = []
+    for _, row in readv2_df.iterrows():
+        id_a, id_b = row["PairIndividuals"].split(",")
+        idx_a = iid_to_idx[id_a]
+        idx_b = iid_to_idx[id_b]
+        fastpmr_deg = degree_labels[degrees[idx_a, idx_b]]
+        readv2_deg = READV2_DEGREE_MAP[row["Rel"]]
+        rows.append({"fastpmr": fastpmr_deg, "READv2": readv2_deg})
+    return pd.DataFrame(rows)
+
+
+def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
+    ct = pd.crosstab(
+        comparison["READv2"],
+        comparison["fastpmr"],
+        dropna=False,
+    )
+    # Reindex to canonical degree order (fill missing with 0)
+    ct = ct.reindex(index=DEGREE_ORDER, columns=DEGREE_ORDER, fill_value=0)
+
+    fig, ax = plt.subplots(figsize=(7, 6), constrained_layout=True)
+    sns.heatmap(
+        ct,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        norm=LogNorm(vmin=1, vmax=ct.values.max()),
+        linewidths=0.5,
+        linecolor="white",
+        square=True,
+        cbar_kws={"label": "Number of pairs", "shrink": 0.8},
+        ax=ax,
+    )
+    ax.set_xlabel("fastpmr", fontsize=14)
+    ax.set_ylabel("READv2", fontsize=14)
+    ax.set_title("Degree Classification: fastpmr vs. READv2", fontsize=15)
+    ax.tick_params(axis="both", labelsize=11)
+    # Rotate labels for readability
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha="right")
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
+
+    fig.savefig(output_path, bbox_inches="tight", dpi=600)
+    plt.close(fig)
+
+
 def main() -> None:
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    degree_comparison = build_degree_comparison()
+    save_confusion_matrix(degree_comparison, PLOTS_DIR / "degree_classification_confusion_matrix.pdf")
 
     readv2_df = pd.read_csv(READV2_CSV)
     readv2_df = bytes_to_gb(readv2_df)
