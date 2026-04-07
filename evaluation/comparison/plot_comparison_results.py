@@ -171,7 +171,7 @@ def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
         linewidths=0.5,
         linecolor="white",
         square=True,
-        cbar_kws={"label": "Number of pairs", "shrink": 0.8},
+        cbar_kws={"label": "Number of Pairs"},
         ax=ax,
     )
     ax.set_xlabel("fastpmr", fontsize=14)
