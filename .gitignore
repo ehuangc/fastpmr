@@ -7,6 +7,7 @@ evaluation/aadr/data
 evaluation/aadr/results/fastpmr/*.npz
 evaluation/comparison/data
 evaluation/comparison/READv2
+evaluation/comparison/results/outputs
 evaluation/performance/data
 
 # Byte-compiled / optimized / DLL files
