@@ -138,7 +138,7 @@ def find_same_master_id_high_pmr_pairs(
                 if np.isnan(pmr):
                     continue
                 n_overlap = int(site_overlaps[idx_i, idx_j])
-                if n_overlap <= overlap_threshold:
+                if n_overlap < overlap_threshold:
                     continue
                 if pmr > threshold:
                     row = {
@@ -180,7 +180,7 @@ def find_diff_master_id_low_pmr_pairs(
             (row_master_ids != "")
             & (row_master_ids != master_id_i)
             & (row_rates < threshold)
-            & (row_overlaps > overlap_threshold)
+            & (row_overlaps >= overlap_threshold)
         )
         mask &= ~np.isnan(row_rates)
         match_offsets = np.nonzero(mask)[0]
@@ -299,7 +299,7 @@ def main() -> None:
     high_pmr_pairs.to_csv(SAME_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(high_pmr_pairs)} same-master-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
-        f"and site overlap > {OVERLAP_THRESHOLD} to {SAME_MASTER_OUTPUT_CSV}.\n"
+        f"and site overlap >= {OVERLAP_THRESHOLD} to {SAME_MASTER_OUTPUT_CSV}.\n"
     )
 
     low_pmr_pairs = find_diff_master_id_low_pmr_pairs(
@@ -317,7 +317,7 @@ def main() -> None:
     low_pmr_pairs.to_csv(DIFF_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(low_pmr_pairs)} different-master-ID pairs with PMR < {IDENTICAL_PMR_THRESHOLD} "
-        f"and site overlap > {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}."
+        f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}."
     )
 
 
