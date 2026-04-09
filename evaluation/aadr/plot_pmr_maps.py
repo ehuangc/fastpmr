@@ -13,7 +13,7 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from analyze_aadr_results import (
+from scan_aadr_pmrs import (
     ensure_npz_data_present,
     load_metadata,
     load_samples,
