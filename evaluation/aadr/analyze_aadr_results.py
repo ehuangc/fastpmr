@@ -11,7 +11,7 @@ from evaluation_utils import AADR_DIR
 
 NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
-OUTPUT_DIR = AADR_DIR / "results" / "analysis"
+OUTPUT_DIR = AADR_DIR / "results" / "scan"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
 SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.png"
