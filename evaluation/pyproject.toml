@@ -42,7 +42,7 @@ plinkio = ">=0.9.8, <0.10"
 [tool.pixi.tasks]
 prepare-aadr = "python aadr/prepare_aadr_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr_aadr.py"
-analyze-aadr = "python aadr/scan_aadr_pmrs.py"
+scan-aadr = "python aadr/scan_aadr_pmrs.py"
 plot-aadr = "python aadr/plot_pmr_maps.py"
 
 prepare-performance = "python performance/prepare_indo_european_data.py"
