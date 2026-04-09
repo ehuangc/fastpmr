@@ -58,7 +58,7 @@ plot-comparison = "python comparison/plot_comparison_results.py"
 aadr-pipeline = [
     { task = "prepare-aadr" },
     { task = "fastpmr-aadr" },
-    { task = "analyze-aadr" },
+    { task = "scan-aadr" },
     { task = "plot-aadr" },
 ]
 performance-pipeline = [
