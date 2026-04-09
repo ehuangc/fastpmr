@@ -1,4 +1,5 @@
 import csv
+import json
 import multiprocessing
 import resource
 import shlex
@@ -11,6 +12,8 @@ import zipfile
 from multiprocessing.connection import Connection
 from pathlib import Path
 
+import numpy as np
+
 EVALUATION_DIR = Path(__file__).resolve().parent.parent
 # Local cargo build; switch back to "fastpmr" once the bioconda package is up to date
 FASTPMR_BIN = str(EVALUATION_DIR.parent / "target" / "release" / "fastpmr")
@@ -18,6 +21,8 @@ AADR_DIR = EVALUATION_DIR / "aadr"
 AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
+AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
+AADR_METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
 COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "southern_cone"
@@ -91,6 +96,54 @@ def extract_files(archive_path: Path, destination: Path, prefix: Path, exts: tup
 
 def quote_path(path: Path) -> str:
     return shlex.quote(str(path))
+
+
+def ensure_aadr_npz_present(npz_path: Path = AADR_NPZ_PATH, metadata_path: Path = AADR_METADATA_PATH) -> None:
+    missing = [path for path in (npz_path, metadata_path) if not path.is_file()]
+    if missing:
+        missing_str = ", ".join(str(path) for path in missing)
+        raise SystemExit(
+            f"Missing input files: {missing_str}. Run `pixi run fastpmr-aadr` after `pixi run prepare-aadr-data`."
+        )
+
+
+def load_aadr_samples(npz_path: Path = AADR_NPZ_PATH) -> list[str]:
+    with zipfile.ZipFile(npz_path) as archive:
+        with archive.open("samples.json") as handle:
+            return json.loads(handle.read().decode("utf-8"))
+
+
+def load_aadr_npz_arrays(
+    npz_path: Path = AADR_NPZ_PATH,
+) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    with np.load(npz_path, allow_pickle=False) as npz:
+        site_overlaps = npz["n_site_overlaps"]
+        mismatch_rates = npz["mismatch_rates"]
+        mismatch_rates_95_ci_lower = npz["mismatch_rates_95_ci_lower"]
+        mismatch_rates_95_ci_upper = npz["mismatch_rates_95_ci_upper"]
+    samples = load_aadr_samples(npz_path)
+    return samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper
+
+
+def load_aadr_metadata(metadata_path: Path = AADR_METADATA_PATH) -> dict[str, dict[str, str]]:
+    with metadata_path.open(newline="") as handle:
+        reader = csv.reader(handle, delimiter="\t")
+        header = next(reader)
+        metadata = {}
+        for row in reader:
+            if not row:
+                continue
+            metadata[row[0]] = dict(zip(header, row, strict=True))
+    return metadata
+
+
+def is_archaic_or_reference_sample(sample: str, sample_metadata: dict[str, str]) -> bool:
+    group = sample_metadata["Group ID"].lower()
+    if "neanderthal" in group or "denisova" in group:
+        return True
+    if ".ref" in sample.lower():
+        return True
+    return False
 
 
 def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -> None:

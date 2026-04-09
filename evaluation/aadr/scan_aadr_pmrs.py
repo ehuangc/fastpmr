@@ -1,16 +1,19 @@
-import csv
-import json
-import zipfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from evaluation_utils import AADR_DIR
+from evaluation_utils import (
+    AADR_DIR,
+    AADR_METADATA_PATH,
+    AADR_NPZ_PATH,
+    ensure_aadr_npz_present,
+    is_archaic_or_reference_sample,
+    load_aadr_metadata,
+    load_aadr_npz_arrays,
+)
 
-NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
-METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
 OUTPUT_DIR = AADR_DIR / "results" / "scan"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
@@ -19,45 +22,6 @@ DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.png"
 IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
 OVERLAP_THRESHOLD = 30000
-
-
-def ensure_npz_data_present(npz_path: Path, metadata_path: Path) -> None:
-    missing = [path for path in (npz_path, metadata_path) if not path.is_file()]
-    if missing:
-        missing_str = ", ".join(str(path) for path in missing)
-        raise SystemExit(
-            f"Missing input files: {missing_str}. Run `pixi run fastpmr-aadr` after `pixi run prepare-aadr-data`."
-        )
-
-
-def load_samples(npz_path: Path) -> list[str]:
-    with zipfile.ZipFile(npz_path) as archive:
-        with archive.open("samples.json") as handle:
-            return json.loads(handle.read().decode("utf-8"))
-
-
-def load_metadata(metadata_path: Path) -> dict[str, dict[str, str]]:
-    with metadata_path.open(newline="") as handle:
-        reader = csv.reader(handle, delimiter="\t")
-        header = next(reader)
-        metadata = {}
-        for row in reader:
-            if not row:
-                continue
-            metadata[row[0]] = dict(zip(header, row, strict=True))
-    return metadata
-
-
-def load_fastpmr_results(
-    npz_path: Path,
-) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    with np.load(npz_path, allow_pickle=False) as npz:
-        site_overlaps = npz["n_site_overlaps"]
-        mismatch_rates = npz["mismatch_rates"]
-        mismatch_rates_95_ci_lower = npz["mismatch_rates_95_ci_lower"]
-        mismatch_rates_95_ci_upper = npz["mismatch_rates_95_ci_upper"]
-    samples = load_samples(npz_path)
-    return samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper
 
 
 def filter_samples(
@@ -70,12 +34,7 @@ def filter_samples(
 ) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     keep_indices: list[int] = []
     for idx, sample in enumerate(samples):
-        # Exclude archaic humans
-        sample_group = metadata[sample]["Group ID"]
-        if "neanderthal" in sample_group.lower() or "denisova" in sample_group.lower():
-            continue
-        # Exclude references
-        if ".ref" in sample.lower():
+        if is_archaic_or_reference_sample(sample, metadata[sample]):
             continue
         keep_indices.append(idx)
 
@@ -253,11 +212,11 @@ def plot_pairwise_mismatch_rate_histograms(
 
 
 def main() -> None:
-    ensure_npz_data_present(NPZ_PATH, METADATA_PATH)
+    ensure_aadr_npz_present(AADR_NPZ_PATH, AADR_METADATA_PATH)
     samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper = (
-        load_fastpmr_results(NPZ_PATH)
+        load_aadr_npz_arrays(AADR_NPZ_PATH)
     )
-    metadata = load_metadata(METADATA_PATH)
+    metadata = load_aadr_metadata(AADR_METADATA_PATH)
     matched = sum(sample in metadata for sample in samples)
     assert len(samples) == len(metadata) == matched == mismatch_rates.shape[0] == site_overlaps.shape[0]
 

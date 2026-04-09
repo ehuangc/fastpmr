@@ -13,16 +13,17 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scan_aadr_pmrs import (
-    ensure_npz_data_present,
-    load_metadata,
-    load_samples,
+
+from evaluation_utils import (
+    AADR_DIR,
+    AADR_METADATA_PATH,
+    AADR_NPZ_PATH,
+    ensure_aadr_npz_present,
+    is_archaic_or_reference_sample,
+    load_aadr_metadata,
+    load_aadr_npz_arrays,
 )
 
-from evaluation_utils import AADR_DIR
-
-NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
-METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
 OUTPUT_DIR = AADR_DIR / "results" / "maps"
 MAP_PATH = OUTPUT_DIR / "pmr_map_by_time.pdf"
 CELLS_CSV_PATH = OUTPUT_DIR / "pmr_map_cells.csv"
@@ -44,17 +45,8 @@ DATE_FIELD = (
     "[OxCal mu for a direct radiocarbon date, and average of range for a contextual date]"
 )
 LOCALITY_FIELD = "Locality"
-GROUP_FIELD = "Group ID"
 MASTER_ID_FIELD = "Master ID"
 COVERED_SNPS_FIELD = "SNPs hit on autosomal targets (Computed using easystats on 1240k snpset)"
-
-
-def load_npz_arrays(npz_path: Path) -> tuple[list[str], np.ndarray, np.ndarray]:
-    with np.load(npz_path, allow_pickle=False) as npz:
-        site_overlaps = npz["n_site_overlaps"]
-        mismatch_rates = npz["mismatch_rates"]
-    samples = load_samples(npz_path)
-    return samples, site_overlaps, mismatch_rates
 
 
 def filter_and_extract(
@@ -77,10 +69,7 @@ def filter_and_extract(
 
     for sample_idx, sample in enumerate(samples):
         sample_metadata = metadata[sample]
-        group = sample_metadata[GROUP_FIELD]
-        if "neanderthal" in group.lower() or "denisova" in group.lower():
-            continue
-        if ".ref" in sample.lower():
+        if is_archaic_or_reference_sample(sample, sample_metadata):
             continue
         locality = sample_metadata[LOCALITY_FIELD].strip()
         if not locality or locality == ".." or locality.lower() == "n/a":
@@ -248,16 +237,18 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
 
 
 def main() -> None:
-    ensure_npz_data_present(NPZ_PATH, METADATA_PATH)
-    samples, site_overlaps, mismatch_rates = load_npz_arrays(NPZ_PATH)
-    metadata = load_metadata(METADATA_PATH)
+    ensure_aadr_npz_present(AADR_NPZ_PATH, AADR_METADATA_PATH)
+    samples, site_overlaps, mismatch_rates, _mismatch_rates_95_ci_lower, _mismatch_rates_95_ci_upper = (
+        load_aadr_npz_arrays(AADR_NPZ_PATH)
+    )
+    metadata = load_aadr_metadata(AADR_METADATA_PATH)
     assert len(samples) == mismatch_rates.shape[0] == site_overlaps.shape[0]
 
-    site_overlaps_f, mismatch_rates_f, lats, lons, dates, localities = filter_and_extract(
+    site_overlaps_filt, mismatch_rates_filt, lats, lons, dates, localities = filter_and_extract(
         samples, site_overlaps, mismatch_rates, metadata
     )
     bin_indices = assign_time_bins(dates)
-    cells = compute_site_cells(site_overlaps_f, mismatch_rates_f, lats, lons, localities, bin_indices)
+    cells = compute_site_cells(site_overlaps_filt, mismatch_rates_filt, lats, lons, localities, bin_indices)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     cells_sorted = cells.sort_values(["bin_idx", "median_pmr"]).reset_index(drop=True)
