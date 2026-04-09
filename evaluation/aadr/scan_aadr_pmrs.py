@@ -17,8 +17,8 @@ from evaluation_utils import (
 OUTPUT_DIR = AADR_DIR / "results" / "scan"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
-SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.png"
-DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.png"
+SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.pdf"
+DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.pdf"
 IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
 OVERLAP_THRESHOLD = 30000
