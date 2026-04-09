@@ -22,6 +22,7 @@ platforms = ["linux-64", "osx-64", "osx-arm64"]
 [tool.pixi.dependencies]
 admixtools = ">=8.0.2,<9"
 bash = ">=5.2.37,<6"
+cartopy = ">=0.25.0,<0.26"
 coreutils = ">=9.5,<10"
 # Benchmark against bioconda package, not a local build
 # TO-DO: Uncomment once bioconda package is up to date
@@ -42,6 +43,7 @@ plinkio = ">=0.9.8, <0.10"
 prepare-aadr = "python aadr/prepare_aadr_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr_aadr.py"
 analyze-aadr = "python aadr/analyze_aadr_results.py"
+plot-aadr = "python aadr/plot_pmr_map.py"
 
 prepare-performance = "python performance/prepare_indo_european_data.py"
 pairs-benchmark = "python performance/pair_count_benchmark.py"
@@ -57,6 +59,7 @@ aadr-pipeline = [
     { task = "prepare-aadr" },
     { task = "fastpmr-aadr" },
     { task = "analyze-aadr" },
+    { task = "plot-aadr" },
 ]
 performance-pipeline = [
     { task = "prepare-performance" },
