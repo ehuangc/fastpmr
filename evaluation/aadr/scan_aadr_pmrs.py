@@ -48,6 +48,7 @@ def filter_samples(
     mismatch_rates_95_ci_lower: np.ndarray,
     mismatch_rates_95_ci_upper: np.ndarray,
     metadata: dict[str, dict[str, str]],
+    eurasia_only: bool,
 ) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     keep_indices: list[int] = []
     for idx, sample in enumerate(samples):
@@ -58,7 +59,7 @@ def filter_samples(
             lon = float(metadata[sample][LON_FIELD])
         except (TypeError, ValueError):
             continue
-        if not (
+        if eurasia_only and not (
             EURASIA_LAT_RANGE[0] <= lat <= EURASIA_LAT_RANGE[1] and EURASIA_LON_RANGE[0] <= lon <= EURASIA_LON_RANGE[1]
         ):
             continue
@@ -319,7 +320,13 @@ def main() -> None:
         filtered_mismatch_rates_95_ci_lower,
         filtered_mismatch_rates_95_ci_upper,
     ) = filter_samples(
-        samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper, metadata
+        samples,
+        site_overlaps,
+        mismatch_rates,
+        mismatch_rates_95_ci_lower,
+        mismatch_rates_95_ci_upper,
+        metadata,
+        eurasia_only=False,
     )
     filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in filtered_samples]
 
@@ -371,16 +378,32 @@ def main() -> None:
         f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}.\n"
     )
 
-    filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in filtered_samples]
+    (
+        eurasia_filtered_samples,
+        eurasia_filtered_site_overlaps,
+        eurasia_filtered_mismatch_rates,
+        eurasia_filtered_mismatch_rates_95_ci_lower,
+        eurasia_filtered_mismatch_rates_95_ci_upper,
+    ) = filter_samples(
+        samples,
+        site_overlaps,
+        mismatch_rates,
+        mismatch_rates_95_ci_lower,
+        mismatch_rates_95_ci_upper,
+        metadata,
+        eurasia_only=True,
+    )
+    eurasia_filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in eurasia_filtered_samples]
+    eurasia_filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in eurasia_filtered_samples]
     diff_locality_pairs = find_diff_locality_low_pmr_pairs(
         metadata,
-        filtered_samples,
-        filtered_master_ids,
-        filtered_localities,
-        filtered_site_overlaps,
-        filtered_mismatch_rates,
-        filtered_mismatch_rates_95_ci_lower,
-        filtered_mismatch_rates_95_ci_upper,
+        eurasia_filtered_samples,
+        eurasia_filtered_master_ids,
+        eurasia_filtered_localities,
+        eurasia_filtered_site_overlaps,
+        eurasia_filtered_mismatch_rates,
+        eurasia_filtered_mismatch_rates_95_ci_lower,
+        eurasia_filtered_mismatch_rates_95_ci_upper,
         IDENTICAL_PMR_THRESHOLD,
         FIRST_DEGREE_PMR_THRESHOLD,
         OVERLAP_THRESHOLD,
