@@ -49,6 +49,7 @@ def filter_samples(
     mismatch_rates_95_ci_upper: np.ndarray,
     metadata: dict[str, dict[str, str]],
     eurasia_only: bool,
+    exclude_localities: bool,
 ) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     keep_indices: list[int] = []
     for idx, sample in enumerate(samples):
@@ -62,6 +63,8 @@ def filter_samples(
         if eurasia_only and not (
             EURASIA_LAT_RANGE[0] <= lat <= EURASIA_LAT_RANGE[1] and EURASIA_LON_RANGE[0] <= lon <= EURASIA_LON_RANGE[1]
         ):
+            continue
+        if exclude_localities and metadata[sample][LOCALITY_FIELD].startswith(AADR_EXCLUDED_LOCALITY_PREFIXES):
             continue
         keep_indices.append(idx)
 
@@ -225,12 +228,6 @@ def find_diff_locality_low_pmr_pairs(
         match_offsets = np.nonzero(mask)[0]
         for offset in match_offsets:
             idx_j = idx_i + 1 + int(offset)
-            locality_j = row_localities[offset]
-            if locality_i.startswith(AADR_EXCLUDED_LOCALITY_PREFIXES) or locality_j.startswith(
-                AADR_EXCLUDED_LOCALITY_PREFIXES
-            ):
-                continue
-
             row = {
                 "master_id1": master_id_i,
                 "master_id2": row_master_ids[offset],
@@ -327,6 +324,7 @@ def main() -> None:
         mismatch_rates_95_ci_upper,
         metadata,
         eurasia_only=False,
+        exclude_localities=False,
     )
     filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in filtered_samples]
 
@@ -392,6 +390,7 @@ def main() -> None:
         mismatch_rates_95_ci_upper,
         metadata,
         eurasia_only=True,
+        exclude_localities=True,
     )
     eurasia_filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in eurasia_filtered_samples]
     eurasia_filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in eurasia_filtered_samples]
