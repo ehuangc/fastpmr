@@ -85,6 +85,10 @@ def get_pair_metadata(metadata: dict[str, dict[str, str]], sample1: str, sample2
         "locality2": metadata[sample2]["Locality"],
         "political_entity1": metadata[sample1]["Political Entity"],
         "political_entity2": metadata[sample2]["Political Entity"],
+        "lat1": metadata[sample1][LAT_FIELD],
+        "lon1": metadata[sample1][LON_FIELD],
+        "lat2": metadata[sample2][LAT_FIELD],
+        "lon2": metadata[sample2][LON_FIELD],
     }
 
 
