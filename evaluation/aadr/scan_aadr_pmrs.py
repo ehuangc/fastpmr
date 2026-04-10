@@ -6,8 +6,8 @@ import pandas as pd
 from haversine import haversine
 
 from evaluation_utils import (
+    AADR_ANOMALOUS_LOCALITY_PREFIXES,
     AADR_DIR,
-    AADR_EXCLUDED_LOCALITY_PREFIXES,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
     FULL_DATE_FIELD,
@@ -64,7 +64,7 @@ def filter_samples(
             EURASIA_LAT_RANGE[0] <= lat <= EURASIA_LAT_RANGE[1] and EURASIA_LON_RANGE[0] <= lon <= EURASIA_LON_RANGE[1]
         ):
             continue
-        if exclude_localities and metadata[sample][LOCALITY_FIELD].startswith(AADR_EXCLUDED_LOCALITY_PREFIXES):
+        if exclude_localities and metadata[sample][LOCALITY_FIELD].startswith(AADR_ANOMALOUS_LOCALITY_PREFIXES):
             continue
         keep_indices.append(idx)
 

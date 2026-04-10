@@ -1,7 +1,7 @@
 from evaluation_utils.core import (
+    AADR_ANOMALOUS_LOCALITY_PREFIXES,
     AADR_DATA_PREFIX,
     AADR_DIR,
-    AADR_EXCLUDED_LOCALITY_PREFIXES,
     AADR_EXTS,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
@@ -44,7 +44,7 @@ from evaluation_utils.core import (
 __all__ = [
     "AADR_DATA_PREFIX",
     "AADR_DIR",
-    "AADR_EXCLUDED_LOCALITY_PREFIXES",
+    "AADR_ANOMALOUS_LOCALITY_PREFIXES",
     "AADR_EXTS",
     "AADR_METADATA_PATH",
     "AADR_NPZ_PATH",

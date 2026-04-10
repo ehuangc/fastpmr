@@ -15,8 +15,8 @@ import numpy as np
 import pandas as pd
 
 from evaluation_utils import (
+    AADR_ANOMALOUS_LOCALITY_PREFIXES,
     AADR_DIR,
-    AADR_EXCLUDED_LOCALITY_PREFIXES,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
     DATE_MEAN_BP_FIELD,
@@ -71,7 +71,7 @@ def filter_and_extract(
         locality = sample_metadata[LOCALITY_FIELD].strip()
         if not locality or locality == ".." or locality.lower() == "n/a":
             continue
-        if locality.startswith(AADR_EXCLUDED_LOCALITY_PREFIXES):
+        if locality.startswith(AADR_ANOMALOUS_LOCALITY_PREFIXES):
             continue
         lat = parse_float(sample_metadata[LAT_FIELD])
         lon = parse_float(sample_metadata[LON_FIELD])
