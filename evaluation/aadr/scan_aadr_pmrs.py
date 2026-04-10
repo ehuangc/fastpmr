@@ -17,10 +17,12 @@ from evaluation_utils import (
 OUTPUT_DIR = AADR_DIR / "results" / "scan"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
+DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "diff_locality_low_pmr.csv"
 SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.pdf"
 DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.pdf"
 IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
+FIRST_DEGREE_PMR_THRESHOLD = 0.18
 OVERLAP_THRESHOLD = 30000
 
 
@@ -161,6 +163,63 @@ def find_diff_master_id_low_pmr_pairs(
     return pd.DataFrame.from_records(rows)
 
 
+def find_diff_locality_low_pmr_pairs(
+    metadata: dict[str, dict[str, str]],
+    samples: list[str],
+    master_ids: list[str],
+    localities: list[str],
+    site_overlaps: np.ndarray,
+    mismatch_rates: np.ndarray,
+    mismatch_rates_95_ci_lower: np.ndarray,
+    mismatch_rates_95_ci_upper: np.ndarray,
+    lower_threshold: float,
+    upper_threshold: float,
+    overlap_threshold: int,
+) -> pd.DataFrame:
+    master_ids_array = np.asarray(master_ids, dtype=object)
+    localities_array = np.asarray(localities, dtype=object)
+    rows: list[dict[str, str | int | float]] = []
+    for idx_i in range(len(samples) - 1):
+        locality_i = localities_array[idx_i]
+        master_id_i = master_ids_array[idx_i]
+        if not locality_i or not master_id_i:
+            continue
+        row_rates = mismatch_rates[idx_i, idx_i + 1 :]
+        row_overlaps = site_overlaps[idx_i, idx_i + 1 :]
+        row_localities = localities_array[idx_i + 1 :]
+        row_master_ids = master_ids_array[idx_i + 1 :]
+        mask = (
+            (row_localities != "")
+            & (row_localities != locality_i)
+            & (row_master_ids != "")
+            & (row_master_ids != master_id_i)
+            & (row_rates >= lower_threshold)
+            & (row_rates < upper_threshold)
+            & (row_overlaps >= overlap_threshold)
+        )
+        mask &= ~np.isnan(row_rates)
+        match_offsets = np.nonzero(mask)[0]
+        for offset in match_offsets:
+            idx_j = idx_i + 1 + int(offset)
+            locality_j = row_localities[offset]
+            # Gurgy site shows anomalously low PMRs with many other samples
+            if locality_i.startswith("Gurgy Les Noisats") or locality_j.startswith("Gurgy Les Noisats"):
+                continue
+
+            row = {
+                "genetic_id1": samples[idx_i],
+                "genetic_id2": samples[idx_j],
+                "site_overlap": int(row_overlaps[offset]),
+                "mismatch_rate": row_rates[offset],
+                "mismatch_rate_95_ci_lower": mismatch_rates_95_ci_lower[idx_i, idx_j],
+                "mismatch_rate_95_ci_upper": mismatch_rates_95_ci_upper[idx_i, idx_j],
+            }
+            row.update(get_pair_metadata(metadata, samples[idx_i], samples[idx_j]))
+            rows.append(row)
+    rows.sort(key=lambda row: row["mismatch_rate"])
+    return pd.DataFrame.from_records(rows)
+
+
 def collect_pairwise_mismatch_rates(
     master_ids: list[str],
     rates: np.ndarray,
@@ -276,7 +335,29 @@ def main() -> None:
     low_pmr_pairs.to_csv(DIFF_MASTER_OUTPUT_CSV, index=False)
     print(
         f"Wrote {len(low_pmr_pairs)} different-master-ID pairs with PMR < {IDENTICAL_PMR_THRESHOLD} "
-        f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}."
+        f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}.\n"
+    )
+
+    filtered_localities = [metadata[sample]["Locality"] for sample in filtered_samples]
+    diff_locality_pairs = find_diff_locality_low_pmr_pairs(
+        metadata,
+        filtered_samples,
+        filtered_master_ids,
+        filtered_localities,
+        filtered_site_overlaps,
+        filtered_mismatch_rates,
+        filtered_mismatch_rates_95_ci_lower,
+        filtered_mismatch_rates_95_ci_upper,
+        IDENTICAL_PMR_THRESHOLD,
+        FIRST_DEGREE_PMR_THRESHOLD,
+        OVERLAP_THRESHOLD,
+    )
+    diff_locality_pairs[rate_cols] = diff_locality_pairs[rate_cols].round(6)
+    diff_locality_pairs.to_csv(DIFF_LOCALITY_OUTPUT_CSV, index=False)
+    print(
+        f"Wrote {len(diff_locality_pairs)} different-locality pairs with "
+        f"{IDENTICAL_PMR_THRESHOLD} <= PMR < {FIRST_DEGREE_PMR_THRESHOLD} "
+        f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_LOCALITY_OUTPUT_CSV}."
     )
 
 
