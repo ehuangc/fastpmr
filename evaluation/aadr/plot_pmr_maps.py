@@ -185,8 +185,6 @@ def compute_site_cells(
 def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
     pmr_values = cells["median_pmr"].to_numpy()
     vmin, vmax = np.percentile(pmr_values, [2, 98])
-    if vmin == vmax:
-        vmin, vmax = float(pmr_values.min()), float(pmr_values.max())
 
     fig, axes = plt.subplots(
         2,
