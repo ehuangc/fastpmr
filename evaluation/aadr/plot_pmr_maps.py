@@ -19,6 +19,11 @@ from evaluation_utils import (
     AADR_EXCLUDED_LOCALITY_PREFIXES,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
+    DATE_MEAN_BP_FIELD,
+    LAT_FIELD,
+    LOCALITY_FIELD,
+    LON_FIELD,
+    MASTER_ID_FIELD,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
     load_aadr_metadata,
@@ -38,15 +43,6 @@ TIME_BINS: list[tuple[float, float, str]] = [
     (2_000.0, 5_000.0, "5,000-2,000 BP"),
     (-np.inf, 2_000.0, "<2,000 BP"),
 ]
-
-LAT_FIELD = "Lat."
-LON_FIELD = "Long."
-DATE_FIELD = (
-    "Date mean in BP in years before 1950 CE "
-    "[OxCal mu for a direct radiocarbon date, and average of range for a contextual date]"
-)
-LOCALITY_FIELD = "Locality"
-MASTER_ID_FIELD = "Master ID"
 
 
 def filter_and_extract(
@@ -79,7 +75,7 @@ def filter_and_extract(
             continue
         lat = parse_float(sample_metadata[LAT_FIELD])
         lon = parse_float(sample_metadata[LON_FIELD])
-        date = parse_float(sample_metadata[DATE_FIELD])
+        date = parse_float(sample_metadata[DATE_MEAN_BP_FIELD])
         if not (np.isfinite(lat) and np.isfinite(lon) and np.isfinite(date)):
             continue
 

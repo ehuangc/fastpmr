@@ -10,6 +10,15 @@ from evaluation_utils import (
     AADR_EXCLUDED_LOCALITY_PREFIXES,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
+    FULL_DATE_FIELD,
+    GROUP_ID_FIELD,
+    LAT_FIELD,
+    LOCALITY_FIELD,
+    LON_FIELD,
+    MASTER_ID_FIELD,
+    POLITICAL_ENTITY_FIELD,
+    PUBLICATION_FIELD,
+    SKELETAL_CODE_FIELD,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
     load_aadr_metadata,
@@ -45,8 +54,8 @@ def filter_samples(
         if is_archaic_or_reference_sample(sample, metadata[sample]):
             continue
         try:
-            lat = float(metadata[sample]["Lat."])
-            lon = float(metadata[sample]["Long."])
+            lat = float(metadata[sample][LAT_FIELD])
+            lon = float(metadata[sample][LON_FIELD])
         except (TypeError, ValueError):
             continue
         if not (
@@ -66,28 +75,23 @@ def filter_samples(
 
 
 def get_pair_metadata(metadata: dict[str, dict[str, str]], sample1: str, sample2: str) -> dict[str, str]:
-    date_field = (
-        "Full Date One of two formats. (Format 1) 95.4% CI calibrated radiocarbon age "
-        "(Conventional Radiocarbon Age BP, Lab number) e.g. 2624-2350 calBCE (3990±40 BP, Ua-35016). "
-        "(Format 2) Archaeological context range, e.g. 2500-1700 BCE"
-    )
     return {
-        "publication1": metadata[sample1]["Publication abbreviation"],
-        "publication2": metadata[sample2]["Publication abbreviation"],
-        "skeletal_code1": metadata[sample1]["Skeletal code"],
-        "skeletal_code2": metadata[sample2]["Skeletal code"],
-        "date1": metadata[sample1][date_field],
-        "date2": metadata[sample2][date_field],
-        "group_id1": metadata[sample1]["Group ID"],
-        "group_id2": metadata[sample2]["Group ID"],
-        "locality1": metadata[sample1]["Locality"],
-        "locality2": metadata[sample2]["Locality"],
-        "political_entity1": metadata[sample1]["Political Entity"],
-        "political_entity2": metadata[sample2]["Political Entity"],
-        "lat1": metadata[sample1]["Lat."],
-        "lon1": metadata[sample1]["Long."],
-        "lat2": metadata[sample2]["Lat."],
-        "lon2": metadata[sample2]["Long."],
+        "publication1": metadata[sample1][PUBLICATION_FIELD],
+        "publication2": metadata[sample2][PUBLICATION_FIELD],
+        "skeletal_code1": metadata[sample1][SKELETAL_CODE_FIELD],
+        "skeletal_code2": metadata[sample2][SKELETAL_CODE_FIELD],
+        "date1": metadata[sample1][FULL_DATE_FIELD],
+        "date2": metadata[sample2][FULL_DATE_FIELD],
+        "group_id1": metadata[sample1][GROUP_ID_FIELD],
+        "group_id2": metadata[sample2][GROUP_ID_FIELD],
+        "locality1": metadata[sample1][LOCALITY_FIELD],
+        "locality2": metadata[sample2][LOCALITY_FIELD],
+        "political_entity1": metadata[sample1][POLITICAL_ENTITY_FIELD],
+        "political_entity2": metadata[sample2][POLITICAL_ENTITY_FIELD],
+        "lat1": metadata[sample1][LAT_FIELD],
+        "lon1": metadata[sample1][LON_FIELD],
+        "lat2": metadata[sample2][LAT_FIELD],
+        "lon2": metadata[sample2][LON_FIELD],
     }
 
 
@@ -317,7 +321,7 @@ def main() -> None:
     ) = filter_samples(
         samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper, metadata
     )
-    filtered_master_ids = [metadata[sample]["Master ID"] for sample in filtered_samples]
+    filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in filtered_samples]
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     same_rates, diff_rates = collect_pairwise_mismatch_rates(
@@ -367,7 +371,7 @@ def main() -> None:
         f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}.\n"
     )
 
-    filtered_localities = [metadata[sample]["Locality"] for sample in filtered_samples]
+    filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in filtered_samples]
     diff_locality_pairs = find_diff_locality_low_pmr_pairs(
         metadata,
         filtered_samples,

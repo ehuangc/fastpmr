@@ -25,6 +25,25 @@ AADR_METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
 # Localities with sample pairs that have anomalously low PMRs
 AADR_EXCLUDED_LOCALITY_PREFIXES = ("Gurgy Les Noisats", "Valdescusa")
 
+# AADR metadata field names
+LAT_FIELD = "Lat."
+LON_FIELD = "Long."
+LOCALITY_FIELD = "Locality"
+MASTER_ID_FIELD = "Master ID"
+GROUP_ID_FIELD = "Group ID"
+DATE_MEAN_BP_FIELD = (
+    "Date mean in BP in years before 1950 CE "
+    "[OxCal mu for a direct radiocarbon date, and average of range for a contextual date]"
+)
+FULL_DATE_FIELD = (
+    "Full Date One of two formats. (Format 1) 95.4% CI calibrated radiocarbon age "
+    "(Conventional Radiocarbon Age BP, Lab number) e.g. 2624-2350 calBCE (3990±40 BP, Ua-35016). "
+    "(Format 2) Archaeological context range, e.g. 2500-1700 BCE"
+)
+PUBLICATION_FIELD = "Publication abbreviation"
+SKELETAL_CODE_FIELD = "Skeletal code"
+POLITICAL_ENTITY_FIELD = "Political Entity"
+
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
 COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "southern_cone"
 
@@ -140,7 +159,7 @@ def load_aadr_metadata(metadata_path: Path = AADR_METADATA_PATH) -> dict[str, di
 
 
 def is_archaic_or_reference_sample(sample: str, sample_metadata: dict[str, str]) -> bool:
-    group = sample_metadata["Group ID"].lower()
+    group = sample_metadata[GROUP_ID_FIELD].lower()
     if "neanderthal" in group or "denisova" in group:
         return True
     if ".ref" in sample.lower():
