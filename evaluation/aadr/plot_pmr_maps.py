@@ -255,12 +255,12 @@ def main() -> None:
     cells_sorted.to_csv(CELLS_CSV_PATH, index=False)
 
     counts = cells_sorted.groupby("bin_label", sort=False).size().to_dict()
-    print(f"Wrote {len(cells_sorted)} (site, time-bin) cells to {CELLS_CSV_PATH}.")
+    print(f"Wrote {len(cells_sorted)} (locality, time bin) cells to {CELLS_CSV_PATH}.")
     for _low, _high, label in TIME_BINS:
         print(f"  {label}: {counts.get(label, 0)} cells")
 
     plot_map(cells_sorted, MAP_PATH)
-    print(f"Wrote PMR map to {MAP_PATH}.")
+    print(f"\nWrote PMR map to {MAP_PATH}.")
 
 
 if __name__ == "__main__":
