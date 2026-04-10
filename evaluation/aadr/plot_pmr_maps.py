@@ -188,7 +188,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
     fig, axes = plt.subplots(
         2,
         2,
-        figsize=(14, 8),
+        figsize=(14, 8.75),
         subplot_kw={"projection": ccrs.Robinson(central_longitude=150)},
         constrained_layout=True,
     )
@@ -229,7 +229,9 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
         cbar = fig.colorbar(
             scatter,
             ax=axes_flat.tolist(),
-            shrink=0.7,
+            orientation="horizontal",
+            shrink=0.5,
+            aspect=40,
         )
         cbar.set_label("Median within-site pairwise mismatch rate", fontsize=12)
         cbar.ax.tick_params(labelsize=12)
