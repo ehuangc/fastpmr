@@ -23,6 +23,8 @@ AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 AADR_METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
+# Localities with sample pairs that have anomalously low PMRs
+AADR_EXCLUDED_LOCALITY_PREFIXES = ("Gurgy Les Noisats", "Valdescusa")
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
 COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "southern_cone"

@@ -6,6 +6,7 @@ import pandas as pd
 
 from evaluation_utils import (
     AADR_DIR,
+    AADR_EXCLUDED_LOCALITY_PREFIXES,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
     ensure_aadr_npz_present,
@@ -217,8 +218,9 @@ def find_diff_locality_low_pmr_pairs(
         for offset in match_offsets:
             idx_j = idx_i + 1 + int(offset)
             locality_j = row_localities[offset]
-            # Gurgy site shows anomalously low PMRs with many other samples
-            if locality_i.startswith("Gurgy Les Noisats") or locality_j.startswith("Gurgy Les Noisats"):
+            if locality_i.startswith(AADR_EXCLUDED_LOCALITY_PREFIXES) or locality_j.startswith(
+                AADR_EXCLUDED_LOCALITY_PREFIXES
+            ):
                 continue
 
             row = {
