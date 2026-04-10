@@ -233,6 +233,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
             orientation="horizontal",
             shrink=0.5,
             aspect=40,
+            extend="both",
         )
         cbar.set_label("Median within-site pairwise mismatch rate", fontsize=12)
         cbar.ax.tick_params(labelsize=12)
