@@ -3,6 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from haversine import haversine
 
 from evaluation_utils import (
     AADR_DIR,
@@ -238,8 +239,15 @@ def find_diff_locality_low_pmr_pairs(
                 "mismatch_rate_95_ci_upper": mismatch_rates_95_ci_upper[idx_i, idx_j],
             }
             row.update(get_pair_metadata(metadata, samples[idx_i], samples[idx_j]))
+            row["distance_km"] = round(
+                haversine(
+                    (float(row["lat1"]), float(row["lon1"])),
+                    (float(row["lat2"]), float(row["lon2"])),
+                    unit="km",
+                )
+            )
             rows.append(row)
-    rows.sort(key=lambda row: row["mismatch_rate"])
+    rows.sort(key=lambda row: row["distance_km"], reverse=True)
     return pd.DataFrame.from_records(rows)
 
 
