@@ -24,9 +24,7 @@ admixtools = ">=8.0.2,<9"
 bash = ">=5.2.37,<6"
 cartopy = ">=0.25.0,<0.26"
 coreutils = ">=9.5,<10"
-# Benchmark against bioconda package, not a local build
-# TO-DO: Uncomment once bioconda package is up to date
-# fastpmr = "==0.2.1"
+fastpmr = "==0.2.2"
 findutils = ">=4.10.0,<5"
 pandas = ">=3.0.1,<4"
 python = ">=3.10,<3.15"

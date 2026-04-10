@@ -15,8 +15,7 @@ from pathlib import Path
 import numpy as np
 
 EVALUATION_DIR = Path(__file__).resolve().parent.parent
-# Local cargo build; switch back to "fastpmr" once the bioconda package is up to date
-FASTPMR_BIN = str(EVALUATION_DIR.parent / "target" / "release" / "fastpmr")
+FASTPMR_BIN = "fastpmr"
 AADR_DIR = EVALUATION_DIR / "aadr"
 AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
