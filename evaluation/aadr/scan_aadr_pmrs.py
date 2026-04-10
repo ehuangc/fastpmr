@@ -20,10 +20,16 @@ DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
 DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "diff_locality_low_pmr.csv"
 SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.pdf"
 DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.pdf"
+
 IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
 FIRST_DEGREE_PMR_THRESHOLD = 0.18
 OVERLAP_THRESHOLD = 30000
+
+LAT_FIELD = "Lat."
+LON_FIELD = "Long."
+EURASIA_LAT_RANGE = (0.0, 85.0)
+EURASIA_LON_RANGE = (-30.0, 180.0)
 
 
 def filter_samples(
@@ -37,6 +43,15 @@ def filter_samples(
     keep_indices: list[int] = []
     for idx, sample in enumerate(samples):
         if is_archaic_or_reference_sample(sample, metadata[sample]):
+            continue
+        try:
+            lat = float(metadata[sample][LAT_FIELD])
+            lon = float(metadata[sample][LON_FIELD])
+        except (TypeError, ValueError):
+            continue
+        if not (
+            EURASIA_LAT_RANGE[0] <= lat <= EURASIA_LAT_RANGE[1] and EURASIA_LON_RANGE[0] <= lon <= EURASIA_LON_RANGE[1]
+        ):
             continue
         keep_indices.append(idx)
 
