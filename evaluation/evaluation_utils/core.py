@@ -117,14 +117,15 @@ def load_aadr_samples(npz_path: Path = AADR_NPZ_PATH) -> list[str]:
 
 def load_aadr_npz_arrays(
     npz_path: Path = AADR_NPZ_PATH,
-) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     with np.load(npz_path, allow_pickle=False) as npz:
         site_overlaps = npz["n_site_overlaps"]
         mismatch_rates = npz["mismatch_rates"]
         mismatch_rates_95_ci_lower = npz["mismatch_rates_95_ci_lower"]
         mismatch_rates_95_ci_upper = npz["mismatch_rates_95_ci_upper"]
+        covered_snps = npz["covered_snps"]
     samples = load_aadr_samples(npz_path)
-    return samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper
+    return samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper, covered_snps
 
 
 def load_aadr_metadata(metadata_path: Path = AADR_METADATA_PATH) -> dict[str, dict[str, str]]:

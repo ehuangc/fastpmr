@@ -289,7 +289,7 @@ def plot_pairwise_mismatch_rate_histograms(
 
 def main() -> None:
     ensure_aadr_npz_present(AADR_NPZ_PATH, AADR_METADATA_PATH)
-    samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper = (
+    samples, site_overlaps, mismatch_rates, mismatch_rates_95_ci_lower, mismatch_rates_95_ci_upper, _covered_snps = (
         load_aadr_npz_arrays(AADR_NPZ_PATH)
     )
     metadata = load_aadr_metadata(AADR_METADATA_PATH)

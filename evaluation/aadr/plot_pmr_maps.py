@@ -47,11 +47,11 @@ DATE_FIELD = (
 )
 LOCALITY_FIELD = "Locality"
 MASTER_ID_FIELD = "Master ID"
-COVERED_SNPS_FIELD = "SNPs hit on autosomal targets (Computed using easystats on 1240k snpset)"
 
 
 def filter_and_extract(
     samples: list[str],
+    covered_snps: np.ndarray,
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
     metadata: dict[str, dict[str, str]],
@@ -60,7 +60,7 @@ def filter_and_extract(
     # along with its Master ID and covered-SNP count for deduplication.
     candidates: list[tuple[int, float, float, float, str]] = []
     candidate_master_ids: list[str] = []
-    candidate_covered_snps: list[float] = []
+    candidate_covered_snps: list[int] = []
 
     def parse_float(value: str) -> float:
         try:
@@ -84,12 +84,9 @@ def filter_and_extract(
             continue
 
         master_id = sample_metadata[MASTER_ID_FIELD].strip()
-        covered_snps = parse_float(sample_metadata[COVERED_SNPS_FIELD])
-        if not np.isfinite(covered_snps):
-            covered_snps = float("-inf")
         candidates.append((sample_idx, lat, lon, date, locality))
         candidate_master_ids.append(master_id)
-        candidate_covered_snps.append(covered_snps)
+        candidate_covered_snps.append(int(covered_snps[sample_idx]))
 
     # Drop known duplicates by AADR master ID, keeping the sample with the most covered SNPs in each group.
     # Samples without a master ID are kept as-is.
@@ -245,14 +242,14 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
 
 def main() -> None:
     ensure_aadr_npz_present(AADR_NPZ_PATH, AADR_METADATA_PATH)
-    samples, site_overlaps, mismatch_rates, _mismatch_rates_95_ci_lower, _mismatch_rates_95_ci_upper = (
+    samples, site_overlaps, mismatch_rates, _mismatch_rates_95_ci_lower, _mismatch_rates_95_ci_upper, covered_snps = (
         load_aadr_npz_arrays(AADR_NPZ_PATH)
     )
     metadata = load_aadr_metadata(AADR_METADATA_PATH)
     assert len(samples) == mismatch_rates.shape[0] == site_overlaps.shape[0]
 
     site_overlaps_filt, mismatch_rates_filt, lats, lons, dates, localities = filter_and_extract(
-        samples, site_overlaps, mismatch_rates, metadata
+        samples, covered_snps, site_overlaps, mismatch_rates, metadata
     )
     bin_indices = assign_time_bins(dates)
     cells = compute_site_cells(site_overlaps_filt, mismatch_rates_filt, lats, lons, localities, bin_indices)
