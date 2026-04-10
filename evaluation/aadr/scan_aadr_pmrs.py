@@ -224,6 +224,8 @@ def find_diff_locality_low_pmr_pairs(
                 continue
 
             row = {
+                "master_id1": master_id_i,
+                "master_id2": row_master_ids[offset],
                 "genetic_id1": samples[idx_i],
                 "genetic_id2": samples[idx_j],
                 "site_overlap": int(row_overlaps[offset]),
