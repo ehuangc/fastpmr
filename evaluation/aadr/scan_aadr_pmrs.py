@@ -16,9 +16,9 @@ from evaluation_utils import (
 )
 
 OUTPUT_DIR = AADR_DIR / "results" / "scans"
-SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
-DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
-DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "diff_locality_low_pmr.csv"
+SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "potential_spurious_duplicates.csv"
+DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "potential_missed_duplicates.csv"
+DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "potential_cross_site_relatives.csv"
 SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.pdf"
 DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.pdf"
 
