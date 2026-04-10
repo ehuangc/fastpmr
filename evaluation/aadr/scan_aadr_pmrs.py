@@ -14,7 +14,7 @@ from evaluation_utils import (
     load_aadr_npz_arrays,
 )
 
-OUTPUT_DIR = AADR_DIR / "results" / "scan"
+OUTPUT_DIR = AADR_DIR / "results" / "scans"
 SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "same_master_id_high_pmr.csv"
 DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "diff_master_id_low_pmr.csv"
 DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "diff_locality_low_pmr.csv"
