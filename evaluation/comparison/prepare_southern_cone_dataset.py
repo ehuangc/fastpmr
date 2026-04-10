@@ -1,3 +1,4 @@
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -33,7 +34,7 @@ def filter_sex_chromosomes(prefix: Path, chrs_to_exclude: set[int]) -> None:
         plink_out.close()
 
         for ext in (".bed", ".bim", ".fam"):
-            Path(tmp_prefix + ext).replace(prefix.with_suffix(ext))
+            shutil.move(tmp_prefix + ext, prefix.with_suffix(ext))
 
     print(f"Filtered chromosomes {sorted(chrs_to_exclude)} from {prefix}")
 
