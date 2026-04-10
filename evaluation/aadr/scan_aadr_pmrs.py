@@ -28,8 +28,6 @@ NON_IDENTICAL_PMR_THRESHOLD = 0.17
 FIRST_DEGREE_PMR_THRESHOLD = 0.18
 OVERLAP_THRESHOLD = 30000
 
-LAT_FIELD = "Lat."
-LON_FIELD = "Long."
 EURASIA_LAT_RANGE = (0.0, 85.0)
 EURASIA_LON_RANGE = (-30.0, 180.0)
 
@@ -47,8 +45,8 @@ def filter_samples(
         if is_archaic_or_reference_sample(sample, metadata[sample]):
             continue
         try:
-            lat = float(metadata[sample][LAT_FIELD])
-            lon = float(metadata[sample][LON_FIELD])
+            lat = float(metadata[sample]["Lat."])
+            lon = float(metadata[sample]["Long."])
         except (TypeError, ValueError):
             continue
         if not (
@@ -86,10 +84,10 @@ def get_pair_metadata(metadata: dict[str, dict[str, str]], sample1: str, sample2
         "locality2": metadata[sample2]["Locality"],
         "political_entity1": metadata[sample1]["Political Entity"],
         "political_entity2": metadata[sample2]["Political Entity"],
-        "lat1": metadata[sample1][LAT_FIELD],
-        "lon1": metadata[sample1][LON_FIELD],
-        "lat2": metadata[sample2][LAT_FIELD],
-        "lon2": metadata[sample2][LON_FIELD],
+        "lat1": metadata[sample1]["Lat."],
+        "lon1": metadata[sample1]["Long."],
+        "lat2": metadata[sample2]["Lat."],
+        "lon2": metadata[sample2]["Long."],
     }
 
 
