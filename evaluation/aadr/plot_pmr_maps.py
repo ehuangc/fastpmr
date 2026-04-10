@@ -198,6 +198,9 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
     for bin_i, (_low, _high, label) in enumerate(TIME_BINS):
         ax = axes_flat[bin_i]
         ax.set_global()
+        # Crop Antarctica by adjusting the y-limit in projected coordinates
+        _x, y_south = ax.projection.transform_point(0, -60, ccrs.PlateCarree())
+        ax.set_ylim(bottom=y_south)
         ax.add_feature(cfeature.LAND, facecolor="#f0f0f0", zorder=0)
         ax.add_feature(cfeature.OCEAN, facecolor="#ffffff", zorder=0)
         ax.add_feature(cfeature.COASTLINE, linewidth=0.4, edgecolor="#555555")
