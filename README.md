@@ -22,10 +22,11 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 ```
 
 > [!NOTE]
-> Minimal command:
+> Example command:
 > ```bash
-> fastpmr -p /path/to/dataset_prefix
+> fastpmr -p /path/to/dataset_prefix -c 1-22 
 > ```
+> This command runs `fastpmr` on the given dataset over all autosomes (chr 1-22).
 
 ### Inputs
 **Prefix** (`-p`, `--prefix`) (*required*): Input file prefix. `fastpmr` auto-detects supported formats from the files on disk. If both EIGENSTRAT and PLINK datasets exist for the same prefix, an explicit extension in `--prefix` can force selection (for example `--prefix data/study.bed`).
