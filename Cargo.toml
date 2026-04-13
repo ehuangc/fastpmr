@@ -14,8 +14,8 @@ indicatif = "0.18.0"
 itertools = "0.14.0"
 memmap2 = "0.9.9"
 miette = { version = "7.6.0", features = ["fancy"] }
-ndarray = "0.16.1"
-ndarray-npy = "0.9.1"
+ndarray = "0.17.2"
+ndarray-npy = "0.10.0"
 # Use ab_glyph to avoid font discovery issues
 plotters = { version = "0.3.7", default-features = false, features = ["ab_glyph", "bitmap_backend", "bitmap_encoder"] }
 rayon = "1.11.0"

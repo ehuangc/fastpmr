@@ -91,13 +91,16 @@ pub fn write_counts_npz(
     ci_results: Option<&ConfidenceIntervals>,
     path: &impl AsRef<Path>,
 ) -> Result<()> {
-    let mut npz =
-        ndarray_npy::NpzWriter::new_compressed(std::fs::File::create(path).map_err(|e| {
-            CustomError::Write {
-                source: e,
-                path: path.as_ref().into(),
-            }
-        })?);
+    let options = SimpleFileOptions::default()
+        .compression_method(zip::CompressionMethod::Deflated)
+        .large_file(true);
+    let mut npz = ndarray_npy::NpzWriter::new_with_options(
+        std::fs::File::create(path).map_err(|e| CustomError::Write {
+            source: e,
+            path: path.as_ref().into(),
+        })?,
+        options,
+    );
     // Write one array at a time and free it immediately
     {
         let covered_snps = Array1::from_vec(counts.covered_snps().to_vec());
