@@ -123,7 +123,7 @@ def ensure_aadr_npz_present(npz_path: Path = AADR_NPZ_PATH, metadata_path: Path 
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
         raise SystemExit(
-            f"Missing input files: {missing_str}. Run `pixi run fastpmr-aadr` after `pixi run prepare-aadr-data`."
+            f"Missing input files: {missing_str}. Run `pixi run fastpmr-aadr` after `pixi run prepare-aadr`."
         )
 
 
