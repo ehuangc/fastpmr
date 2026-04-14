@@ -76,6 +76,9 @@ pub enum CustomError {
     #[error("could not write to NPZ")]
     NpzWrite(#[from] ndarray_npy::WriteNpzError),
 
+    #[error("could not write to NPY")]
+    NpyWrite(#[from] ndarray_npy::WriteNpyError),
+
     #[error("could not write to ZIP")]
     ZipWrite(#[from] zip::result::ZipError),
 

@@ -2,10 +2,10 @@ use crate::counts::{ConfidenceIntervals, Counts};
 use crate::degrees::{Degree, DegreeResults};
 use crate::error::{CustomError, Result};
 use ndarray::Array1;
+use ndarray_npy::WriteNpyExt;
 use plotters::coord::combinators::IntoLogRange;
 use plotters::prelude::*;
 use plotters::style::{FontStyle, register_font};
-use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 use zip::ZipWriter;
@@ -94,67 +94,60 @@ pub fn write_counts_npz(
     let options = SimpleFileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated)
         .large_file(true);
-    let mut npz = ndarray_npy::NpzWriter::new_with_options(
-        std::fs::File::create(path).map_err(|e| CustomError::Write {
-            source: e,
-            path: path.as_ref().into(),
-        })?,
-        options,
-    );
+    let mut zip = ZipWriter::new(std::fs::File::create(path).map_err(|e| CustomError::Write {
+        source: e,
+        path: path.as_ref().into(),
+    })?);
     // Write one array at a time and free it immediately
     {
         let covered_snps = Array1::from_vec(counts.covered_snps().to_vec());
-        npz.add_array("covered_snps", &covered_snps)?;
+        zip.start_file("covered_snps.npy", options)?;
+        covered_snps.write_npy(&mut zip)?;
     }
     {
         let site_overlaps = counts.site_overlaps_2d();
-        npz.add_array("n_site_overlaps", &site_overlaps)?;
+        zip.start_file("n_site_overlaps.npy", options)?;
+        site_overlaps.write_npy(&mut zip)?;
     }
     {
         let mismatch_rates = counts.mismatch_rates_2d();
-        npz.add_array("mismatch_rates", &mismatch_rates)?;
+        zip.start_file("mismatch_rates.npy", options)?;
+        mismatch_rates.write_npy(&mut zip)?;
     }
     if let Some(dr) = degree_results {
         {
             let normalized = dr.normalized_mismatch_rates_2d(counts.n_samples(), counts);
-            npz.add_array("normalized_mismatch_rates", &normalized)?;
+            zip.start_file("normalized_mismatch_rates.npy", options)?;
+            normalized.write_npy(&mut zip)?;
         }
         {
             let degrees = dr.degrees_2d(counts.n_samples(), counts);
-            npz.add_array("degrees", &degrees)?;
+            zip.start_file("degrees.npy", options)?;
+            degrees.write_npy(&mut zip)?;
         }
     }
     if let Some(ci) = ci_results {
         {
             let lower = counts.ci_95_lower_2d(ci);
-            npz.add_array("mismatch_rates_95_ci_lower", &lower)?;
+            zip.start_file("mismatch_rates_95_ci_lower.npy", options)?;
+            lower.write_npy(&mut zip)?;
         }
         {
             let upper = counts.ci_95_upper_2d(ci);
-            npz.add_array("mismatch_rates_95_ci_upper", &upper)?;
+            zip.start_file("mismatch_rates_95_ci_upper.npy", options)?;
+            upper.write_npy(&mut zip)?;
         }
     }
-    npz.finish()?;
-
-    // Reopen file and append JSON metadata
+    // Write JSON metadata
     let samples = counts.samples();
-    let file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .open(path)
-        .map_err(|e| CustomError::Write {
-            source: e,
-            path: path.as_ref().into(),
-        })?;
-    let mut zip = ZipWriter::new_append(file)?;
-    zip.start_file("samples.json", SimpleFileOptions::default())?;
+    zip.start_file("samples.json", options)?;
     zip.write_all(serde_json::to_string(&samples)?.as_bytes())
         .map_err(|e| CustomError::Write {
             source: e,
             path: path.as_ref().into(),
         })?;
     if degree_results.is_some() {
-        zip.start_file("degree_labels.json", SimpleFileOptions::default())?;
+        zip.start_file("degree_labels.json", options)?;
         zip.write_all(serde_json::to_string(&Degree::LABELS)?.as_bytes())
             .map_err(|e| CustomError::Write {
                 source: e,
