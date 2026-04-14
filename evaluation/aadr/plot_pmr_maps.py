@@ -201,9 +201,6 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
 
         bin_cells = cells[cells["bin_idx"] == bin_i]
         ax.set_title(f"{label}\n(n={len(bin_cells)} sites)", fontsize=12)
-        if bin_cells.empty:
-            continue
-
         sizes = 20 + 3 * np.clip(bin_cells["n_pairs"].to_numpy(), 0, 20)
         scatter = ax.scatter(
             bin_cells["lon"].to_numpy(),
