@@ -33,7 +33,7 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 
 **Output Directory** (`-o`, `--output-directory`) (*optional*): Directory for outputs. Defaults to `./fastpmr_output_<timestamp>`.
 
-**NPZ Output** (`-n`, `--npz`) (*flag*): Write outputs as compressed `numpy` arrays to `fastpmr_results.npz` instead of as CSV files. Recommended for large sample sets. See [Loading NPZ outputs](#loading-npz-outputs) for how to read the file in Python.
+**NPZ Output** (`-n`, `--npz`) (*flag*): Write outputs as compressed `numpy` arrays to `fastpmr_results.npz` instead of as CSV files. Recommended for large sample sets.
 
 **Degrees** (`-d`, `--degrees`) (*flag*): Call degrees of relatedness for each sample pair, using the procedure described in [READv2](https://doi.org/10.1186/s13059-024-03350-3) (Kuhn et al. 2018). Each pair is classified as Identical/Twin, First Degree, Second Degree, Third Degree, or Unrelated based on normalized mismatch rates (mismatch rate divided by the median across all pairs). Third degree inference additionally requires an "expected mismatch" count of at least 3000.
 
@@ -63,37 +63,9 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 **When `--npz/-n` is set**:
 - `fastpmr_results.npz`
   - Sample list: `samples.json`
-  - Arrays: `covered_snps` (1D), `mismatch_rates` (2D), `n_site_overlaps` (2D)
-  - When `--ci/-i` is set, includes additional 2D arrays `mismatch_rates_95_ci_lower` and `mismatch_rates_95_ci_upper`
-  - When `--degrees/-d` is set, includes additional 2D arrays `normalized_mismatch_rates` and `degrees`, and a `degree_labels.json` mapping
-
-#### Loading NPZ outputs
-
-The `.npz` file is a zip archive containing numpy arrays and JSON metadata. Load it in Python with:
-
-```python
-import json
-import numpy as np
-from zipfile import ZipFile
-
-path = "fastpmr_output/fastpmr_results.npz"
-
-# Load numpy arrays
-data = np.load(path)
-covered_snps = data["covered_snps"]          # 1D array (n_samples,)
-mismatch_rates = data["mismatch_rates"]      # 2D symmetric matrix (n_samples, n_samples)
-n_site_overlaps = data["n_site_overlaps"]    # 2D symmetric matrix (n_samples, n_samples)
-
-# Load sample names from embedded JSON
-with ZipFile(path) as zf:
-    samples = json.loads(zf.read("samples.json"))
-
-    # If --degrees was used:
-    if "degree_labels.json" in zf.namelist():
-        degree_labels = json.loads(zf.read("degree_labels.json"))
-```
-
-The 2D arrays are symmetric matrices where `matrix[i, j]` gives the value for the pair `(samples[i], samples[j])`.
+  - Arrays: `covered_snps`, `mismatches`, `totals`, `site_overlaps`
+  - When `--ci/-i` is set, includes additional arrays `mismatch_rate_95_ci_lower` and `mismatch_rate_95_ci_upper`
+  - When `--degrees/-d` is set, includes additional arrays `normalized_mismatch_rates`, `degrees`, and a `degree_labels.json` mapping
 
 ## Reproducibility
 We recommend using [`Pixi`](https://pixi.sh/) to reproduce evaluations. `Pixi` evaluation tasks can be found in `evaluation/pyproject.toml`.
