@@ -1,0 +1,694 @@
+locality,bin_idx,bin_label,n_samples,n_pairs,median_pmr,lat,lon,region,migratory_distance_km
+"Taforalt Cave (Oriental, Cercle d'Aklim, Tafoughalt, Lotissement Riyad Al Istiyaf)",0,">10,000 BP",7,20,0.192597895860672,34.807812000000006,-2.4108890000000005,africa,5006.758263154619
+"Caverna do Sumidouro (Central Minas Gerais, Lagoa Santa)",0,">10,000 BP",4,6,0.19383583962917328,-19.54,-43.94,americas,26219.105048408026
+"Dolní Věstonice-2 (South Moravian Region, Břeclav District)",0,">10,000 BP",5,9,0.21212883293628693,48.877778,16.652222,europe,4947.155797810458
+"Padina (Bor District, Majdanpek Municipality, Boljetin)",0,">10,000 BP",7,21,0.22646456956863403,44.595879000000004,22.010568000000003,europe,4329.749021647456
+"Zhaodong on the northern bank of the Songhua River (Amur River Basin, southwest Heilongjiang Province, Songnen Plain)",0,">10,000 BP",9,21,0.22832848131656647,45.97555555555556,125.86666666666666,asia,10455.70256551423
+"Minino 1 (Vologda Oblast, Vologda District, Minino Village)",0,">10,000 BP",5,10,0.2289837896823883,59.42,39.3,asia,5776.661035102696
+"Sunghir (Vladimir Oblast, Vlaidmir municipality)",0,">10,000 BP",4,6,0.23456844687461853,56.1761111,40.5025,asia,5450.713923712654
+"Boncuklu (Konya, Karatay)",0,">10,000 BP",5,5,0.24257412552833557,37.75191,32.864901,asia,3324.8764779710805
+"Goyet Cave (Wallonia region, Namur province, Gesves municipality, Troisième caverne)",0,">10,000 BP",10,26,0.25627589225769043,50.446000000000005,5.008000000000001,europe,5756.998943071059
+"Bacho-Kiro Cave (Lovech province, Ugarchin municipality)",0,">10,000 BP",6,6,0.2595324218273163,42.948,24.4302,europe,4064.652746861675
+San Nicolas Island (California),1,"10,000-5,000 BP",4,5,0.16988155245780945,33.26428,-119.539,americas,17164.927834653376
+"CA-SRI-3 (California, Santa Rosa Island, Tecolote Point)",1,"10,000-5,000 BP",7,13,0.188509002327919,34.004782,-120.18487000000002,americas,17069.09691842617
+"Odake Shell Midden (Honshu, Toyama, Kureha Hills)",1,"10,000-5,000 BP",4,6,0.19163861870765686,36.72122,137.16677,asia,11778.93782069242
+"Hoedic (Bretagne, Morbihan)",1,"10,000-5,000 BP",6,10,0.200261652469635,47.339,-2.879,europe,6241.6288843097045
+"CA-SBA-7 (California, Carpinteria, Mishopshnow)",1,"10,000-5,000 BP",6,15,0.20066986978054047,34.385844,-119.51232,americas,17046.363286514294
+"Lauricocha (Antacolpa, Highlands)",1,"10,000-5,000 BP",4,6,0.20264889299869537,-10.3222,-76.666667,americas,23438.81437471405
+Henriksholm-Bøgebakken (Vedbæk) (Zealand region),1,"10,000-5,000 BP",5,5,0.20315301418304443,55.852999999999994,12.559,europe,5695.212500311654
+"Lapa do Santo (Central Minas Gerais, Matozinhos)",1,"10,000-5,000 BP",7,21,0.2086580991744995,-19.477183,-44.03805599999999,americas,26207.336834179056
+"Arroyo Seco II (Buenos Aires Province, Tres Arroyos Partido)",1,"10,000-5,000 BP",8,9,0.2091200351715088,-38.360556,-60.244167,americas,26951.84846427954
+"Devil's-Gate-Cave (Primorsky Krai, Dalnegorsk municipality, Dalnegorsk Village)",1,"10,000-5,000 BP",6,15,0.21065454185009003,44.550000000000004,135.583333,asia,11200.723254867105
+"Gross Fredenwalde (Brandenburg, Brandenburg, Uckermark)",1,"10,000-5,000 BP",8,27,0.2111538201570511,53.1290375,13.795975,europe,5417.332154305127
+"Mayahak Cab Pek (Toledo District, Maya Mountains, Bladen Nature Reserve)",1,"10,000-5,000 BP",8,18,0.21222174167633057,16.497398,-88.90496,americas,20178.40544082881
+"Kanaljorden (Östergötlands län, Motala)",1,"10,000-5,000 BP",7,20,0.21952533721923828,58.53499999999998,15.045999999999996,europe,5850.355133807998
+"Marzyn-Khutul (Bulgan Province, Khutag-Öndor District, Egiin-gol River)",1,"10,000-5,000 BP",4,6,0.2241208553314209,49.274012,102.716761,asia,8696.003251279488
+"Schela-Cladovei (Mehedinți County, Drobeta-Turnu Severin)",1,"10,000-5,000 BP",8,25,0.22444979846477509,44.626111,22.605833,europe,4295.195149306433
+"Boismana-2 (Primorsky Krai, Khasansky District)",1,"10,000-5,000 BP",18,101,0.22534416615962982,42.7894444,131.27611100000001,asia,10999.278805539709
+"Zhaodong on the northern bank of the Songhua River (Amur River Basin, southwest Heilongjiang Province, Songnen Plain)",1,"10,000-5,000 BP",12,45,0.22770580649375916,45.93,126.04,asia,10469.988975232262
+"Vovnihy-1 (Zaporizhia Oblast, Zaporizhia District, Petro-Mykhailivka municipality)",1,"10,000-5,000 BP",9,15,0.22798685729503632,48.123,35.098,europe,4669.089063623415
+Heraklion (Crete),1,"10,000-5,000 BP",6,6,0.22827473282814026,35.2394569,24.988304800000005,europe,4391.124515360192
+"Karavaikha (Vologda Oblast, Kirillovsky District, Karavaikha Village)",1,"10,000-5,000 BP",10,44,0.2286110818386078,60.465568000000005,38.8483032,asia,5883.473970038496
+"Sakhtysh-2 (Ivanovo Oblast, Teykovsky District, Sakhtysh Village)",1,"10,000-5,000 BP",4,6,0.2291780263185501,56.7825,40.4479,asia,5513.76005998289
+"Ostrovul-Corbului (Mehedinți County, Hinova)",1,"10,000-5,000 BP",5,10,0.22943750023841858,44.517,22.722,europe,4280.317052308765
+"Vovnihy-2 (Dnipropetrovsk Oblast, Dnipro District, Solone municipality)",1,"10,000-5,000 BP",11,44,0.23008117079734802,48.132999999999996,35.082,europe,4669.2378671454435
+"Vlasac (Bor District, Majdanpek Municipality, Boljetin)",1,"10,000-5,000 BP",18,148,0.23013538122177124,44.533055,22.04991,europe,4323.051239273789
+"Sakhtysh-2a (Ivanovo Oblast, Teykovsky District, Sakhtysh Village)",1,"10,000-5,000 BP",13,58,0.23018845915794373,56.784,40.448660000000004,asia,5513.93301080301
+"Padina (Bor District, Majdanpek Municipality, Boljetin)",1,"10,000-5,000 BP",6,15,0.2317175716161728,44.595879,22.010568000000003,europe,4329.749021647455
+"Hajdučka-Vodenica (Bor District, Kladovo Municipality, Hajdučka)",1,"10,000-5,000 BP",6,15,0.2317250370979309,44.640260000000005,22.30333,europe,4314.576751463408
+"Wanggou site (Henan province, Yingyang county, Wanggou village)",1,"10,000-5,000 BP",7,8,0.23178768157958984,34.8191841,113.39592300000001,asia,9973.027644450942
+"Glazkovo (Irkutsk Oblast, Irkutsk municipality, Lokomotiv (Cyclodrome))",1,"10,000-5,000 BP",5,10,0.2321442812681198,52.28694399999999,104.24916699999999,asia,8756.79639298586
+"Murzikha-2 (Tatarstan, Alexeyevsky District, Mokrye Kurnali Village)",1,"10,000-5,000 BP",5,10,0.23216009140014648,55.341899999999995,50.0173,asia,5640.635725152135
+"Shamanka-2 (Irkutsk Oblast, Slyudyansky District, Shamanka cape)",1,"10,000-5,000 BP",10,45,0.2325494885444641,51.698333000000005,103.70305600000002,asia,8728.19202092433
+"Zvejnieki (Zemgale, Neretas District)",1,"10,000-5,000 BP",23,253,0.2330024689435959,56.28330000000001,25.1333,europe,5410.692052470458
+"Fofonovo (Buryatia, Kabansky District, Fofonovo Village)",1,"10,000-5,000 BP",7,18,0.2335180938243866,52.048428,106.766261,asia,8930.491102496055
+"Ust'-Ida (Irkutsk Oblast, Bokhanskiy District, Kamenka Village)",1,"10,000-5,000 BP",4,6,0.23382362723350525,53.188889,103.368056,asia,8685.983168645686
+"Yuzhny Oleniy Ostrov (Republic of Karelia, Medvezhyegorsky District, Velikaya Guba Village)",1,"10,000-5,000 BP",18,129,0.2339979112148285,61.937725,35.260893,asia,6010.793887661044
+"Vasilyevskiy kordon-17 (Lipetsk Oblast, Dobrovsky District)",1,"10,000-5,000 BP",9,32,0.23445996642112732,52.9,40.03,asia,5096.303361098297
+"Donkalnis (Telsiai County, Telšių rajono savivaldybė)",1,"10,000-5,000 BP",6,6,0.2356073558330536,55.808,22.422,europe,5394.555678134612
+"Vengerovo-2 (Novosibirsk Oblast, Vengerovsky District)",1,"10,000-5,000 BP",9,18,0.23969310522079468,55.707,76.783,asia,7018.002887114635
+"Boncuklu (Konya, Karatay)",1,"10,000-5,000 BP",4,6,0.23995816707611084,37.75191,32.864901,asia,3324.8764779710805
+"Golubaya-Krinitsa (Voronezh Oblast, Rossoshansky District, Golubaya Krinitsa Village)",1,"10,000-5,000 BP",6,5,0.24106936156749725,50.0913528,39.894511099999995,asia,4800.789759859908
+"La Mina (Castilla y León, Soria, Alcubilla de las Peñas)",1,"10,000-5,000 BP",4,6,0.24111947417259216,41.2522,-2.32622,europe,6225.876018721406
+"Oberbipp Horgen (Bern, Wangen)",1,"10,000-5,000 BP",9,25,0.24147436022758484,47.262067,7.659834999999999,europe,5458.359033750494
+"Yasynuvatka (Zaporizhia Oblast, Zaporizhia District, Petro-Mykhailivka municipality)",1,"10,000-5,000 BP",5,10,0.24276113510131836,48.121309,35.090177,europe,4668.583924034684
+"Vilnianka (Zaporizhia Oblast, Zaporizhia District, Vilniansk municipality)",1,"10,000-5,000 BP",10,34,0.24289047718048096,47.9543,35.3893,europe,4668.075886490001
+"Deriivka-1 (Kirovohrad Oblast, Oleksandriia District, Onufriivka municipality)",1,"10,000-5,000 BP",22,151,0.24325823783874512,48.91422000000001,33.764930000000014,europe,4687.989128577214
+"Cova de Els Trocs (Aragón, Huesca, Bisaurri)",1,"10,000-5,000 BP",7,21,0.24454450607299805,42.5,0.5,europe,5976.053368024013
+"Ust'-Belaya (Irkutsk Oblast, Usolskiy District, mouth of the Belaya River)",1,"10,000-5,000 BP",5,10,0.24582403898239136,52.916944,103.657222,asia,8708.557191017771
+"Deriivka (Kirovohrad Oblast, Oleksandriia District)",1,"10,000-5,000 BP",10,36,0.24643489718437195,48.91422,33.76493,europe,4687.989128577214
+"Isbister (Scotland, Orkney)",1,"10,000-5,000 BP",5,10,0.2475661337375641,58.744960000000006,-2.91688,europe,6618.781695524212
+"Blätterhöhle Cave (Nordrhein-Westfalen, Arnsberg, Hagen-Kreisfreie Stadt)",1,"10,000-5,000 BP",4,6,0.2477276623249054,51.358333,7.551111,europe,5638.448752208865
+"Gurgy Les Noisats (Bourgogne-Franche-Comté Region, Yonne Department, Auxerre arrondissement)",1,"10,000-5,000 BP",122,4322,0.24818748235702515,47.88967213114754,3.559180327868852,europe,5773.639081442561
+"Holm of Papa Westray North (Scotland, Orkney)",1,"10,000-5,000 BP",4,6,0.2485625147819519,59.353914,-2.8733368,europe,6649.80893095644
+Frälsegården,1,"10,000-5,000 BP",22,122,0.24915634095668793,58.16440000000001,13.4547,europe,5865.77532211492
+"Les Bréguières (Provence-Alpes-Côte d'Azur Region, Alpes-Maritimes Department, Grasse arrondissement)",1,"10,000-5,000 BP",5,10,0.2493383139371872,43.7,6.99,europe,5446.202685589407
+Rössberga,1,"10,000-5,000 BP",15,28,0.2494383156299591,58.229590000000016,13.605850000000002,europe,5866.7503691859965
+"Fleury-sur-Orne (Normandie Region, Calvados Department, Caen arrondissement)",1,"10,000-5,000 BP",14,68,0.24952301383018494,49.190000000000005,-0.37999999999999995,europe,6087.542597446776
+"Rákóczifalva-Bivaly-Tó-5 (Jász-Nagykun-Szolnok County, Szolnok)",1,"10,000-5,000 BP",4,6,0.24959567189216614,47.064232,20.211518,europe,4615.5427242531605
+"Hazleton North (England, Gloucestershire, Cheltenham)",1,"10,000-5,000 BP",34,518,0.2496606409549713,51.86121099999999,-1.883011,europe,6262.426711601375
+"Szentpéterszeg-Körtvélyes-2 (Hajdú-Bihar County, Berettyóújfalu)",1,"10,000-5,000 BP",5,9,0.24966534972190857,47.254147,21.610127,europe,4560.39067002146
+"Cueva de Chaves (Aragón, Huesca, Bastarás)",1,"10,000-5,000 BP",4,5,0.2499636709690094,42.215129,-0.138457,europe,6031.39338174929
+"Gorzsa Cukormajor (Csongrád-Csanád County, Hódmezővásárhely)",1,"10,000-5,000 BP",7,9,0.2500680088996887,46.36899999999999,20.424000000000003,europe,4550.848900652363
+Hjelmars rör,1,"10,000-5,000 BP",16,38,0.2501557469367981,58.1697,13.578,europe,5862.166569045385
+"Halberstadt (Sachsen-Anhalt, Sachsen-Anhalt, Harz)",1,"10,000-5,000 BP",7,9,0.25015848875045776,51.8958333,11.046666700000001,europe,5466.829176658619
+Ansarve,1,"10,000-5,000 BP",5,9,0.2501867115497589,57.509,18.14,europe,5664.161633333563
+"Derenburg-Meerenstieg-2 (Sachsen-Anhalt, Sachsen-Anhalt, Harz)",1,"10,000-5,000 BP",32,492,0.250347763299942,51.87,10.91,europe,5472.676900590753
+"Mandubi Zelaia (Basque Country, Gipuzkoa, Ezkio-Itsaso)",1,"10,000-5,000 BP",5,10,0.25052881240844727,43.085823,-2.251197,europe,6193.862920339036
+"Grotte-du-Rouquet (Occitanie Region, Aude Department, Narbonne arrondissement, La Clape)",1,"10,000-5,000 BP",6,15,0.2509700059890747,43.177669,3.062455,europe,5762.906841782473
+Yunatsite (Pazardzhik province),1,"10,000-5,000 BP",18,153,0.25100192427635193,42.23,24.26,europe,4038.2652034126154
+"Schwetzingen (Baden-Württemberg, Karlsruhe, Rhein-Neckar-Kreis)",1,"10,000-5,000 BP",10,11,0.2510792315006256,49.39,8.569999999999999,europe,5476.395944167643
+"Mérnöki-telep (Tolna County, Szekszárd)",1,"10,000-5,000 BP",5,10,0.25111329555511475,46.208562,18.700047,europe,4644.228951706382
+"Halberstadt-Sonntagsfeld (Sachsen-Anhalt, Sachsen-Anhalt, Harz)",1,"10,000-5,000 BP",24,105,0.25111842155456543,51.8958333,11.046666699999998,europe,5466.829176658619
+"Hajji Firuz (West Azerbaijan, Naghadeh)",1,"10,000-5,000 BP",5,6,0.251170814037323,36.9944,45.4744,asia,3994.5446522426737
+"Les Llometes (Valencian community, Alicante, Alcoi)",1,"10,000-5,000 BP",11,17,0.2513786256313324,38.70249999999999,-0.4863099999999999,europe,6132.90561892054
+"Raschoille Cave (Scotland, Argyll and Bute, Oban)",1,"10,000-5,000 BP",8,26,0.251427561044693,56.403333,-5.478056,europe,6647.273354840136
+"Ain Ghazal (Amman, Sahab)",1,"10,000-5,000 BP",9,11,0.25144603848457336,31.988,35.976,asia,2969.1465064414274
+"Campo de Hockey (Andalusia, Cádiz, San Fernando)",1,"10,000-5,000 BP",6,5,0.2514650225639343,36.445,-6.21,europe,6689.7372620238875
+"Popova-zemlja (Osijek-Baranja County, Grad Beli Manastir)",1,"10,000-5,000 BP",19,170,0.2515156865119934,45.7663,18.571700000000003,europe,4625.778534000977
+"Rákóczifalva-Bivaly-Tó-8 (Jász-Nagykun-Szolnok County, Szolnok)",1,"10,000-5,000 BP",4,6,0.2515504062175751,47.064232,20.211518,europe,4615.5427242531605
+"Port Blanc (Bretagne Region, Morbihan Department, Lorient arrondissement, Saint-Pierre Quiberon)",1,"10,000-5,000 BP",6,15,0.2516140639781952,47.523479,-3.1545990000000006,europe,6263.997647359904
+"Mittelfeld-Rosenmeer (Grand Est Region, Bas-Rhin Department, Molsheim arrondissement, Rosheim)",1,"10,000-5,000 BP",4,5,0.25163787603378296,48.49666,7.47052,europe,5513.714216940072
+"Lugar do Canto (Santarém, Valverde)",1,"10,000-5,000 BP",4,6,0.2516915798187256,39.414,-8.822,europe,6807.387006737705
+"Barcın-Höyük (Bursa, Yenişehir)",1,"10,000-5,000 BP",26,300,0.2518308162689209,40.303700000000006,29.608500000000006,asia,3598.575019842502
+"Geoksyur (Ahai, Tejen)",1,"10,000-5,000 BP",22,138,0.2518646717071533,37.1907,61.03430000000001,asia,5326.742538806513
+"Asparn Schletz (Niederösterreich, Mistelbach)",1,"10,000-5,000 BP",89,3542,0.25193631649017334,48.57975199999999,16.469310000000004,europe,4936.453410585629
+"Stuttgart-Mühlhausen-2 (Baden-Württemberg, Stuttgart, Stuttgart-Stadtkreis)",1,"10,000-5,000 BP",9,11,0.2519899010658264,48.78,9.18,europe,5408.3655258326935
+Pietrele Măgura Gorgana (Giurgiu County),1,"10,000-5,000 BP",51,1107,0.25208526849746704,44.06806,26.156169999999996,europe,4071.7205204779057
+"Varna (province Varna, municipality Varna)",1,"10,000-5,000 BP",28,318,0.2523239552974701,43.2177575,27.905192142857135,europe,3945.3665746696906
+"Tepecik-Ciftlik (Niğde, Çiftlik)",1,"10,000-5,000 BP",5,6,0.2523294687271118,38.172218,34.49387,asia,3409.7082309927546
+"Obernai (Grand Est Region, Bas-Rhin Department, Sélestat arrondissement)",1,"10,000-5,000 BP",11,55,0.2524261474609375,48.459999999999994,7.480000000000001,europe,5511.687774084776
+"Nitra-Mlynárce (Nitra Region, Nitra District, Nitra)",1,"10,000-5,000 BP",5,6,0.25244125723838806,48.317816,18.049592,europe,4828.870473429743
+"Füzesabony-Gubakút (Heves County, Füzesabony)",1,"10,000-5,000 BP",6,15,0.2526496350765228,47.74794500000001,20.412493,europe,4660.306617079063
+"Polgár-Ferenci-hát (Hajdú-Bihar County, Hajdúnánás)",1,"10,000-5,000 BP",47,983,0.2527174651622772,47.84646400000001,21.14942900000001,europe,4633.517741762734
+"Apc-Berekalya-1 (Heves County, Hatvan)",1,"10,000-5,000 BP",4,6,0.25282520055770874,47.796249,19.681001,europe,4701.41692780095
+"Nitra-Horné-Krškany (Nitra Region, Nitra District, Nitra)",1,"10,000-5,000 BP",50,832,0.25284433364868164,48.283311000000005,18.085484,europe,4824.3238364370245
+"Niedertiefenbach (Rheinland-Pfalz, Koblenz, Rhein-Lahn-Kreis)",1,"10,000-5,000 BP",37,654,0.2530393600463867,50.442,8.136000000000003,europe,5554.88154967604
+"Budakalász-Luppa-csárda (Pest County, Szentendre)",1,"10,000-5,000 BP",4,6,0.2530963718891144,47.62094,19.04494,europe,4721.8820949248775
+"Veszprém-Jutasi-út (Veszprém County, Veszprém)",1,"10,000-5,000 BP",5,5,0.25316399335861206,47.102645,17.912987,europe,4750.861558329869
+"Potočani (Požega-Slavonia County, Općina Velika)",1,"10,000-5,000 BP",38,576,0.2531664967536926,45.44820000000001,17.638799999999993,europe,4671.907758192749
+"Fossato di Stretto Partana (Sicily, Trapani, Partanna)",1,"10,000-5,000 BP",4,6,0.25319331884384155,37.724,12.916,europe,5043.647230423027
+Primrose Grange (County Sligo),1,"10,000-5,000 BP",9,23,0.2532968819141388,54.2469,-8.55609,europe,6761.601351224102
+"Jentilarri (Basque Country, Gipuzkoa, Enirio-Aralar)",1,"10,000-5,000 BP",4,6,0.25331804156303406,43.0866,-2.2154,europe,6190.959631928792
+"Stuttgart-Mühlhausen-1 (Baden-Württemberg, Stuttgart, Stuttgart-Stadtkreis)",1,"10,000-5,000 BP",18,113,0.25333505868911743,48.78,9.18,europe,5408.3655258326935
+"Grotta dell'Uzzo (Sicily, Trapani, San Vito Lo Capo)",1,"10,000-5,000 BP",15,90,0.2533631920814514,38.110099999999996,12.786599999999996,europe,5040.005224097618
+"Anghelu Ruju (Sardinia, Sassari province)",1,"10,000-5,000 BP",7,14,0.25341781973838806,40.626667,8.323056,europe,5351.609823954279
+"Kolín-Šťáralka (Central Bohemian Region, Kolín District)",1,"10,000-5,000 BP",6,10,0.25348156690597534,50.00873000000001,15.23091,europe,5106.912044234894
+"Pusztataskony-Ledence-I (Jász-Nagykun-Szolnok County, Kunhegyes)",1,"10,000-5,000 BP",8,20,0.2536221742630005,47.45925,20.51282,europe,4631.401362885972
+"Makotrasy (Central Bohemian Region, Kladno District)",1,"10,000-5,000 BP",20,190,0.2536766529083252,50.145765999999995,14.221421000000001,europe,5172.2454667215015
+"Urziceni (Satu Mare County, Urziceni)",1,"10,000-5,000 BP",43,903,0.2540530264377594,47.7467,22.394999999999996,europe,4570.591406049318
+"Oslonki (Kuyavian-Pomeranian Province, Radziejów County, Osięciny)",1,"10,000-5,000 BP",5,10,0.25435519218444824,52.61,18.8,europe,5164.572960268347
+"Turjányos-dűlő (Pest County, Cegléd)",1,"10,000-5,000 BP",4,6,0.2543991208076477,47.189141,20.004795,europe,4636.434511684667
+Poulnabrone (County Clare),1,"10,000-5,000 BP",12,66,0.25442031025886536,53.048660000000005,-9.140049000000001,europe,6771.156986523581
+"Mont-Aimé-hypogée-2 (Grand Est Region, Marne Department, Épernay arrondissement)",1,"10,000-5,000 BP",6,10,0.2547770142555237,48.858472,3.995887,europe,5768.907402992365
+"Alepotrypa Cave (Peloponnisoy, Diros)",1,"10,000-5,000 BP",4,6,0.2548597455024719,36.6383333,22.3825,europe,4385.41457230026
+"Cabeço da Arruda I (Lisbon, Torres Vedras)",1,"10,000-5,000 BP",4,6,0.25518906116485596,39.110833,-8.663583,europe,6803.2537369726415
+"Tell-Kurdu (Hatay, Reyhanlı)",1,"10,000-5,000 BP",6,7,0.25524604320526123,36.329405,36.444255,asia,3312.819352938276
+"Dzhulyunitsa (province Veliko Tarnovo, municipality Lyaskovets)",1,"10,000-5,000 BP",7,21,0.2552812397480011,43.16089,25.88341,europe,3995.6811868762893
+Parknabinnia (County Clare),1,"10,000-5,000 BP",11,55,0.2556280791759491,52.985499,-9.111453999999998,europe,6767.974350915838
+"Peki'in (Northern District, Akko)",1,"10,000-5,000 BP",22,197,0.25564712285995483,32.974166999999994,35.33138899999999,asia,2973.1507189690747
+"Grotta Continenza (Abruzzo, L'Aquila)",1,"10,000-5,000 BP",7,21,0.2560639977455139,41.958000000000006,13.5445,europe,4906.141284151285
+"Lepenski-Vir (Bor District, Majdanpek Municipality, Boljetin)",1,"10,000-5,000 BP",8,18,0.2568369209766388,44.552924,22.027563,europe,4325.79451921966
+"Malak-Preslavets (province Silistra, municipality Tutrakan, Tsar Samuil)",1,"10,000-5,000 BP",11,35,0.2568630576133728,43.980000000000004,26.4,europe,4055.0058662981146
+"Verteba Cave (Ternopil Oblast, Chortkiv District, Bilche-Zolote municipality)",1,"10,000-5,000 BP",20,169,0.25704488158226013,48.7889,25.871500000000005,europe,4580.707442222469
+"Smyadovo (province Shumen, municipality Smyadovo)",1,"10,000-5,000 BP",8,20,0.2571304440498352,43.057778,26.983611,europe,3942.362442488694
+"Arslantepe (Malatya, Battalgazi)",1,"10,000-5,000 BP",18,150,0.2580150365829468,38.381944,38.36111100000001,asia,3596.9945497257295
+"Çamlıbel-Tarlası (Çorum, Boğazkale)",1,"10,000-5,000 BP",12,66,0.25820404291152954,40.019745,34.58612900000001,asia,3606.673820113457
+"Ilıpınar (Bursa, Orhangazi)",1,"10,000-5,000 BP",6,9,0.25842398405075073,40.48,29.295999999999996,asia,3621.42131433568
+"Areni-1 (Vayots Dzor Province, Areni Municipality)",1,"10,000-5,000 BP",5,10,0.25882095098495483,39.731573,45.202743,asia,4130.351020050344
+"Dlinnaya-Polyana (Republic of Adygea, Maykopsky District, Klady site)",1,"10,000-5,000 BP",4,6,0.2591533660888672,44.385019,40.394588,asia,4246.078265994127
+"Majaky (Odessa Oblast, Odesa District)",1,"10,000-5,000 BP",6,15,0.2597583532333374,46.397,30.271999999999995,europe,4325.863785509458
+Usatove-Bolšoj Kujalnik (Odessa Oblast),1,"10,000-5,000 BP",4,6,0.2598249316215515,46.52603,30.63042,europe,4348.2988792683545
+"Seh-Gabi (Kermanshah, Kangavar)",1,"10,000-5,000 BP",5,10,0.2605215907096863,34.5,47.96,asia,4115.066980941974
+Kartal (Odessa Oblast),1,"10,000-5,000 BP",8,28,0.2607054114341736,45.31667,28.45,europe,4180.014846826039
+"Maryinskaya-5 (Stavropol Krai, Kirovsky municipality)",1,"10,000-5,000 BP",4,5,0.26232507824897766,43.905354,43.521883,asia,4346.0933671555385
+"Shah Tepe (Kerman, Arzuiyeh)",1,"10,000-5,000 BP",9,36,0.26559948921203613,28.33,56.87,asia,4959.408602972097
+"Cueva Calero (Matanzas Province, Cardenas)",2,"5,000-2,000 BP",4,5,0.1711655557155609,23.05,-81.317,americas,20013.259802008626
+"Canimar Abajo (Northwestern Cuba, Matanzas)",2,"5,000-2,000 BP",8,25,0.1733292192220688,23.038,-81.497,americas,20003.3330469083
+Rokutsu Shell Midden,2,"5,000-2,000 BP",6,15,0.1861114799976349,35.550000000000004,140.157,asia,12074.292963287706
+Jabuticabeira II (South Coast),2,"5,000-2,000 BP",16,120,0.18935224413871765,-28.58,-48.99,americas,26707.749192819203
+Xiaohe (Xinjiang),2,"5,000-2,000 BP",11,51,0.19141864776611328,40.336400000000005,88.6725,asia,7718.547693941689
+"Naton Beach Site (Guam, Tamuning)",2,"5,000-2,000 BP",27,11,0.19312168657779694,13.519983000000003,144.806559,oceania,14654.488160923365
+"Praha-Ďáblice (Prague Region, Prague District)",2,"5,000-2,000 BP",5,10,0.19737257063388824,50.151931,14.493838,europe,5157.527521590268
+San Nicolas Island (California),2,"5,000-2,000 BP",21,25,0.19869348406791687,33.26428,-119.53900000000004,americas,17164.927834653376
+"Las Locas (Jiménez Municipality, Quíbor Valley)",2,"5,000-2,000 BP",8,28,0.2009056806564331,10.03,-69.64,americas,21912.243036024294
+"Mayahak Cab Pek (Toledo District, Maya Mountains, Bladen Nature Reserve)",2,"5,000-2,000 BP",9,29,0.20888224244117737,16.497398,-88.90496,americas,20178.40544082881
+Teouma (Efate),2,"5,000-2,000 BP",8,9,0.20901057124137878,-17.786,168.37,oceania,17972.920215726685
+Rhirhi (Mustang District),2,"5,000-2,000 BP",4,6,0.2176971733570099,28.97,83.83,asia,7513.948867409254
+"Verkhny-Askiz (Republic of Khakassia, Askizsky District, Verkhny-Askiz Village)",2,"5,000-2,000 BP",8,27,0.22332707047462463,53.156486,90.207811,asia,7810.267408097427
+"Pingliangtai site (Henan province, Huaiyang)",2,"5,000-2,000 BP",4,6,0.22405651211738586,33.7086342,114.922462,asia,10149.82173415184
+"Shamanka-2 (Irkutsk Oblast, Slyudyansky District, Shamanka cape)",2,"5,000-2,000 BP",7,18,0.22443103790283203,51.698333,103.70305600000003,asia,8728.19202092433
+"Ust'-Ida (Irkutsk Oblast, Bokhanskiy District, Kamenka Village)",2,"5,000-2,000 BP",4,6,0.2267712652683258,53.188889,103.368056,asia,8685.983168645686
+"Taldy-2 (Karaganda Region, Qarqaralı district)",2,"5,000-2,000 BP",4,6,0.22868601977825165,49.0981333,75.84315,asia,6753.850765922178
+Zongri (Hainan),2,"5,000-2,000 BP",19,171,0.22922547161579132,35.29999999999999,100.40000000000002,asia,8837.316945065748
+"Khaptsagai (Irkutsk Oblast, Bayandayevskiy District)",2,"5,000-2,000 BP",6,14,0.230460524559021,53.04452800000001,105.510583,asia,8829.854461836592
+Pukagongma (Yushu),2,"5,000-2,000 BP",5,6,0.2311888337135315,33.5,95.4,asia,8448.731287424893
+Malakula,2,"5,000-2,000 BP",6,5,0.23138631880283356,-16.073881,167.44778599999998,oceania,17817.48966048694
+Piyangjiweng (Ngari),2,"5,000-2,000 BP",6,12,0.23225653171539307,31.599999999999998,79.60000000000001,asia,7052.526087327686
+"Ust'-Belaya (Irkutsk Oblast, Usolskiy District, mouth of the Belaya River)",2,"5,000-2,000 BP",8,28,0.23249860107898712,52.916944,103.657222,asia,8708.557191017771
+"Ulaanzuukh (Sükhbaatar Province, Tüvshinshiree District)",2,"5,000-2,000 BP",9,35,0.2338690161705017,46.650964,111.846572,asia,9421.370170244778
+Kyang (Manang District),2,"5,000-2,000 BP",7,21,0.23428718745708466,28.729999999999997,84.27,asia,7562.274773069272
+"Tanjung Pinang (North Moluccas, Morotai)",2,"5,000-2,000 BP",4,6,0.2346697896718979,2.35,128.4,asia,13033.705230400044
+"Ksiaznice-2 (Subcarpathian Province, Mielec County, Przecław)",2,"5,000-2,000 BP",5,10,0.2347748577594757,50.2,21.4,europe,4842.178473471133
+"Grottina dei Covoloni del Broion (Veneto, Vicenza, Berici Hills)",2,"5,000-2,000 BP",4,5,0.2350464016199112,45.467615,11.58982,europe,5114.6993777449425
+"Västerbjers (Gotland, Gothem parish)",2,"5,000-2,000 BP",13,55,0.23513482511043549,57.58000000000001,18.699999999999996,europe,5657.500724704541
+Mebrak Tomb (Mustang District),2,"5,000-2,000 BP",12,44,0.2360008955001831,28.860000000000003,83.91999999999999,asia,7525.575080382292
+"Leubingen-2 (Thüringen, Kyffhäuserkreis)",2,"5,000-2,000 BP",5,10,0.23657768964767456,51.190278,11.169722,europe,5414.161810401234
+"Muttenz (Bern, Moutier)",2,"5,000-2,000 BP",5,10,0.236860990524292,47.3122,7.384299999999999,europe,5479.874498012903
+"Lajia site (Qinghai province, Minhe County, Lajia village)",2,"5,000-2,000 BP",6,11,0.2372988909482956,36.508904,101.79648199999998,asia,8921.418195497798
+"Jiaozuoniecun site (Henan province, Jiazuo city)",2,"5,000-2,000 BP",4,6,0.23736988008022308,33.8719844,113.918666,asia,10057.24439059143
+"Koszyce-3 (Lesser Poland Province, Proszowice County, Koszyce)",2,"5,000-2,000 BP",15,105,0.23760287463665009,50.17013699999998,20.579033999999996,europe,4869.134654884553
+"Mygdalia (Achaea, Patras region)",2,"5,000-2,000 BP",7,21,0.23833075165748596,38.186889,21.776528000000003,europe,4316.639961828066
+Dolge njive (Smarjepke Toplice),2,"5,000-2,000 BP",9,34,0.2389306277036667,45.867366,15.279788,europe,4857.73200547732
+"Glazkovo (Irkutsk Oblast, Irkutsk municipality, Lokomotiv (Cyclodrome))",2,"5,000-2,000 BP",4,6,0.23979240655899048,52.286944,104.249167,asia,8756.79639298586
+"Bolshoy-Oleniy-Ostrov (Murmansk Oblast, Alexandrovsk municipality)",2,"5,000-2,000 BP",9,28,0.240950345993042,69.2239,33.4828,asia,6810.3468453329115
+"Il'movaya-Pad' (Buryatia, Kyakhtinsky District, Ust'-Kyakhta Village)",2,"5,000-2,000 BP",7,21,0.24102674424648285,50.497414,106.40550299999998,asia,8935.066624122479
+"Planes, Cova d' En Pardo (Valencian community, Alicante, Planes)",2,"5,000-2,000 BP",7,13,0.24111086130142212,38.78317599999999,-0.33999999999999997,europe,6118.326232318749
+"Pikutkowo (Kuyavian-Pomeranian Province, Wrocław County, Brześć Kujawski)",2,"5,000-2,000 BP",4,6,0.24442678689956665,52.62,18.96,europe,5159.844279644389
+Chania (Crete),2,"5,000-2,000 BP",27,298,0.2457284927368164,35.5172563,24.0149291,europe,4400.395808881292
+Landbogården,2,"5,000-2,000 BP",14,35,0.24573925137519836,58.1775,13.434400000000002,europe,5867.650415014157
+"Uybat-5 (Republic of Khakassia, Ust-Abakansky District)",2,"5,000-2,000 BP",6,15,0.24581439793109894,53.70856100000001,90.359808,asia,7825.024963608585
+Heraklion (Crete),2,"5,000-2,000 BP",5,10,0.24690595269203186,35.2394569,24.9883048,europe,4391.124515360192
+"Oberbipp Horgen (Bern, Wangen)",2,"5,000-2,000 BP",9,33,0.24693475663661957,47.262067,7.659834999999999,europe,5458.359033750494
+"Kytmanovo (Altai Krai, Kytmanovsky District, Kytmanovo Village)",2,"5,000-2,000 BP",4,6,0.24759894609451294,53.456,85.447,asia,7499.704535841975
+"Ayituohan (Xinjiang, Aletai Region, Habahe County)",2,"5,000-2,000 BP",4,6,0.2479049414396286,48.2856,86.2708,asia,7499.722310948562
+"Aidonia (Corinthia,Phlious Valley)",2,"5,000-2,000 BP",7,9,0.2479650378227234,37.84082999999999,22.5832,europe,4281.452337871945
+"Tuoganbai (Xinjiang, Aletai Region, Habahe County)",2,"5,000-2,000 BP",6,15,0.24838435649871826,48.06,86.42,asia,7509.5952691685925
+"Arroyal I (Castilla y León, Burgos, Alfoz de Quintanadueñas)",2,"5,000-2,000 BP",5,6,0.24863919615745544,42.4,-3.75,europe,6323.842580459224
+"Kalehöyük (Kırşehir, Kaman)",2,"5,000-2,000 BP",7,20,0.24894538521766663,39.34580499999999,33.78813,asia,3515.8002503652688
+"Serra Cabriles (Sardinia, Sassari, Sennori)",2,"5,000-2,000 BP",9,36,0.2491244375705719,40.78776088888888,8.593847888888888,europe,5326.628790239748
+"Las Yurdinas II (Basque Country, Álava, Peñacerrada)",2,"5,000-2,000 BP",4,6,0.24940457940101624,42.63,-2.7,europe,6235.331465749132
+"Chaganguole (Chagangole) (Xinjiang, Aletai Region, Qinghe County)",2,"5,000-2,000 BP",11,50,0.24950790405273438,46.480000000000004,90.75,asia,7835.721169718732
+"PP4-Montelirio (Andalusia, Sevilla, Valencina de la Concepción)",2,"5,000-2,000 BP",11,37,0.24964889883995056,37.41092600000001,-6.059,europe,6641.409604521327
+"Lasithi (Crete, Ierapetra, Schinokapsala, Vornospilia)",2,"5,000-2,000 BP",33,497,0.24978673458099365,35.17725,25.4411,europe,4383.644220877799
+Nea Styra (Euboea),2,"5,000-2,000 BP",4,6,0.2498481571674347,38.17975,24.207417,europe,4150.168112062546
+"Kivutkalns (Vidzeme, Salaspils District)",2,"5,000-2,000 BP",10,44,0.2501828372478485,56.852,24.272,europe,5481.557405641401
+"Aesch (Basel-Landschaft, Laufen)",2,"5,000-2,000 BP",25,253,0.25019219517707825,47.46541299999999,7.601691,europe,5468.8583414773475
+"S'Orcu ‘e Tueri (Sardinia, Nuoro, Perdasdefogu)",2,"5,000-2,000 BP",9,36,0.25025254487991333,39.667222,9.426111,europe,5276.969531250993
+"Cueva de las Lechuzas (Valencian community, Alicante, Villena)",2,"5,000-2,000 BP",10,45,0.25040796399116516,38.630293,-0.8629999999999999,europe,6166.570795027002
+"Jierzankale (Jirzankal) (Xinjiang, Kashi (Kashgar) Region, Tashikuergan (Taxkorgan) County)",2,"5,000-2,000 BP",13,78,0.25045156478881836,37.769999999999996,75.22000000000001,asia,6578.946381667445
+"Isbister (Scotland, Orkney)",2,"5,000-2,000 BP",5,6,0.2506915032863617,58.744960000000006,-2.91688,europe,6618.781695524212
+Rössberga,2,"5,000-2,000 BP",10,22,0.25074154138565063,58.22496430000001,13.610265000000002,europe,5866.179658318409
+"Riparo sotto roccia Su Asedazzu (Sardinia, South Sardinia, Seulo)",2,"5,000-2,000 BP",5,7,0.2507976293563843,39.87,9.2356,europe,5288.657046309928
+"Su Grutta 'e is Bittuleris (Sardinia, South Sardinia, Seulo)",2,"5,000-2,000 BP",5,5,0.2508615553379059,39.87,9.2356,europe,5288.657046309928
+"Afanasieva-Gora (Bateni) (Republic of Khakassia, Bogradsky District, Pervomayskoye Village)",2,"5,000-2,000 BP",8,28,0.25091075897216797,54.35661,90.919186,asia,7867.261834744215
+"Falköping-5 (Västra Götalands län, Falköping)",2,"5,000-2,000 BP",8,15,0.2510996162891388,58.166,13.573,europe,5861.992455899142
+"Boyanovo (Yambol province, Elhovo municipality)",2,"5,000-2,000 BP",6,14,0.2513370215892792,42.281573333333334,26.631043333333334,europe,3880.9752694717727
+"Su Crucifissu Mannu (Sardinia, Sassari, Porto Torres)",2,"5,000-2,000 BP",11,55,0.25135448575019836,40.810297,8.442207300000002,europe,5338.979361661339
+"Perdasdefogu (Sardinia, Nuoro)",2,"5,000-2,000 BP",4,6,0.25156283378601074,39.683255,9.433333,europe,5276.012923223332
+"Camino del Molino (Murcia, Caravaca)",2,"5,000-2,000 BP",9,14,0.25169092416763306,38.102807,-1.8654409999999997,europe,6266.74444052768
+Frälsegården,2,"5,000-2,000 BP",32,409,0.2520736753940582,58.1644,13.4547,europe,5865.775322114919
+"Alto de la Huesera (Basque Country, Álava, Laguardia)",2,"5,000-2,000 BP",7,20,0.25225895643234253,42.56946,-2.5659999999999994,europe,6225.187033906729
+"Es Forat de ses Aritges (Balearic Islands, Menorca, Ciutadella)",2,"5,000-2,000 BP",6,7,0.2523232400417328,40.004934999999996,3.8620000000000005,europe,5736.012392657667
+"Links of Noltland (Scotland, Orkney, Westray)",2,"5,000-2,000 BP",22,42,0.2523989975452423,59.327009999999994,-3.0057199999999993,europe,6654.835208421342
+"Smiljan (Lika-Senj County, Grad Gospić)",2,"5,000-2,000 BP",6,15,0.25252094864845276,44.555384,15.310516000000002,europe,4805.732786167491
+"Grotte-des-Tortues (Occitanie Region, Aude Department, Narbonne arrondissement, La Clape)",2,"5,000-2,000 BP",4,6,0.25267526507377625,43.149777,3.060539,europe,5763.163298864396
+"El Mirador Cave (Castilla y León, Burgos, Atapuerca)",2,"5,000-2,000 BP",15,91,0.2530323266983032,42.33333330000001,-3.5,europe,6304.436257227558
+"Sima del Ángel (Andalusia, Córdoba, Lucena)",2,"5,000-2,000 BP",17,40,0.25328028202056885,37.24,-4.24,europe,6494.988148175433
+"Carrowkeel (County Sligo, Ballinacarrow)",2,"5,000-2,000 BP",6,15,0.25328329205513,54.058617000000005,-8.382059,europe,6745.69229968544
+Perachora Cave (Corinthia),2,"5,000-2,000 BP",5,9,0.25374656915664673,37.808,23.786,europe,4205.5337433564955
+"Jagodnjak-Krčevine (Osijek-Baranja County, Općina Jagodnjak)",2,"5,000-2,000 BP",6,15,0.2538371682167053,45.695289,18.564403,europe,4622.161581323513
+Yunatsite (Pazardzhik province),2,"5,000-2,000 BP",11,54,0.25387072563171387,42.230000000000004,24.26,europe,4038.265203412616
+"Puntal de los Carniceros (Valencian community, Alicante, Villena)",2,"5,000-2,000 BP",4,6,0.25401052832603455,38.627399,-0.864597,europe,6166.78968284833
+"Tuchoměřice (Central Bohemian Region, Prague-West District)",2,"5,000-2,000 BP",6,15,0.2541499733924866,50.137677,14.273410999999998,europe,5168.783529750021
+"Karasuk-3 (Republic of Khakassia, Bogradsky District, Pervomayskoye Village)",2,"5,000-2,000 BP",8,28,0.2542954087257385,54.619893,90.802179,asia,7862.205478359334
+"Koukounaries (Cyclades, Paros)",2,"5,000-2,000 BP",4,6,0.2547728419303894,37.126595,25.208784,europe,4192.105879287972
+"La Almoloya (Murcia, Pliego)",2,"5,000-2,000 BP",67,2095,0.2548283338546753,37.952759,-1.5079999999999998,europe,6241.596768399018
+"Humanejos (Community of Madrid, Parla)",2,"5,000-2,000 BP",12,16,0.2548390030860901,40.220000000000006,-3.7599999999999993,europe,6366.21150357335
+"Polizzello (Sicily, Caltanissetta)",2,"5,000-2,000 BP",19,171,0.2550351619720459,37.608431,13.834838,europe,4972.744552246454
+"Cova de la Guineu (Catalonia, Barcelona, Font-rubí)",2,"5,000-2,000 BP",13,47,0.25529223680496216,41.4391,1.5733,europe,5900.886887551424
+"La Bastida (Murcia, Totana)",2,"5,000-2,000 BP",10,40,0.25544998049736023,37.762609,-1.5619999999999998,europe,6252.370362850463
+"Buffa (Sicily, Palermo)",2,"5,000-2,000 BP",7,21,0.25579366087913513,37.90800000000001,13.477999999999998,europe,4990.25218441167
+"Spiridonovka-4 (Samara Oblast, Volzhsky District, Spiridonovka Village)",2,"5,000-2,000 BP",5,10,0.2558656930923462,53.029999999999994,50.39,asia,5451.672631371954
+Lazarides (Aegina),2,"5,000-2,000 BP",5,10,0.2559416592121124,37.721203,23.50542,europe,4229.753533359826
+"El Portalón Cave (Castilla y León, Burgos, Atapuerca)",2,"5,000-2,000 BP",7,13,0.2560720443725586,42.352669999999996,-3.5183199999999997,europe,6305.650794932447
+"Le Cailar ""Place de la Saint-Jean"" (Occitanie Region, Gard Department, Nîmes arrondissement)",2,"5,000-2,000 BP",5,10,0.2561506927013397,43.6667,4.2333,europe,5667.688058270079
+"Königsbrunn-Obere-Kreuzstraße (Baugebiet-110) (Bayern, Schwaben, Augsburg-Landkreis)",2,"5,000-2,000 BP",18,63,0.25621646642684937,48.26656,10.87857,europe,5270.871104294671
+"Barbuise les Grèves de Frécul (Grand Est Region, Aube Department, Nogent-sur-Seine arrondissement)",2,"5,000-2,000 BP",5,10,0.2562829256057739,48.55,3.5833,europe,5789.118401052514
+"Haunstetten-Unterer-Talweg-58-62 (Bayern, Schwaben, Augsburg-Kreisfreie Stadt)",2,"5,000-2,000 BP",6,8,0.25632244348526,48.31611,10.891530000000001,europe,5272.298481826584
+"Wervershoof-Zwaagdijk (Noord-Holland, Medemblik)",2,"5,000-2,000 BP",5,10,0.2563757300376892,52.712,5.145,europe,5854.639841021302
+"Anghelu Ruju (Sardinia, Sassari province)",2,"5,000-2,000 BP",8,21,0.2563925087451935,40.626667,8.323056,europe,5351.609823954279
+"Marcita (Sicily, Trapani, Castelvetrano)",2,"5,000-2,000 BP",5,10,0.2564362585544586,37.68,12.789,europe,5055.825746881455
+"Wartau (St. Gallen, Sankt Gallen)",2,"5,000-2,000 BP",8,21,0.2566013038158417,47.45,9.292,europe,5347.2597131914945
+"Tepe Hissar (Semnan, Damghan)",2,"5,000-2,000 BP",9,36,0.2566039562225342,36.1544444,54.3836111,asia,4723.010760221681
+"Haunstetten-Postillionstraße (Bayern, Schwaben, Augsburg-Kreisfreie Stadt)",2,"5,000-2,000 BP",14,38,0.25661513209342957,48.295730000000006,10.89103,europe,5271.384286159687
+"Wehringen-Hochfeld (Bayern, Schwaben, Augsburg-Landkreis)",2,"5,000-2,000 BP",9,33,0.2566516697406769,48.25283,10.80879,europe,5274.940519874811
+"Tell-Atchana (Hatay, Reyhanlı)",2,"5,000-2,000 BP",10,45,0.2568050026893616,36.2378,36.3847,asia,3301.4827114479212
+"Sveti-Križ-Brdovečki (Zagreb County, Općina Marija Gorica)",2,"5,000-2,000 BP",6,15,0.2568341791629791,45.900833,15.700288,europe,4829.46899349
+"Battlesbury Bowl (England, Wiltshire)",2,"5,000-2,000 BP",5,10,0.25693318247795105,51.217744,-2.136648,europe,6260.389688509908
+"Jirentaigoukou (Xinjiang, Yili Region, Nileke County)",2,"5,000-2,000 BP",10,45,0.2570091485977173,43.790000000000006,82.64,asia,7202.668453652697
+"De-Tuithoorn (Noord-Holland, Medemblik)",2,"5,000-2,000 BP",4,6,0.25702840089797974,52.733563,5.096183,europe,5858.668239654851
+"Zhagunluke (Zaghunluq) (Xinjiang, Bayinguoleng Region, Qiemo County)",2,"5,000-2,000 BP",15,63,0.25703996419906616,38.269999999999996,85.33,asia,7458.289742915729
+Beirut,2,"5,000-2,000 BP",16,119,0.2570790648460388,33.89639,35.50833,asia,3052.9598770425446
+Tiryns (Argolid),2,"5,000-2,000 BP",4,6,0.2570856213569641,37.5995263,22.7995951,europe,4284.283540019596
+"Caishichang (Xinjiang, Yili Region, Nileke County)",2,"5,000-2,000 BP",8,25,0.25716233253479004,43.8,82.51,asia,7192.254783176308
+"Camino de las Yeseras (Community of Madrid, San Fernando de Henares)",2,"5,000-2,000 BP",15,27,0.25727444887161255,40.439721999999996,-3.5063889999999995,europe,6340.097783065952
+Velika Gruda,2,"5,000-2,000 BP",18,85,0.25728660821914673,42.366667,18.733333000000002,europe,4482.616648964847
+"Galls Carboners (Catalonia, Tarragona, Mont-ral)",2,"5,000-2,000 BP",7,21,0.2573177218437195,41.29160000000001,1.0638000000000003,europe,5945.247817725736
+"Cetina-Valley (Šibenik-Knin County, Općina Civljane)",2,"5,000-2,000 BP",12,30,0.2573709487915039,43.9672237,16.432670800000004,europe,4701.892398326629
+"Roudnice-nad-Labem (Ústecký Region, Litoměřice District)",2,"5,000-2,000 BP",7,21,0.25740739703178406,50.41684300000001,14.245509,europe,5189.815503713973
+"Spreitenbach CWC (Aargau, Kulm)",2,"5,000-2,000 BP",11,55,0.25744548439979553,47.255,8.2158,europe,5417.855651419067
+"Kleinaitingen-Gewerbegebiet-Nord (Bayern, Schwaben, Augsburg-Landkreis)",2,"5,000-2,000 BP",20,136,0.25747257471084595,48.222809999999996,10.84499,europe,5271.121401310973
+"Kamenny-Ambar-5 (Chelyabinsk Oblast, Kartalinskiy District, Yuzhno-Stepnoe Village)",2,"5,000-2,000 BP",50,994,0.25760266184806824,52.8166667,60.466666700000005,asia,5931.418263613833
+"Trethellan Farm (England, Cornwall, Redruth, Trethellan Water)",2,"5,000-2,000 BP",8,9,0.25766560435295105,50.203523,-5.199698,europe,6448.710557155501
+"Esperstedt (Sachsen-Anhalt, Sachsen-Anhalt, Saalekreis)",2,"5,000-2,000 BP",16,107,0.25770413875579834,51.42,11.68,europe,5400.22481810626
+"Ebla / Tell Mardikh (northwestern Syria, Idlib Governorate)",2,"5,000-2,000 BP",16,45,0.25777825713157654,35.798,36.798,asia,3287.38592707246
+"Aktogai (Abay Region, Urzhar District)",2,"5,000-2,000 BP",5,10,0.25778019428253174,46.9658667,80.0347333,asia,7022.118697400396
+"Over Narrows (England, Needingworth Quarry)",2,"5,000-2,000 BP",5,10,0.2577861547470093,52.34000000000001,0.03,europe,6154.552017299792
+"Pian Sultano (Lazio, Rome)",2,"5,000-2,000 BP",4,6,0.25794148445129395,42.0263,11.9483,europe,5038.038902955532
+"Surxondaryo Region, Rabat",2,"5,000-2,000 BP",19,52,0.2579476237297058,38.102999999999994,67.27500000000002,asia,5883.45566733856
+"Orak (Krasnoyarsk Krai, Sharypovsky District, Orak Ulus)",2,"5,000-2,000 BP",11,55,0.257951021194458,55.1924,89.3053,asia,7773.58621038787
+"Worlebury (England, North Somerset)",2,"5,000-2,000 BP",7,10,0.2579669654369354,51.357333999999994,-2.9882820000000003,europe,6321.611858924536
+"Villard (Provence-Alpes-Côte d'Azur Region, Alpes-de-Haute-Provence Department, Barcelonnette arrondissement, Lauzet-Ubaye)",2,"5,000-2,000 BP",8,28,0.2579762041568756,44.476,6.369,europe,5501.3094276594975
+"Tarquinia (Lazio, Viterbo)",2,"5,000-2,000 BP",16,120,0.2580125629901886,42.249972,11.767892,europe,5052.9019835093695
+"Brandýs-nad-Labem (Central Bohemian Region, Prague-East District)",2,"5,000-2,000 BP",10,45,0.25804784893989563,50.17420700000001,14.646466999999998,europe,5150.681042506258
+"Carsington Pasture Cave (England, Derbyshire, Brassington)",2,"5,000-2,000 BP",9,36,0.2580675482749939,53.079803,-1.640942,europe,6288.108996707875
+"Bisoba (Aqtöbe Region, Martök district, Rodinkovka vilage)",2,"5,000-2,000 BP",4,5,0.25809192657470703,50.65421,57.170474,asia,5606.672854369191
+"Devret-Höyük (Amasya, Suluova, Kanatpınar)",2,"5,000-2,000 BP",6,9,0.25810709595680237,40.69,35.56,asia,3704.0034573027515
+Palace of Nestor (Pylos),2,"5,000-2,000 BP",10,24,0.25814682245254517,37.026797,21.694586000000005,europe,4399.708666968478
+"Leubingen-1 (Thüringen, Kyffhäuserkreis)",2,"5,000-2,000 BP",43,879,0.25817129015922546,51.190278000000006,11.169721999999998,europe,5414.161810401234
+Zagorje ob Savi (Zagorje ob Savi),2,"5,000-2,000 BP",4,6,0.25821608304977417,46.13711,14.992415,europe,4890.094338877522
+"Kápolnadomb-Gór (Vas County, Sárvár)",2,"5,000-2,000 BP",6,15,0.258254736661911,47.353728,16.794725,europe,4835.869695529709
+"Dali-1 (Jetisu Region, Aqsu District)",2,"5,000-2,000 BP",4,6,0.25829386711120605,45.1323778,79.3643944,asia,6950.546233206564
+"Oostwoud (Noord-Holland, Medemblik)",2,"5,000-2,000 BP",8,28,0.2583125829696655,52.733563,5.096183,europe,5858.668239654851
+"Gravelly Guy (England, Oxfordshire, Stanton Harcourt)",2,"5,000-2,000 BP",9,36,0.2583353519439697,51.74585,-1.416236,europe,6228.01682943001
+"Singen (Baden-Württemberg, Freiburg, Konstanz)",2,"5,000-2,000 BP",15,103,0.2583525478839874,47.76709700000001,8.872239000000004,europe,5388.553206368084
+"Songshugou (Xinjiang, Aletai Region, Jimunai (Jeminay) County)",2,"5,000-2,000 BP",11,54,0.2583945691585541,47.43999999999999,85.87,asia,7465.588262510779
+"Füzesabony-Kettőshalom (Csongrád-Csanád County, Csongrád)",2,"5,000-2,000 BP",5,6,0.2584354877471924,46.6883,20.02431,europe,4597.308354729358
+"G218 (Xinjiang, Yili Region, Nileke County)",2,"5,000-2,000 BP",9,32,0.2584664523601532,43.8,82.51,asia,7192.254783176308
+"Castillejo del Bonete (Castilla-La Mancha, Ciudad Real, Terrinches)",2,"5,000-2,000 BP",5,5,0.2585008442401886,38.5781,-2.8417,europe,6333.7980983968555
+"Markotabödöge-Mohos-tóra-dűlő (Győr-Moson-Sopron County, Csorna)",2,"5,000-2,000 BP",6,15,0.25850173830986023,47.688333,17.298056,europe,4826.980594055681
+"Ostojicevo (North Banat District, Čoka Municipality, Ostojicevo)",2,"5,000-2,000 BP",7,21,0.2585112154483795,45.888056,20.166667,europe,4531.807835803881
+"Nepluyevsky Barrow Necropolis (Chelyabinsk Oblast, Kartaly district, Nepluyevka)",2,"5,000-2,000 BP",32,496,0.258539080619812,52.904,60.126,asia,5918.369062136884
+"El Sotillo (Basque Country, Álava, Laguardia)",2,"5,000-2,000 BP",9,28,0.25856781005859375,42.5731538,-2.621938,europe,6229.6920126095465
+Obrežje,2,"5,000-2,000 BP",4,6,0.2586071491241455,45.847908,15.690421,europe,4827.746189051879
+"Covesea Caves (Scotland, Moray, Covesea)",2,"5,000-2,000 BP",5,10,0.258614182472229,57.719296,-3.3828680000000007,europe,6590.2094022703395
+"Arslantepe (Malatya, Battalgazi)",2,"5,000-2,000 BP",4,6,0.2586204409599304,38.381944,38.361111,asia,3596.9945497257295
+"Ashkelon (Southern District, Ashkelon)",2,"5,000-2,000 BP",10,25,0.2586231529712677,31.666667,34.566667,asia,2833.606651550549
+"Vetulonia (Tuscany, Grosseto)",2,"5,000-2,000 BP",10,36,0.2586584687232971,42.920709,10.971394,europe,5120.239460903394
+"Hostivice (Central Bohemian Region, Prague-West District)",2,"5,000-2,000 BP",4,6,0.25866568088531494,50.080377,14.27686,europe,5164.63553865308
+"Dibbles Farm (England, Somerset, Christon)",2,"5,000-2,000 BP",9,36,0.25872647762298584,51.313891,-2.885217,europe,6313.504323177161
+"Kútvölgyi-dűlő-Zamárdi-56-89 (Somogy County, Siófok)",2,"5,000-2,000 BP",9,21,0.2587476074695587,46.875901,17.96734,europe,4732.700212209233
+"Broxmouth (Scotland, East Lothian)",2,"5,000-2,000 BP",9,36,0.25887033343315125,55.988523,-2.480662,europe,6458.421951265058
+"Pocklington (England, East Riding of Yorkshire)",2,"5,000-2,000 BP",30,435,0.2588784992694855,53.9194,-0.7666399999999999,europe,6267.062985545572
+"Parkhai-2 (Balkan, Magtymguly)",2,"5,000-2,000 BP",6,10,0.25890451669692993,38.348048,56.24543,asia,4936.89566363984
+"Kazakh-Mys (Abay Region, Ayagöz District)",2,"5,000-2,000 BP",4,6,0.25894296169281006,46.94785,79.9880833,asia,7018.375591998112
+"Chouč (Ústecký Region, Teplice District)",2,"5,000-2,000 BP",5,10,0.25895002484321594,50.511285,13.767871,europe,5222.724884321027
+"Lechlade Memorial Hall / Skate Park (England, Gloucestershire, Lechlade-on-Thames)",2,"5,000-2,000 BP",4,6,0.25900137424468994,51.697969,-1.692092,europe,6244.757836305693
+"Maitan (Karaganda Region, Buqar Jıraw District)",2,"5,000-2,000 BP",9,36,0.2590157985687256,50.09,74.44,asia,6682.161305661146
+"Dzhoghaz (Tavush Province, Ijevan District)",2,"5,000-2,000 BP",6,15,0.2590482831001282,41.06,45.13999999999999,asia,4216.248001721464
+"Augsburg-Hugo-Eckener-Straße (Bayern, Schwaben, Augsburg-Kreisfreie Stadt)",2,"5,000-2,000 BP",12,36,0.25905463099479675,48.328520000000005,10.89819,europe,5272.430000418342
+"Radovesice (Ústecký Region, Litoměřice District)",2,"5,000-2,000 BP",16,120,0.25907808542251587,50.410265,14.074597,europe,5198.75364522348
+"Chleby (Central Bohemian Region, Nymburk District)",2,"5,000-2,000 BP",7,21,0.25910845398902893,50.215039,15.119066000000002,europe,5127.910331023684
+"Radovesice-2 (Ústecký Region, Litoměřice District)",2,"5,000-2,000 BP",18,120,0.2591577172279358,50.410265,14.074597000000002,europe,5198.75364522348
+"Casenovole (Tuscany, Grosseto)",2,"5,000-2,000 BP",12,39,0.2591664791107178,43.033319,11.332940000000002,europe,5091.583873932437
+"Değirmendere (Muğla, Yatağan)",2,"5,000-2,000 BP",12,66,0.25918155908584595,37.34000000000001,28.040000000000003,asia,3306.7079765267526
+"Danebury (England, Hampshire, Nether Wallop)",2,"5,000-2,000 BP",9,27,0.2592078745365143,51.13768,-1.5384,europe,6217.793735444826
+"Praha-Zahradnictví (Prague Region, Prague District, Prague-5)",2,"5,000-2,000 BP",6,15,0.2593742609024048,50.0504153,14.3667267,europe,5157.537738580118
+"Kastrouli (Desfina, Phokis, near Delphi)",2,"5,000-2,000 BP",12,7,0.25937917828559875,38.399083000000005,22.575,europe,4245.338012872364
+"Kapitan-Andreevo (South) (province Haskovo, municipality Svilengrad)",2,"5,000-2,000 BP",12,42,0.2593993544578552,41.730000000000004,26.329999999999995,europe,3859.917472554364
+"Biddenham Loop (England, Bedfordshire)",2,"5,000-2,000 BP",9,36,0.2594197988510132,52.122402,-0.511365,europe,6181.465144086456
+"Suddern Farm (England, Hampshire, Middle Wallop)",2,"5,000-2,000 BP",10,36,0.25942230224609375,51.14041099999999,-1.595361,europe,6221.711445462559
+"Harlyn Bay (England, Cornwall, Padstow, Harlyn)",2,"5,000-2,000 BP",9,36,0.2595387399196625,50.539905,-4.997809,europe,6440.720603868558
+"Szigetszentmiklós-Üdülősor (Pest County, XXI. kerület)",2,"5,000-2,000 BP",5,10,0.25963664054870605,47.429954,19.051966,europe,4707.19906429985
+"Trumpington Meadows (England, Cambridgeshire)",2,"5,000-2,000 BP",8,28,0.2596387267112732,52.170279,0.105604,europe,6143.382653260671
+"Stradonice (Central Bohemian Region, Kladno District)",2,"5,000-2,000 BP",4,5,0.25970718264579773,50.291389,14.045556,europe,5192.108521939493
+"Kněževes (Central Bohemian Region, Prague-West District)",2,"5,000-2,000 BP",7,21,0.2597179412841797,50.119278,14.267059000000001,europe,5167.866779375121
+"Yarnton (England, Oxfordshire)",2,"5,000-2,000 BP",18,136,0.2597396671772003,51.79769999999999,-1.313464,europe,6222.894657477398
+"Brandýsek (Central Bohemian Region, Kladno District)",2,"5,000-2,000 BP",11,53,0.2597883939743042,50.18999999999999,14.157999999999998,europe,5178.839938405716
+"Atchana-Alalakh (Hatay, Reyhanlı)",2,"5,000-2,000 BP",28,352,0.2598112225532532,36.23778000000001,36.38472,asia,3301.4820329721447
+"Kuokesuxi (Xinjiang, Yili Region, Tekesi County)",2,"5,000-2,000 BP",8,26,0.25982844829559326,43.08,81.52,asia,7110.961579304196
+"Velim-Kosa (Zadar County, Grad Benkovac)",2,"5,000-2,000 BP",5,6,0.25983113050460815,43.88741,15.72534,europe,4754.581758637876
+"Győr-Kert-utca (Győr-Moson-Sopron County, Győr)",2,"5,000-2,000 BP",10,36,0.2598841190338135,47.674394,17.630908,europe,4806.335676714969
+"Bezdanjača Cave (Lika-Senj County, Općina Vrhovine)",2,"5,000-2,000 BP",38,471,0.25989532470703125,44.85200519999999,15.419944399999997,europe,4807.344474889034
+"Wattle Syke (England, West Yorkshire)",2,"5,000-2,000 BP",6,10,0.2599141597747803,53.9085,-1.384997,europe,6304.217357678261
+"Baq'ah (Balqa, Ardhah)",2,"5,000-2,000 BP",20,171,0.25991806387901306,32.080000000000005,35.830000000000005,asia,2960.87968699437
+"Kairan-1 (Karaganda Region, Qarqaralı district)",2,"5,000-2,000 BP",10,24,0.2599322199821472,48.74175000000001,76.99573,asia,6828.111395233855
+"Hostivice-Palouky (Central Bohemian Region, Prague-West District)",2,"5,000-2,000 BP",18,133,0.2599649131298065,50.07884,14.280243,europe,5164.340165254427
+"CRL-Arman (Buzău County, Vernești, Cârlomănești)",2,"5,000-2,000 BP",9,24,0.2600173354148865,45.22509,26.68277,europe,4180.442327834402
+"East Kent Access Road (England, Kent, Ramsgate)",2,"5,000-2,000 BP",24,276,0.2600342035293579,51.328562,1.3542558,europe,6031.395257586534
+"Bagheri-Tchala (Lori Province, Tumanyan District)",2,"5,000-2,000 BP",14,77,0.26013556122779846,41.1406,44.83339999999999,asia,4202.329792057626
+"Kazburun-1 (Bashkortostan, Aurgazinsky District, Usmanovo Village)",2,"5,000-2,000 BP",9,27,0.2602348029613495,54.07,55.544,asia,5767.688850718558
+"Radovesice-1 (Ústecký Region, Litoměřice District)",2,"5,000-2,000 BP",11,45,0.26025691628456116,50.410265,14.074597,europe,5198.75364522348
+"Praha-Stodůlky-Malá-Ohrada (Prague Region, Prague District, Prague-5)",2,"5,000-2,000 BP",19,171,0.2602660059928894,50.044984,14.339296,europe,5158.698817831992
+"Tian Shan, Central Steppe (Naryn Region, Naryn)",2,"5,000-2,000 BP",9,36,0.2602751851081848,41.45194446666667,75.48787036666666,asia,6608.352284079498
+"Praha-Jinonice-Butovická (Prague Region, Prague District, Prague-5)",2,"5,000-2,000 BP",7,15,0.2603101432323456,50.0504153,14.3667267,europe,5157.537738580118
+"Nerkin-Getashen (Gegharkunik Province, Martuni District)",2,"5,000-2,000 BP",12,43,0.2603137493133545,40.146666999999994,45.26416699999999,asia,4161.803401817803
+"Thanet (England, Kent)",2,"5,000-2,000 BP",4,6,0.26032155752182007,51.3603,1.3405,europe,6033.450551274103
+"Praha-Kobylisy-Ke-Stírce (Prague Region, Prague District, Prague-8)",2,"5,000-2,000 BP",10,44,0.26033419370651245,50.12174749999999,14.456950799999998,europe,5157.461348859001
+"Stkr.-Straubing (Bayern, Niederbayern, Straubing-Kreisfreie Stadt)",2,"5,000-2,000 BP",13,45,0.2603360116481781,48.8833,12.533199999999997,europe,5194.129827786628
+"Kolín-1 (Central Bohemian Region, Kolín District)",2,"5,000-2,000 BP",12,66,0.26043540239334106,50.033343,15.168083999999999,europe,5112.1036869967575
+"Wutulan (Xinjiang, Yili Region, Nileke County)",2,"5,000-2,000 BP",12,60,0.26052674651145935,43.82999999999999,82.72000000000001,asia,7209.158494545161
+"Irlbach-LKR (Bayern, Niederbayern, Straubing-Bogen)",2,"5,000-2,000 BP",17,75,0.2605300545692444,48.841,12.75,europe,5178.059244874772
+"Faux Vesigneul (Grand Est Region, Marne Department, Châlons-en-Champagne arrondissement, Chemin de Coupetz)",2,"5,000-2,000 BP",22,86,0.2605321407318115,48.80181,4.27874,europe,5747.268124219272
+College Site (Sidon),2,"5,000-2,000 BP",5,10,0.2605357766151428,33.561623,35.371184,asia,3018.1436615356574
+"Amesbury Down (England, Wiltshire)",2,"5,000-2,000 BP",20,160,0.2605443298816681,51.16802299999999,-1.7725402000000003,europe,6234.442839103207
+"Grishkin-Log-1 (Republic of Khakassia, Bogradsky District)",2,"5,000-2,000 BP",8,28,0.2605469822883606,54.6758333,90.8536111,asia,7866.045625097673
+"Monterozzi necropolis (Lazio, Viterbo, Tarquinia)",2,"5,000-2,000 BP",11,55,0.26055729389190674,42.25419999999999,11.757599999999998,europe,5053.75263706897
+Nästegården,2,"5,000-2,000 BP",6,5,0.2605597674846649,58.1544,13.5222,europe,5862.613548939256
+Megiddo (Jezreel Valley),2,"5,000-2,000 BP",35,409,0.26058024168014526,32.584720000000004,35.01694,asia,2923.661487745404
+"Roquepertuse (Provence-Alpes-Côte d'Azur Region, Bouches-du-Rhône Department, Aix-en-Provence arrondissement, Velaux)",2,"5,000-2,000 BP",7,13,0.26059380173683167,43.53000000000001,5.2700000000000005,europe,5584.053917184314
+"Konobrže (Ústecký Region, Most District)",2,"5,000-2,000 BP",7,10,0.26067301630973816,50.533635,13.61765,europe,5232.59825699616
+"Bitiya (Omsk Oblast, Sargatsky District, Uval'naya Bitiya Village)",2,"5,000-2,000 BP",11,23,0.26070478558540344,55.49929999999999,73.33550000000001,asia,6807.581822571723
+"Thame (England, Oxfordshire)",2,"5,000-2,000 BP",9,32,0.26072412729263306,51.75,-0.99,europe,6200.058851622167
+"Tatika (Southeast, Şırnak, Güçlükonak, Koçtepe köyü)",2,"5,000-2,000 BP",8,10,0.2607388198375702,37.5432,41.8662,asia,3752.829266868499
+"Chotín-1A (Nitra Region, Komárno District)",2,"5,000-2,000 BP",20,116,0.2608683109283447,47.808164000000005,18.218719000000004,europe,4781.873881722744
+"Lchashen (Gegharkunik Province, Sevan District)",2,"5,000-2,000 BP",16,120,0.26092013716697693,40.516618,44.933321,asia,4164.683312274972
+"Kópháza-Széles-földek (Győr-Moson-Sopron County, Sopron)",2,"5,000-2,000 BP",6,15,0.2609797418117523,47.647501,16.629722,europe,4864.670245436562
+"Gordion (Central, Ankara)",2,"5,000-2,000 BP",6,15,0.26103535294532776,39.65248,31.996658999999998,asia,3523.0720886975228
+"Mikulovice (Pardubice Region, Pardubice District)",2,"5,000-2,000 BP",15,105,0.2610417604446411,49.99200399999999,15.776860999999998,europe,5076.310458220672
+"Çinamak (Northern Albania, Kukës County, Kukës Municipality, Surroj)",2,"5,000-2,000 BP",11,35,0.26107853651046753,42.01611100000001,20.369443999999998,europe,4343.770833170789
+"Berel (East Kazakhstan Region, Katonkaragay District)",2,"5,000-2,000 BP",7,21,0.2611258924007416,49.3435,86.37109999999998,asia,7513.910254552604
+"Necrópolis Centre de Visitants (Catalonia, Girona, Empúries)",2,"5,000-2,000 BP",15,36,0.2611285448074341,42.1333,3.1083,europe,5765.982271594539
+"Święte (Subcarpathian Province, Jarosław County, Radymno)",2,"5,000-2,000 BP",5,6,0.26116472482681274,49.916111,22.860833,europe,4767.381433028393
+"Cliffs End Farm (England, Kent, Ramsgate)",2,"5,000-2,000 BP",20,179,0.2611950635910034,51.32921760000001,1.3695917999999998,europe,6030.41176281468
+"Tangbalesayi (Xinjiang, Yili Region, Nileke County)",2,"5,000-2,000 BP",6,15,0.26125457882881165,43.6,82.62,asia,7200.754133480848
+"Rowbarrow (England, Wiltshire, Salisbury)",2,"5,000-2,000 BP",12,55,0.2614080607891083,51.052725,-1.7862875,europe,6232.12935793137
+"Mokrin (North Banat District, Kikinda Municipality, Mokrin)",2,"5,000-2,000 BP",30,435,0.26142802834510803,45.934721999999994,20.404444000000005,europe,4520.653453467355
+Crihana-Veche (Cahul District),2,"5,000-2,000 BP",7,10,0.26149189472198486,45.845833000000006,28.194722000000006,europe,4237.700635267617
+"Szigetszentmiklós-Felső-Ürge-hegyi-dűlő (Pest County, Szigetszentmiklós)",2,"5,000-2,000 BP",4,6,0.2614975571632385,47.383224,19.020252,europe,4705.52373370494
+"Halikarnassos (Muğla, Bodrum, Yokuşbaşı)",2,"5,000-2,000 BP",8,7,0.2615983486175537,37.044768,27.436551,asia,3295.888595032555
+"Hlinaia (Transnistria, Slobozia District)",2,"5,000-2,000 BP",10,30,0.2616264820098877,46.668400000000005,29.800099999999997,europe,4345.213248152612
+"Praha-Jinonice (Prague Region, Prague District, Prague-5)",2,"5,000-2,000 BP",43,613,0.2616764008998871,50.054384999999996,14.363387,europe,5157.998801525542
+"Praha-Ruzyně (Prague Region, Prague District, Prague-6)",2,"5,000-2,000 BP",6,15,0.2617024779319763,50.078134,14.312195000000001,europe,5162.5027020713205
+"Obříství (Central Bohemian Region, Mělník District)",2,"5,000-2,000 BP",4,5,0.2617087662220001,50.292725,14.484945,europe,5167.928978181904
+"Zevakinskiy-stone-fence (East Kazakhstan Region, Shemonaikha District)",2,"5,000-2,000 BP",9,36,0.26171940565109253,50.2249,81.8367833,asia,7200.784424760503
+"Oylum-Höyük (Kilis, Kilis (merkez))",2,"5,000-2,000 BP",16,90,0.2617718577384949,36.69,37.17,asia,3384.501654751244
+"Shahr i Sokhta (Sistan and Baluchestan, Hamun)",2,"5,000-2,000 BP",19,77,0.26178044080734253,30.649857000000004,61.400311000000016,asia,5355.749311783691
+"Vliněves (Central Bohemian Region, Mělník District)",2,"5,000-2,000 BP",44,865,0.26178333163261414,50.365945,14.446605999999997,europe,5175.2135134262
+"Sappali-Tepe (Surxondaryo Region, Muzrabad)",2,"5,000-2,000 BP",14,91,0.2617911994457245,37.4166667,66.83333330000002,asia,5839.717724382684
+"Himera (Sicily, Palermo, Termini Imerese)",2,"5,000-2,000 BP",29,233,0.26181966066360474,37.97229599999999,13.824735999999994,europe,4959.230091875815
+"Ham Hill (England, Somerset)",2,"5,000-2,000 BP",14,71,0.26183030009269714,50.949984999999984,-2.735841999999999,europe,6293.907290918829
+"Black-Fortress (Shirak Province, Akhuryan District)",2,"5,000-2,000 BP",5,10,0.2618368864059448,40.78238,43.82529,asia,4112.411322235463
+"Fin Cop (England, Derbyshire)",2,"5,000-2,000 BP",13,60,0.26186543703079224,53.23583299999999,-1.7369440000000003,europe,6299.898516534505
+"Tell-Kran (province Stara Zagora, municipality Kazanlak)",2,"5,000-2,000 BP",5,10,0.26188522577285767,42.666642,25.373858,europe,3984.416389931982
+Shirenzigou (Northwest Xinjian),2,"5,000-2,000 BP",11,24,0.2619660496711731,43.60969999999999,93.1667,asia,8048.373508205543
+"Dzharkutan (Surxondaryo Region, Sherabad)",2,"5,000-2,000 BP",10,36,0.26199063658714294,37.75,67.0,asia,5856.67254796492
+"Harjis (Syunik Province, Tatev Municipality)",2,"5,000-2,000 BP",6,15,0.26199138164520264,39.431305,46.226678,asia,4184.419692305131
+"Noratus (Gegharkunik Province, Gavar District)",2,"5,000-2,000 BP",21,210,0.26202958822250366,40.37393099999999,45.181233000000006,asia,4171.4369697664715
+"Brardzryal (Lori Province, Vanadzor District)",2,"5,000-2,000 BP",7,21,0.2620597779750824,40.91666,44.5,asia,4164.890883027453
+"Wuzan (Xinjiang, Yili Region, Nileke County)",2,"5,000-2,000 BP",5,9,0.26220300793647766,43.22,81.84,asia,7137.162448514953
+Plaosnik-Ohrid,2,"5,000-2,000 BP",5,10,0.26224151253700256,41.11,20.79,europe,4303.14813051734
+"Praha-Miškovice (Prague Region, Prague District)",2,"5,000-2,000 BP",8,27,0.2622903883457184,50.156484,14.538727,europe,5155.365821590653
+"Karashamb (Kotayk Province, Hrazdan District)",2,"5,000-2,000 BP",26,325,0.2623082399368286,40.405,44.576389,asia,4133.369473248633
+"Çavuştepe (Van, Gürpınar)",2,"5,000-2,000 BP",6,10,0.26252156496047974,38.34,43.449999999999996,asia,3917.2599913607687
+"Salkhityn-Am (Khövsgöl Province, Rashaant District)",2,"5,000-2,000 BP",11,55,0.26257801055908203,49.162275,101.42435300000001,asia,8604.740013146335
+"Broom Quarry (England, Bedfordshire)",2,"5,000-2,000 BP",4,6,0.26261377334594727,52.079115,-0.280974,europe,6165.0152629914755
+"Pidjut (Lori Province, Tumanyan District)",2,"5,000-2,000 BP",8,28,0.26271000504493713,41.091,44.851,asia,4199.8792449429175
+"Bustan (Surxondaryo Region, Sherabad)",2,"5,000-2,000 BP",13,43,0.26277247071266174,37.6666667,67.0,asia,5856.073686984271
+"Ulaangom (Uvs Province, Ulaangom District, Chandman Uul)",2,"5,000-2,000 BP",20,149,0.26281461119651794,49.999824,92.03337200000001,asia,7923.489321649415
+"Tarquinia Civita (Lazio, Viterbo)",2,"5,000-2,000 BP",6,10,0.26297709345817566,42.251,11.756,europe,5053.881618558861
+"Turgen-2 (Almaty Region, Enbekshikazakh District)",2,"5,000-2,000 BP",4,6,0.26312553882598877,43.22005,77.84759,asia,6813.944300418085
+"Beniamin (Shirak Province, Akhuryan District)",2,"5,000-2,000 BP",7,21,0.2631525695323944,40.6885,43.84930000000001,asia,4106.958638665686
+"Karmir Blur (Yerevan, Shengavit, Teishebaini)",2,"5,000-2,000 BP",12,22,0.2631561756134033,40.153888,44.45336600000001,asia,4107.730033242676
+"Kuriki-Höyük (Batman, Batman Merkez)",2,"5,000-2,000 BP",8,13,0.26316407322883606,37.79,41.01,asia,3710.908913752898
+Gonur (Mary Region),2,"5,000-2,000 BP",47,141,0.26316583156585693,38.21227999999999,62.03443000000002,asia,5429.389447714067
+"Villamar (Sardinia, South Sardinia)",2,"5,000-2,000 BP",6,11,0.26335155963897705,39.618016000000004,8.958117,europe,5317.328745301387
+"Lori-Berd (Lori Province, Stepanavan District)",2,"5,000-2,000 BP",5,5,0.26343730092048645,41.0043068,44.429164,asia,4166.771333754945
+"Isar Marvinci (V. Marvinci-Valandovo, Southwest Necropolis)",2,"5,000-2,000 BP",5,6,0.2634970247745514,41.28,22.49,europe,4161.025431751455
+"Sarukhan (Gegharkunik Province, Gavar District)",2,"5,000-2,000 BP",8,28,0.26376885175704956,40.29221,45.130679,asia,4162.507857473256
+"Kerkouane (Nabeul, Dar Allosh, Ezzahra)",2,"5,000-2,000 BP",10,45,0.2638561725616455,36.947562,11.099143,africa,4121.339610445061
+"Keti (Shirak Province, Akhuryan District)",2,"5,000-2,000 BP",4,6,0.2639138698577881,40.8716,43.8445,asia,4120.259396254503
+"Butkara II (Khyber-Pakhtunkwa, Swat Valley)",2,"5,000-2,000 BP",5,10,0.26403477787971497,34.7658417,72.3491333,asia,6337.4391905408565
+"Udegram (Khyber-Pakhtunkwa, Swat Valley, Babozai tahsil)",2,"5,000-2,000 BP",13,64,0.26442521810531616,34.74319000000001,72.31421999999999,asia,6334.433511343564
+"Hasanlu (West Azerbaijan, Naghadeh)",2,"5,000-2,000 BP",22,231,0.26454946398735046,37.004949,45.459021,asia,3993.8302314386647
+"Loebanr (Khyber-Pakhtunkwa, Swat Valley)",2,"5,000-2,000 BP",38,666,0.2648025155067444,34.751461099999986,72.40193610000001,asia,6342.363259863365
+"Abusanteer (Xinjiang, Yili Region, Chabuchaer (Qapqal) County)",2,"5,000-2,000 BP",6,15,0.2648202180862427,43.80700000000001,80.81,asia,7055.907900557095
+"Katelai (Khyber-Pakhtunkwa, Swat Valley)",2,"5,000-2,000 BP",33,418,0.26525431871414185,34.7658417,72.3491333,asia,6337.4391905408565
+"Dinkha Tepe (West Azerbaijan, Ashnavieh)",2,"5,000-2,000 BP",14,91,0.2653294503688812,37.007863400000005,45.165758699999984,asia,3970.6285150778594
+"Aligrama (Khyber-Pakhtunkwa, Swat Valley)",2,"5,000-2,000 BP",5,10,0.2654896378517151,34.8048944,72.3181694,asia,6334.317821641409
+"Tell-Ezero (province Sliven, municipality Nova Zagora)",2,"5,000-2,000 BP",5,6,0.2656204402446747,42.462247,26.025931000000003,europe,3929.432215719181
+"Barikot (Khyber-Pakhtunkwa, Swat Valley)",2,"5,000-2,000 BP",4,6,0.265641450881958,34.7570056,72.3623806,asia,6338.715109253797
+"Saidu Sharif (Khyber-Pakhtunkwa, Swat Valley)",2,"5,000-2,000 BP",12,55,0.266082227230072,34.75700560000001,72.36238060000001,asia,6338.715109253798
+"Gishimangeda Cave (Karatu District, Eyasi Basin)",2,"5,000-2,000 BP",7,19,0.2786000967025757,-3.4759999999999995,35.348000000000006,africa,1418.0725821504154
+Naivasha Burial Site (Nakuru County),2,"5,000-2,000 BP",5,10,0.2796792984008789,-0.663,36.41,africa,1088.816476190989
+"Playa del Mango (Eastern Cuba, Granma province, Rio Cauto Basin)",3,"2,000-500 BP",8,28,0.17084446549415588,20.554,-76.986,americas,20502.715550916568
+Cueva del Perico I (Artemisa province),3,"2,000-500 BP",7,6,0.17102771997451782,22.958,-83.27499999999999,americas,19902.630089382306
+"Canimar Abajo (Northwestern Cuba, Matanzas)",3,"2,000-500 BP",18,151,0.1732272356748581,23.038,-81.49700000000001,americas,20003.3330469083
+"well shaft (England, Norwich, Chapelfield Shopping Center)",3,"2,000-500 BP",6,13,0.17617887258529663,52.625550999999994,1.291518,europe,6086.059310348708
+"San Clemente Island (California, Los Angeles County)",3,"2,000-500 BP",8,28,0.18898969888687134,32.9,-118.5,americas,17232.166369285114
+"CA-SRI-2B (California, Santa Rosa Island, Skull Gulch)",3,"2,000-500 BP",5,10,0.19026979804039001,34.001891,-120.1925,americas,17069.21058517711
+California (Point Sal),3,"2,000-500 BP",11,12,0.1906072348356247,34.901389,-120.64806,americas,16961.53332599305
+"Macao (eastern DR, Altagracia)",3,"2,000-500 BP",4,6,0.19431738555431366,18.77917,-68.527222,americas,21193.588298740226
+San Nicolas Island (California),3,"2,000-500 BP",9,29,0.1957438439130783,33.26428,-119.53900000000002,americas,17164.927834653376
+"Best Sunshine Casino site (Northern Mariana Islands, Saipan, Garapan)",3,"2,000-500 BP",14,91,0.19641268253326416,15.211057000000006,145.71683899999996,oceania,14752.00476737386
+"Naton Beach Site (Guam, Tamuning)",3,"2,000-500 BP",45,903,0.1970227062702179,13.519983000000002,144.80655899999996,oceania,14654.48816092336
+Chinchawas,3,"2,000-500 BP",5,6,0.20002040266990662,-9.582555,-77.697503,americas,23312.541476416925
+"Calveras County (California, Central California)",3,"2,000-500 BP",7,21,0.20026399195194244,38.19599999999999,-120.68049999999997,americas,16611.1740418909
+California (San Catalina Island),3,"2,000-500 BP",6,6,0.2003656029701233,33.38333,-118.41700000000002,americas,17183.429430522912
+Akapana,3,"2,000-500 BP",5,7,0.2006741762161255,-16.5564,-68.6725,americas,24470.416084201326
+"Preacher's Cave (Eleuthera, North part of island)",3,"2,000-500 BP",8,10,0.20181629061698914,25.55711,-76.6952,americas,20081.547464358504
+Sambaqui do Limão (Southeast Coast),3,"2,000-500 BP",4,6,0.20218312740325928,-23.89,-46.42,americas,26449.542618809955
+"Juan Dolio (southeast coast DR, San Pedro de Macorís)",3,"2,000-500 BP",7,21,0.2031707763671875,18.45,-69.40999999999998,americas,21166.386513313908
+"Atajadizo (southeast coast DR, Altagracia, mouth of the Yuma River)",3,"2,000-500 BP",18,136,0.20395883917808533,18.394444000000004,-68.60999999999999,americas,21222.32188792724
+"Botigiriayocc (Laramate, Lucanas, Ayacucho, Highlands)",3,"2,000-500 BP",4,6,0.20439529418945312,-14.275556,-74.843611,americas,23919.349144889587
+"Andres (southeast coast DR, Santo Domingo, Boca Chica)",3,"2,000-500 BP",4,6,0.20456022024154663,18.44,-69.64,americas,21152.632431651742
+"Sanctuary Blue Hole (Andros, South Andros)",3,"2,000-500 BP",7,21,0.20481747388839722,24.099999999999998,-77.55,americas,20154.099873223997
+"La Caleta (southeast coast DR, Santo Domingo, Aeropuerto Santo Domingo)",3,"2,000-500 BP",60,1711,0.20487062633037567,18.450601999999993,-69.68628199999999,americas,21148.747510903326
+"Cueva Juana (Samaná, Cabo Samaná, Las Galeras)",3,"2,000-500 BP",4,6,0.2053297907114029,19.24,-69.2,americas,21109.906858430608
+"El Soco (southeast coast DR, San Pedro de Macorís, Ramón Santana, Playa Nueva Romana)",3,"2,000-500 BP",16,88,0.20536059141159058,18.447,-69.187,americas,21180.85923860503
+Rio Uncallane (Rio Ilave Basin),3,"2,000-500 BP",5,10,0.20547792315483093,-16.2,-69.7,americas,24380.103087391486
+Lovelock Cave (Nevada),3,"2,000-500 BP",4,6,0.20578572154045105,39.96,-118.56,americas,16497.542312114976
+Huaca Pucllana (Lima),3,"2,000-500 BP",12,19,0.20633408427238464,-12.111111,-77.03388900000002,americas,23594.25170359941
+"Tayopa (Sonora, Sahuaripa)",3,"2,000-500 BP",7,21,0.20650164783000946,29.099999999999998,-108.93000000000004,americas,17966.14998507687
+Cueva DeLos Muertos Chiquitos (Rio Zape),3,"2,000-500 BP",10,42,0.20718461275100708,25.812514,-105.79170000000002,americas,18430.04346278053
+Chincha,3,"2,000-500 BP",5,10,0.2082040011882782,-13.476219,-76.016683,americas,23780.32135134108
+Anse à la Gourde (Pointe de Chateaux peninsula),3,"2,000-500 BP",4,6,0.20831793546676636,16.263,-61.22,americas,21886.49011210516
+"Lavoutte (St. Lucia, Cas-en-Bas)",3,"2,000-500 BP",12,52,0.20837055146694183,14.091000000000001,-60.926000000000016,americas,22098.163575585437
+Paso del Indio (Vega Baja),3,"2,000-500 BP",8,23,0.20843559503555298,18.45239,-66.3991,americas,21358.87822891839
+El Brujo (North Coast),3,"2,000-500 BP",9,27,0.2085748165845871,-7.9149780000000005,-79.305486,americas,23065.53182798168
+"Man Nadol - Peinioar (Caroline Islands, Pohnpei, Temwen Island)",3,"2,000-500 BP",4,6,0.20914699137210846,6.844504,158.335674,oceania,16195.783317792997
+Chichén Itzá (Yucatán),3,"2,000-500 BP",61,910,0.21125197410583496,20.683056000000004,-88.56861099999999,americas,19801.46940144596
+Futuna,3,"2,000-500 BP",4,6,0.21421007812023163,-19.51995925,170.2270955,oceania,18221.250626344183
+"Ekven (Chukotka Autonomous Okrug, Chukotsky District)",3,"2,000-500 BP",18,151,0.217148557305336,66.12138299999998,-170.46034,asia,11616.874887409387
+"Uelen (Chukotka Autonomous Okrug, Chukotsky District)",3,"2,000-500 BP",5,6,0.21907725930213928,66.161126,-169.8223,asia,11621.721519294866
+Latuotanggu (Shigatse),3,"2,000-500 BP",4,6,0.22178593277931213,28.9,88.6,asia,7963.124820216457
+"Blihun site (Eastern Taiwan, Hanben)",3,"2,000-500 BP",46,368,0.232844278216362,24.327780000000008,121.76559999999996,asia,11200.318036919452
+Tavan Khailaast,3,"2,000-500 BP",4,6,0.23398283123970032,47.1711,109.0238,asia,9199.302705407732
+Longsangquduo (Shigatse),3,"2,000-500 BP",14,91,0.2355247139930725,29.699999999999996,89.1,asia,7985.178505620233
+Samdzong (Mustang District),3,"2,000-500 BP",9,25,0.23588597774505615,29.279999999999998,84.03,asia,7523.919381778884
+Daeseong-dong (Gyeongsangnam-do),3,"2,000-500 BP",7,21,0.23894758522510529,35.24,128.88,asia,11225.677687919451
+"Dulan Wayan reservoir site (Dulan County, Reshui town)",3,"2,000-500 BP",10,16,0.2390454113483429,36.2214987,98.16696920000001,asia,8616.03234238141
+Samdzong Tomb (Mustang District),3,"2,000-500 BP",4,6,0.23967918753623962,29.28,84.03,asia,7523.919381778884
+Yappa Nhae 2 (Mae Hong Son Province),3,"2,000-500 BP",26,323,0.24075022339820862,19.6,98.25,asia,9240.394543587228
+"Zaan-Khoshuu (Bulgan Province, Dashintshilen District)",3,"2,000-500 BP",6,15,0.2420242428779602,47.854689,104.04602,asia,8817.889576331896
+"Kunpeszér-Felsőpeszéri-út (Bács-Kiskun County, Kunszentmiklós)",3,"2,000-500 BP",6,15,0.24287568032741547,47.077494,19.242593,europe,4670.496933927568
+"Bodzia (Kuyavian-Pomeranian Province, Wrocław County, Brześć Kujawski)",3,"2,000-500 BP",5,9,0.2454616129398346,52.7,18.9,europe,5169.544656673563
+"Alsike (Uppsala län, Knivsta)",3,"2,000-500 BP",4,6,0.24603617191314697,59.8,17.8,europe,5904.649441934293
+"Tsagaan-Chuluut (Dornod Province, Gurvanzagal District)",3,"2,000-500 BP",7,21,0.24635322391986847,49.14463,114.877124,asia,9560.754984660329
+"Dunum (Niedersachsen, Weser-Ems, Wittmund)",3,"2,000-500 BP",11,36,0.24668079614639282,53.59623199999999,7.645448000000001,europe,5762.967284853181
+Gurvan Dov,3,"2,000-500 BP",5,10,0.24743664264678955,47.0155,109.0636,asia,9206.371702487007
+"Drantum (Niedersachsen, Weser-Ems, Cloppenburg)",3,"2,000-500 BP",17,120,0.24778588116168976,52.81474,8.192343,europe,5684.197080343743
+"Csólyospálos-Felsőpálos (Csongrád-Csanád County, Kistelek)",3,"2,000-500 BP",4,6,0.24926717579364777,46.43606,19.89108,europe,4586.633721902832
+"Albertirsa-Szentmártoni-ut (Pest County, Cegléd)",3,"2,000-500 BP",5,10,0.2515517473220825,47.245162,19.628505,europe,4661.283774657728
+"Karda (Jönköpings län, Värnamo)",3,"2,000-500 BP",6,5,0.25161007046699524,57.18,13.930000000000001,europe,5759.849713980935
+"Sandby Borg (Kalmar län, Mörbylånga)",3,"2,000-500 BP",7,21,0.25166526436805725,56.550000000000004,16.63,europe,5612.179380792423
+"Kunpeszér-Felsőpeszériút-Homokbánya (Pest County, Dabas)",3,"2,000-500 BP",4,6,0.25183168053627014,47.21897,19.37753,europe,4673.265859360617
+"Gnezdovo (Smolensk Oblast, Smolensky District, Gnezdovo Village)",3,"2,000-500 BP",12,17,0.2520167827606201,54.779999999999994,31.87,asia,5202.226725065607
+"Kunszállás-Fülöpjakab (Bács-Kiskun County, Kecskemét)",3,"2,000-500 BP",61,1752,0.2524499297142029,46.750963163934436,19.738022032786887,europe,4618.277431895774
+Tollemosegard (Zealand region),3,"2,000-500 BP",4,6,0.2524614632129669,55.87,12.08,europe,5716.312330295342
+Trondheim - Public Library Site/Folkebibliotekstomten (Trondheim),3,"2,000-500 BP",7,10,0.2525845766067505,63.43,10.39,europe,6444.8717305772225
+Levanluhta (Isokyro),3,"2,000-500 BP",8,5,0.25265926122665405,62.948744,22.410146,europe,6166.902744211873
+"Vasterhus (Jämtlands län, Östersund)",3,"2,000-500 BP",7,21,0.25287458300590515,63.199999999999996,14.5,europe,6321.157881003286
+"Tian Shan, Central Steppe (Issyk-Kul Region, Tong)",3,"2,000-500 BP",5,10,0.25311601161956787,42.0729996,76.9658892,asia,6734.494399645828
+"Eastry (England, Kent)",3,"2,000-500 BP",6,10,0.25311949849128723,51.245326,1.303369,europe,6031.7470789820145
+Marvelė Necropolis (Kaunas City),3,"2,000-500 BP",4,6,0.2537481188774109,54.8985,23.9036,europe,5273.221038376748
+"St John's College Oxford (England, Oxford)",3,"2,000-500 BP",22,169,0.25388872623443604,51.76,-1.2600000000000005,europe,6218.163582052835
+"Anderten (Niedersachsen, Hannover, Region Hannover)",3,"2,000-500 BP",14,78,0.2542271912097931,52.359733,9.869502999999998,europe,5562.155892850144
+"Lakenheath (England, Suffolk)",3,"2,000-500 BP",16,105,0.25433629751205444,52.413832,0.521962,europe,6126.020452764426
+Ribe (Jutland region),3,"2,000-500 BP",9,36,0.25447511672973633,55.33,8.76,europe,5823.271058588167
+"Ridgeway Hill Mass Grave (England, Dorset, Weymouth)",3,"2,000-500 BP",10,45,0.25468018651008606,50.671087899999996,-2.465799,europe,6268.4288522468
+"Sant' Imbenia (Sardinia, Sassari, Porto Conte)",3,"2,000-500 BP",4,6,0.254897803068161,40.5938,8.2045,europe,5362.027518096405
+"Oland (Kalmar län, Mörbylånga)",3,"2,000-500 BP",15,105,0.2551869750022888,56.445436913333324,16.482196933333334,europe,5606.754267903198
+"Nor South, Telemark (Vestfold og Telemark, Skien nor)",3,"2,000-500 BP",4,6,0.2552119791507721,59.22,9.59,europe,6094.904459487885
+"Salme (Saare County, Saaremaa Municipality, Tehumardi Village)",3,"2,000-500 BP",34,561,0.2556232810020447,58.17000000000001,22.25,europe,5650.615610886616
+64 (Eastern Settlement),3,"2,000-500 BP",6,14,0.2557056248188019,60.99,-45.42000000000001,americas,19468.936216672235
+"Kopparsvik (Gotlands län, Gotland)",3,"2,000-500 BP",22,188,0.25587067008018494,57.630000000000024,18.279999999999994,europe,5672.840254617407
+Oland,3,"2,000-500 BP",15,88,0.2558765113353729,56.96526060666667,16.833673593333337,europe,5646.183409363108
+"Staraya-Ladoga (Leningrad oblast, Olhava District)",3,"2,000-500 BP",17,128,0.25598374009132385,60.0,32.3,asia,5783.209850788724
+Kilteasheen (County Roscommon),3,"2,000-500 BP",39,597,0.25610417127609253,54.00684,-8.202308000000004,europe,6732.934968079131
+"Alt-Inden (Nordrhein-Westfalen, Köln, Düren)",3,"2,000-500 BP",17,136,0.25613540410995483,50.846122,6.357818,europe,5687.300377479429
+"Weklice (Warmian-Masurian Province, Elbląg County, Elbląg)",3,"2,000-500 BP",9,36,0.2562386989593506,54.1176,19.5742,europe,5285.7335016070565
+"Frojel (Gotlands län, Gotland)",3,"2,000-500 BP",29,291,0.256258100271225,57.33999999999999,18.190000000000005,europe,5645.88771944763
+"Hofstadir (Northeastern Region, Skútustaðahreppur)",3,"2,000-500 BP",14,85,0.25638946890830994,65.61,-17.16,europe,7611.368515929743
+"Varnhem (Västra Götalands län, Skara)",3,"2,000-500 BP",31,424,0.25647449493408203,58.38000000000003,13.649999999999995,europe,5879.166334775733
+"Kiskőrös-Vágóhídidűlő (Bács-Kiskun County, Kiskőrös)",3,"2,000-500 BP",4,6,0.2566012442111969,46.61994,19.44131,europe,4626.176536421984
+029a (Eastern Settlement),3,"2,000-500 BP",8,9,0.25713860988616943,61.18,-45.68,americas,19446.21448925475
+"Kiskundorozsma-Kettőshatár-2 (Csongrád-Csanád County, Szeged)",3,"2,000-500 BP",4,6,0.2572195827960968,46.38,20.08944,europe,4570.9954391270485
+Chhim,3,"2,000-500 BP",5,10,0.2572985589504242,33.622519,35.499985,asia,3031.5180025132113
+"Norton East Mill / Bishops Mill (England, North Yorkshire, Stockton-on-Tees, Norton)",3,"2,000-500 BP",8,28,0.2573345899581909,54.594544,-1.3093983,europe,6328.43646843764
+"Polhill (England, Kent)",3,"2,000-500 BP",9,36,0.2574400305747986,51.3,0.2,europe,6106.588838989967
+"Straubing (Bayern, Niederbayern, Straubing-Kreisfreie Stadt)",3,"2,000-500 BP",17,71,0.25744199752807617,48.89,12.57,europe,5192.176618442483
+"Butakty-1 (Almaty Region, Medeu District)",3,"2,000-500 BP",5,10,0.25750893354415894,43.2025,76.9816667,asia,6743.805166902139
+"Viminacium-Rit (Braničevo District, Požarevac Municipality, Kostolac)",3,"2,000-500 BP",12,19,0.2575245499610901,44.7167,21.166699999999995,europe,4391.798195453114
+"Jakovo-Kormadin (Belgrade, Surčin Municipality, Jakovo)",3,"2,000-500 BP",4,6,0.25774896144866943,44.7787,20.248,europe,4456.662049628452
+"Bolshoye-Davydovskoye-2 (Ivanovo Oblast, Gavrilovo-Posadsky District, Bolshoye Davydovskoye Village)",3,"2,000-500 BP",9,36,0.25778672099113464,56.511472,40.210791,asia,5480.639689400916
+"Sedgeford (England, Norfolk)",3,"2,000-500 BP",20,148,0.25797387957572937,52.89965099999999,0.544309,europe,6144.07245966068
+"Kowalewko (Greater Poland Province, Oborniki)",3,"2,000-500 BP",37,167,0.2579886019229889,52.58999999999999,16.779999999999998,europe,5240.779666576186
+"Schleswig (Schleswig-Holstein, Schleswig-Holstein, Schleswig-Flensburg)",3,"2,000-500 BP",15,104,0.2580007314682007,54.520535,9.559718000000002,europe,5726.009333683882
+Doclea Bjelovine,3,"2,000-500 BP",6,15,0.258222758769989,42.466869,19.266164,europe,4441.125569202832
+"Niederstotzingen (Baden-Württemberg, Stuttgart, Heidenheim)",3,"2,000-500 BP",12,28,0.2582399845123291,48.541111,10.233056000000001,europe,5326.886330422498
+Galgedil (Funen region),3,"2,000-500 BP",16,72,0.2582452893257141,55.5,10.33,europe,5762.642203194516
+"Shekshovo-9 (Ivanovo Oblast, Gavrilovo-Posadsky District, Sheksnovo Village)",3,"2,000-500 BP",9,30,0.2582837641239166,56.52776,40.178777,asia,5481.773839956411
+"Oakington (England, Cambridgeshire)",3,"2,000-500 BP",16,120,0.25831538438796997,52.26136,0.06869,europe,6149.134042071338
+"Hiddestorf (Niedersachsen, Hannover, Region Hannover)",3,"2,000-500 BP",4,6,0.2585785388946533,52.280438,9.712492,europe,5565.793099623207
+"Hatherdene (England, Cambridgeshire)",3,"2,000-500 BP",18,153,0.25859272480010986,52.20000000000001,0.20000000000000004,europe,6138.420785557315
+"Hassleben (Thüringen, Thüringen, Sömmerda)",3,"2,000-500 BP",7,21,0.2586294114589691,51.108999999999995,10.995599999999998,europe,5419.058708559241
+Tjærby (Randers Municipality),3,"2,000-500 BP",28,244,0.2587405741214752,56.470000000000006,10.1,europe,5848.750326663545
+"Magdalenenberg (Baden-Württemberg, Villingen-Schwenningen)",3,"2,000-500 BP",16,61,0.25875601172447205,48.04456368,8.443347259,europe,5428.994777347962
+"Oakington (England, South Cambridgeshire)",3,"2,000-500 BP",4,6,0.2587862014770508,52.26136,0.06869,europe,6149.134042071338
+"Rookery Hill (England, Sussex, Bishopstone)",3,"2,000-500 BP",9,28,0.2588058114051819,50.789115,0.082351,europe,6098.056279991373
+"Wolverton (England, Buckinghamshire)",3,"2,000-500 BP",4,6,0.25882166624069214,52.062352,-0.81617,europe,6199.148542413252
+"Hetian (Xinjiang, Hetian Region, Luopu County)",3,"2,000-500 BP",9,21,0.25884389877319336,36.97,79.94,asia,7000.368404539355
+"Ely (England, Cambridgeshire)",3,"2,000-500 BP",6,15,0.25885024666786194,52.4,0.3,europe,6139.600179000596
+"Szarvas-Kovács-halom-8 / 1 (Békés County, Szarvas)",3,"2,000-500 BP",4,6,0.2588537335395813,46.861303,20.556284,europe,4581.074383304792
+Bogevej (Langeland region),3,"2,000-500 BP",13,78,0.25889378786087036,54.87,10.72,europe,5696.354290639965
+"Tesárske-Mlyňany (Nitra Region, Zlatc Moravce District)",3,"2,000-500 BP",6,15,0.25895926356315613,48.337073,18.356218,europe,4813.721334052612
+"Chiusi (Tuscany, Siena)",3,"2,000-500 BP",8,13,0.25900423526763916,43.017037,11.948444,europe,5041.542688508546
+"Nuštar (Vukovar-Syrmia County, Općina Nuštar, Dvorac)",3,"2,000-500 BP",7,21,0.2590201795101166,45.33815599999999,18.845027999999996,europe,4583.187630622358
+Hesselbjerg (Jutland region),3,"2,000-500 BP",8,13,0.25905585289001465,55.95,10.2,europe,5803.42792680839
+Kaagarden (Langeland region),3,"2,000-500 BP",6,15,0.2590774595737457,54.85,10.78,europe,5692.036538299789
+"Osijek (Osijek-Baranja County, Grad Osijek, Trg B. Josipa Jelačića)",3,"2,000-500 BP",5,10,0.25914156436920166,45.55,18.74,europe,4602.145032818027
+Groningen,3,"2,000-500 BP",19,171,0.25915464758872986,53.217279999999995,6.565521000000001,europe,5800.007114994911
+"Gornji-Kosinj-Sveta-Ana (Lika-Senj County, Općina Perušić)",3,"2,000-500 BP",6,15,0.2592550814151764,44.7066035,15.269391999999998,europe,4813.725083338624
+"Tian Shan, Central Steppe (Naryn Region, Naryn)",3,"2,000-500 BP",14,90,0.2593657970428467,41.48567462142858,75.69507934285716,asia,6625.798304474227
+Midlum (Friesland),3,"2,000-500 BP",7,21,0.2593875825405121,53.184298000000005,5.444313999999999,europe,5862.394890699221
+"Ostrów Lednicki (Greater Poland Province, Gniezno, Łubowo)",3,"2,000-500 BP",13,29,0.2594727575778961,52.52999999999999,17.38,europe,5211.030914901084
+"Altheim (Bayern, Niederbayern, Landshut-Landkreis)",3,"2,000-500 BP",4,6,0.2595632076263428,48.58,12.2,europe,5199.02667743979
+"Płońsk (Masovian Province, Płońsk)",3,"2,000-500 BP",17,14,0.25957316160202026,52.62,20.37,europe,5113.313017982768
+"Zeytinliada (Balikesir, Erdek)",3,"2,000-500 BP",5,10,0.25958776473999023,40.39,27.79,asia,3637.259768862073
+"Collegno (Piedmont, Turin)",3,"2,000-500 BP",24,253,0.25963160395622253,45.07919999999999,7.5783,europe,5413.990016671961
+"Qornet ed-Deir (Keserwan-Jbeil, Kesrouan)",3,"2,000-500 BP",4,6,0.25965672731399536,34.0522,35.7758,asia,3082.735304578322
+Kopenhagen (Zealand region),3,"2,000-500 BP",15,91,0.2596782147884369,55.67526799999999,12.568294000000002,europe,5679.882526877105
+"Trogir (Split-Dalmatia County, Grad Trogir, Matije Gupca 15)",3,"2,000-500 BP",6,15,0.25992199778556824,43.530795000000005,16.260043999999997,europe,4703.8574660066415
+"Szólád (Somogy County, Kaposvár)",3,"2,000-500 BP",38,591,0.2599374055862427,46.28333330000002,17.850000000000005,europe,4703.441766562768
+Ahlgade 15-17 (Holbæk),3,"2,000-500 BP",25,244,0.25998425483703613,55.72,11.71,europe,5719.493306869721
+"Szakony-Kavicsbánya-unknown-site-2 (Győr-Moson-Sopron County, Sopron)",3,"2,000-500 BP",4,6,0.2600320279598236,47.45028,16.80639,europe,4841.234918598202
+"Driffield Terrace (England, Yorkshire)",3,"2,000-500 BP",7,21,0.2600436806678772,53.958332999999996,-1.080278,europe,6287.715992634149
+"Sigtuna, cemetery 1 (Nunnnan)",3,"2,000-500 BP",4,6,0.2601189613342285,59.61731,17.72361,europe,5887.702056140093
+"Hinxton (England, South Cambridgeshire, East Anglia)",3,"2,000-500 BP",5,10,0.26018083095550537,52.08,0.18,europe,6135.263159015372
+"Emona (Ljubljana, Gosposvetska Road)",3,"2,000-500 BP",7,21,0.2602261006832123,46.05689999999999,14.505799999999997,europe,4921.041511403082
+"Timacum-Minus-Slog (Zaječar District, Knjaževac Municipality, Ravna)",3,"2,000-500 BP",11,45,0.2602536380290985,43.644999999999996,22.264999999999997,europe,4254.146590278723
+Vor Frue Kirkegård (Aalborg),3,"2,000-500 BP",15,59,0.2602766156196594,57.049999999999976,9.919999999999998,europe,5902.714648460593
+"Iznik-Basilica (Bursa, İznik)",3,"2,000-500 BP",9,36,0.2602778375148773,40.42,29.709999999999997,asia,3610.4618528474653
+"Niemcza (Lower Silesian Province, Dzierżoniów County, Niemcza)",3,"2,000-500 BP",20,70,0.2603108882904053,50.720000000000006,16.839999999999996,europe,5079.323223007032
+"Hvar-Radošević (Split-Dalmatia County, Grad Hvar)",3,"2,000-500 BP",23,209,0.2603258490562439,43.171910000000004,16.44216,europe,4681.622985958045
+"West Heslerton (England, North Yorkshire, Vale of Pickering)",3,"2,000-500 BP",48,898,0.2603825032711029,54.170989,-0.6057389999999999,europe,6268.111195430049
+"Bivio della Croce dei Missionari (Marche, Pesaro and Urbino, Urbino)",3,"2,000-500 BP",4,6,0.26056092977523804,43.7237164,12.6346536,europe,4994.8340260763125
+"Berel (East Kazakhstan Region, Katonkaragay District)",3,"2,000-500 BP",9,36,0.26056110858917236,49.3435,86.3711,asia,7513.910254552604
+"Hollow Banks (England, Scorton)",3,"2,000-500 BP",5,10,0.2605685591697693,54.39549999999999,-1.614,europe,6338.129981074623
+"Timacum-Minus-Kuline (Zaječar District, Knjaževac Municipality, Ravna)",3,"2,000-500 BP",6,15,0.2607881724834442,43.645,22.265,europe,4254.146590278724
+"Masłomęcz (Lublin Province, Hrubieszów County, Hrubieszów)",3,"2,000-500 BP",17,40,0.26084956526756287,50.72,23.89,europe,4824.879506536363
+"Alattyán-Tulát (Jász-Nagykun-Szolnok County, Jászapáti)",3,"2,000-500 BP",7,21,0.2608891725540161,47.506919999999994,20.123970000000003,europe,4655.226672923471
+"Klosterneuburg (Lower Austria, Pannonia province, Tulln)",3,"2,000-500 BP",6,15,0.26092514395713806,48.3099,16.323800000000002,europe,4926.508886838528
+"Tarquinia (Lazio, Viterbo)",3,"2,000-500 BP",7,21,0.26095953583717346,42.24997200000001,11.767892000000002,europe,5052.9019835093695
+"Ląd (Greater Poland Province, Słupca County, Lądek)",3,"2,000-500 BP",22,20,0.26100897789001465,52.21000000000001,17.889999999999997,europe,5161.902031926558
+"Eberdingen-Hochdorf ""Biegel"" (Baden-Württemberg, Ludwigsburg)",3,"2,000-500 BP",4,5,0.2611435353755951,48.88782209,9.001590684,europe,5425.1074779573955
+"Sisak-Pogorelec (Sisak-Moslavina County, Grad Sisak)",3,"2,000-500 BP",7,21,0.2611618936061859,45.483706999999995,16.376082,europe,4762.605228583949
+"Kiskundorozsma-Kettőshatár-1 (Csongrád-Csanád County, Szeged)",3,"2,000-500 BP",5,10,0.2611877918243408,46.38,20.08944,europe,4570.9954391270485
+"Tiszafüred-Majoros-halom (Borsod-Abaúj-Zemplén County, Mezőkövesd)",3,"2,000-500 BP",6,15,0.26122674345970154,47.74269,20.75278,europe,4643.232419801861
+"İznik-Yenişehirkapı (Bursa, İznik)",3,"2,000-500 BP",5,10,0.2613299489021301,40.42,29.71,asia,3610.4618528474653
+"Samantaş (Muğla, Yatağan)",3,"2,000-500 BP",7,21,0.26136574149131775,37.339999999999996,28.039999999999996,asia,3306.7079765267517
+"Viminacium-Pirivoj (Braničevo District, Požarevac Municipality, Kostolac)",3,"2,000-500 BP",25,150,0.2614162564277649,44.7167,21.166700000000002,europe,4391.798195453113
+"Ackerhof (Thüringen, Thüringen, Erfurt-Kreisfreie Stadt)",3,"2,000-500 BP",33,338,0.2614210247993469,50.978877,11.027447,europe,5409.120022961602
+"Ovilava (Upper Austria, Wels)",3,"2,000-500 BP",5,10,0.26147037744522095,48.1499777,14.033749500000003,europe,5057.552055700198
+Ej-Jaouze Tombs (Mount Lebanon),3,"2,000-500 BP",4,6,0.2616276741027832,33.8522,35.8292,asia,3071.2280439802203
+"L'Esquerda (Catalonia, Barcelona, Roda de Ter)",3,"2,000-500 BP",10,7,0.2616305947303772,41.981377,2.309824,europe,5833.184905137815
+"Casale del Dolce (Lazio, Frosinone)",3,"2,000-500 BP",4,6,0.2616890072822571,41.684979,13.149861,europe,4939.161205893845
+"Sigtuna, church 1 (St. Gertrud)",3,"2,000-500 BP",5,10,0.2616989314556122,59.617309999999996,17.72361,europe,5887.702056140091
+"Tilbeşar-Höyük (Gaziantep, Oğuzeli)",3,"2,000-500 BP",7,19,0.26173529028892517,36.87,37.54,asia,3420.9807225478394
+"Dara (Mardin, Artuklu)",3,"2,000-500 BP",5,10,0.26179003715515137,37.177,40.952,asia,3663.9019745114133
+"Sükösd-Ságod (Bács-Kiskun County, Jánoshalma)",3,"2,000-500 BP",6,15,0.26189565658569336,46.286,19.101920000000003,europe,4623.99836136073
+"Szeged-Makkoserdő (Csongrád-Csanád County, Hódmezővásárhely)",3,"2,000-500 BP",5,10,0.2619239091873169,46.40256,20.27403,europe,4561.934144158055
+"Viminacium-Pécine (Braničevo District, Požarevac Municipality, Kostolac)",3,"2,000-500 BP",10,24,0.2619892954826355,44.7167,21.1667,europe,4391.798195453114
+"Pons Saravi-Marxberg (Grand Est Region, Moselle Department, Sarrebourg arrondissement)",3,"2,000-500 BP",11,55,0.2620859444141388,48.7327,7.052599999999999,europe,5551.492503838151
+"Ibrány-Esbóhalom (Szabolcs-Szatmár-Bereg County, Ibrány)",3,"2,000-500 BP",8,28,0.262101411819458,48.21647,21.81072,europe,4638.108718206334
+"Beniamin (Shirak Province, Akhuryan District)",3,"2,000-500 BP",11,55,0.26215872168540955,40.68849999999999,43.84929999999999,asia,4106.958638665685
+"Sidon (Liban-Sud, Saida)",3,"2,000-500 BP",9,36,0.26216062903404236,33.560556,35.398056,asia,3019.898650273316
+"Crypta Balbi (Lazio, Rome)",3,"2,000-500 BP",7,21,0.2621621787548065,41.894776400000005,12.476265800000002,europe,4994.548808565807
+"Junmachanyilian (Xinjiang, Yili Region, Tekesi County)",3,"2,000-500 BP",4,5,0.2621690034866333,43.22,81.84,asia,7137.162448514953
+"Sipar (Istria County, Grad Umag)",3,"2,000-500 BP",7,21,0.2621849775314331,45.46729299999999,13.506564999999998,europe,4971.190568193428
+"Kecskemét-Mindszenti-dűlő-2 (Bács-Kiskun County, Kecskemét)",3,"2,000-500 BP",8,28,0.2622146010398865,46.858919,19.718868,europe,4627.296674128471
+"Isola Sacra (Lazio, Rome)",3,"2,000-500 BP",19,171,0.26228854060173035,41.74788209999999,12.259474899999999,europe,5012.852612471557
+"Venosa (Basilicata, Potenza)",3,"2,000-500 BP",16,52,0.26230689883232117,40.968228,15.827097,europe,4719.612542634391
+"Miroiço (Lisbon, Cascais)",3,"2,000-500 BP",8,28,0.26231807470321655,38.7261,-9.3653,europe,6873.479029666991
+"Szeged-Fehértó-A (Csongrád-Csanád County, Szeged)",3,"2,000-500 BP",4,6,0.2623313069343567,46.33625,20.12286,europe,4565.889461667076
+"ANAS necropolis (Lazio, Rome, Acilia)",3,"2,000-500 BP",8,28,0.26246464252471924,41.8336869,12.468561,europe,4995.297691705836
+"Trogir-Dragulin (Split-Dalmatia County, Grad Trogir)",3,"2,000-500 BP",7,21,0.26252418756484985,43.52498400000001,16.252825,europe,4704.289705330727
+"Sárrétudvari-Hízóföld (Hajdú-Bihar County, Püspökladány)",3,"2,000-500 BP",10,45,0.26253587007522583,47.30525,21.21411,europe,4583.7138595709675
+"Vörs-Papkert-B (Zala County, Keszthely)",3,"2,000-500 BP",9,35,0.26256054639816284,46.80031,17.3095,europe,4769.268367345946
+"Worth Matravers (England, Dorset)",3,"2,000-500 BP",18,32,0.262763112783432,50.60009089999999,-2.0369505000000006,europe,6237.183105113721
+"Szeged-Kundomb (Csongrád-Csanád County, Szeged)",3,"2,000-500 BP",5,10,0.26283156871795654,46.22894,20.264,europe,4549.898785123059
+"El Castillón (Andalusia, Granada, Montefrío)",3,"2,000-500 BP",9,25,0.26287803053855896,37.3244444,-4.0058333,europe,6472.358895307996
+"Hajdúnánás-Fürj-halom-dűlő-2-M3 / 40A (Hajdú-Bihar County, Hajdúnánás)",3,"2,000-500 BP",8,28,0.26289260387420654,47.857447,21.357433,europe,4625.032111907119
+"Viminacium-Vise-Grobalja (Braničevo District, Požarevac Municipality, Kostolac)",3,"2,000-500 BP",11,36,0.26292139291763306,44.73199999999999,21.234000000000005,europe,4388.373532076825
+"Székkutas-Kápolnadűlő (Csongrád-Csanád County, Hódmezővásárhely)",3,"2,000-500 BP",5,10,0.2629290223121643,46.56361,20.57267,europe,4557.110528215004
+"Villa Magna (Lazio, Rome)",3,"2,000-500 BP",14,91,0.2630355656147003,41.687731200000016,13.086495299999997,europe,4944.413783431638
+"Homokmégy-Székes (Bács-Kiskun County, Kalocsa)",3,"2,000-500 BP",9,36,0.26306766271591187,46.54156,19.128,europe,4639.495359515358
+"Cancelleria (Lazio, Rome)",3,"2,000-500 BP",8,28,0.26307108998298645,41.8964977,12.4718662,europe,4994.9103130219955
+"Boğazköy-Ḫattuša (Çorum, Boğazkale)",3,"2,000-500 BP",4,6,0.2631374001502991,40.021,34.613,asia,3607.493369653889
+"Sándorfalva-Eperjes-unknown-site-2 (Csongrád-Csanád County, Kistelek)",3,"2,000-500 BP",7,21,0.26323381066322327,46.48593999999999,20.13222,europe,4576.216305302536
+"Mausoleo di Augusto (Lazio, Rome)",3,"2,000-500 BP",5,10,0.2632642388343811,41.9060311,12.4742324,europe,4994.7005136730195
+"Stratonikeia-West-Church (Muğla, Yatağan)",3,"2,000-500 BP",9,36,0.26330703496932983,37.3,28.03,asia,3302.8092815772325
+"Trogir-Dobrić (Split-Dalmatia County, Općina Marina)",3,"2,000-500 BP",4,6,0.2633768320083618,43.51859,16.13651,europe,4713.312219811138
+"Necropoli Salaria-Via Paisiello (Lazio, Rome)",3,"2,000-500 BP",6,15,0.2634165585041046,41.917993700000004,12.4912439,europe,4993.27674868792
+"Necropoli Salaria-Via Rossini (Lazio, Rome)",3,"2,000-500 BP",5,10,0.26356053352355957,41.9206851,12.4894765,europe,4993.419537617643
+"Marcellino & Pietro (Lazio, Rome)",3,"2,000-500 BP",6,15,0.2636788785457611,41.8891604,12.500704999999998,europe,4992.534691859735
+"Valencia, Carrer Sagunto 49 (Valencian Community, Valencia, Valencia)",3,"2,000-500 BP",7,5,0.26367899775505066,39.469699999999996,-0.37740000000000007,europe,6102.898224261703
+"Nagytarcsa-Homokbánya (Pest County, Aszód)",3,"2,000-500 BP",4,6,0.2636898159980774,47.61303,19.42633,europe,4700.506284326497
+"Necrópolis Centre de Visitants (Catalonia, Girona, Empúries)",3,"2,000-500 BP",9,13,0.2637466788291931,42.1333,3.1083,europe,5765.982271594539
+"Centocelle (Lazio, Rome)",3,"2,000-500 BP",4,6,0.2641209065914154,41.844153,12.5490107,europe,4988.613044266666
+"Pla de l'Horta (Catalonia, Girona, Sarrià de Ter)",3,"2,000-500 BP",9,12,0.2641254961490631,42.01656,2.814897,europe,5791.265363978013
+"Ulaangom (Uvs Province, Ulaangom District, Chandman Uul)",3,"2,000-500 BP",6,12,0.2641777992248535,49.999824,92.033372,asia,7923.489321649411
+"Monterotondo (Lazio, Rome)",3,"2,000-500 BP",5,10,0.26424649357795715,42.0659019,12.5866474,europe,4985.313947156205
+"Tian Shan, Central Steppe (Issyk-Kul Region, Jeti-Oguz)",3,"2,000-500 BP",6,15,0.2643359303474426,42.156944,77.405556,asia,6771.180237652905
+"San Ercolano (Lazio, Rome)",3,"2,000-500 BP",5,10,0.2643638253211975,41.7552257,12.2948926,europe,5009.892942034746
+"Osh Province, Alai Valley, Alai / Nura I, II, Tuyuk II Mounds",3,"2,000-500 BP",7,19,0.2645002007484436,41.410000000000004,71.5,asia,6276.647289663615
+"Plaza Einstein (Andalusia, Granada, Granada)",3,"2,000-500 BP",4,5,0.2646287977695465,37.1775,-3.6091667,europe,6444.302867300485
+"Sant Julià de Ramis (Catalonia, Girona, Sant Julià de Ramis)",3,"2,000-500 BP",7,12,0.26497936248779297,42.0507,2.8670000000000004,europe,5786.628478048504
+"Konyrtobe (Turkistan Region, Keles District)",3,"2,000-500 BP",7,21,0.265076607465744,41.415234,68.798064,asia,6053.2027684086115
+"Roopkund (Indian Himalayan Region, Uttarakhand state)",3,"2,000-500 BP",23,210,0.2654057741165161,30.247204600000007,79.73739619999998,asia,7095.931568613554
+"Magyarhomorog-Kónyadomb (Hajdú-Bihar County, Berettyóújfalu)",3,"2,000-500 BP",9,36,0.2657111883163452,47.07222,21.67994,europe,4541.315650022047
+"Kiskundorozsma-Daruhalom-dűlő (Csongrád-Csanád County, Szeged)",3,"2,000-500 BP",4,6,0.2657913565635681,46.38,20.08944,europe,4570.9954391270485
+"Oylum-Höyük (Kilis, Kilis (merkez))",3,"2,000-500 BP",4,6,0.26579535007476807,36.69,37.17,asia,3384.501654751244
+"Szegvár-Szőlőkalja (Csongrád-Csanád County, Szentes)",3,"2,000-500 BP",6,15,0.26589271426200867,46.71644,20.316419999999997,europe,4583.002813936731
+"Püspökladány-Eperjesvölgy (Hajdú-Bihar County, Püspökladány)",3,"2,000-500 BP",13,78,0.2660415768623352,47.368219999999994,21.120720000000002,europe,4593.603577800584
+"Pitvaros-Víztározó (Békés County, Mezőkovácsháza)",3,"2,000-500 BP",5,10,0.2662109136581421,46.30439,20.85797,europe,4521.427245085587
+Karos-2 (Borsod-Abaúj-Zemplén County),3,"2,000-500 BP",7,21,0.2662898600101471,48.460359999999994,21.806389999999997,europe,4660.97875030943
+"Makó-Mikócsa-halom (Csongrád-Csanád County, Makó)",3,"2,000-500 BP",7,21,0.2664775252342224,46.21672,20.516719999999996,europe,4534.291459245786
+"Uguumur-Uul (Selenge Province, Sant District)",3,"2,000-500 BP",8,19,0.2665948271751404,49.248364,105.377512,asia,8887.024347211442
+"Barikot (Khyber-Pakhtunkwa, Swat Valley)",3,"2,000-500 BP",4,6,0.26660144329071045,34.7570056,72.3623806,asia,6338.715109253797
+"Burkhan-Tolgoi (Arkhangai Province, Ögiinuur District, Tamiryn Ulaan Khoshuu)",3,"2,000-500 BP",10,45,0.2666829526424408,47.799255,102.36124199999999,asia,8694.908111931929
+"Árkus-Homokbánya (Hajdú-Bihar County, Balmazújváros)",3,"2,000-500 BP",17,136,0.2666975259780884,47.59417,21.05047,europe,4616.273324148931
+"Madaras-Téglavető (Bács-Kiskun County, Bácsalmás)",3,"2,000-500 BP",4,6,0.2667001485824585,46.10494,19.38319,europe,4594.635667167764
+"Orosháza-BónumTéglagyár (Békés County, Békéscsaba)",3,"2,000-500 BP",5,10,0.26687929034233093,46.65006,20.71992,europe,4555.689263043406
+Kunpeszér-Felsőpeszéri út (Bács-Kiskun County),3,"2,000-500 BP",27,301,0.26707401871681213,47.126999999999995,19.261,europe,4673.059186948272
+"Olon-Dov (Arkhangai Province, Khotont District)",3,"2,000-500 BP",11,55,0.2670782804489136,47.11078,102.078841,asia,8686.177190654038
+"Hajdúnánás (Hajdú-Bihar County, Hajdúnánás)",3,"2,000-500 BP",18,109,0.26739975810050964,47.841,21.423999999999996,europe,4620.585303293052
+"Algyő-258-kútkörzet (Csongrád-Csanád County, Hódmezővásárhely)",3,"2,000-500 BP",4,6,0.2674846351146698,46.4775,20.34697,europe,4563.299629042585
+"Rákóczifalva-Bagi-földek (Jász-Nagykun-Szolnok Coiunty, Szolnok)",3,"2,000-500 BP",341,51121,0.26758867502212524,47.07499999999999,20.226000000000003,europe,4615.601559410412
+"Szegvár-Oromdűlő (Csongrád-Csanád County, Szentes)",3,"2,000-500 BP",9,36,0.2684609293937683,46.71644,20.31642,europe,4583.002813936731
+"Szarvas-Grexatéglagyár (Jász-Nagykun-Szolnok County, Mezőtúr)",3,"2,000-500 BP",8,28,0.26903384923934937,46.97997,20.55983,europe,4590.250849128208
+"Kulubnarti 21-R-2 (Nubia, Batn El Hajar, R Cemetery)",3,"2,000-500 BP",27,103,0.27619361877441406,21.070453000000004,30.664028000000002,africa,1555.3800175405902
+"Kulubnarti 21-S-46 (Nubia, Batn El Hajar, S Cemetery)",3,"2,000-500 BP",39,524,0.2771264910697937,21.070453000000008,30.664027999999988,africa,1555.380017540591
+Mtwapa (Kilifi),3,"2,000-500 BP",34,108,0.2854231297969818,-3.9534999999999996,39.7565,africa,1453.4658955511868

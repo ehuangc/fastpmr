@@ -1,9 +1,11 @@
 """
-Plot median within-site pairwise mismatch rate (PMR) over space and time.
+1) Plot median within-site pairwise mismatch rate (PMR) over space and time.
 
-For each (locality, time bin) cell with at least MIN_PAIRS_PER_CELL within-site
-sample pairs with site overlap > OVERLAP_THRESHOLD, the median PMR is plotted
-on a global map stratified by time period.
+   For each (locality, time bin) cell with at least MIN_PAIRS_PER_CELL within-site
+   sample pairs with site overlap > OVERLAP_THRESHOLD, the median PMR is plotted
+   on a global map stratified by time period.
+
+2) Plot within-site PMR vs. migratory distance from Addis Ababa, Ethiopia.
 """
 
 from pathlib import Path
@@ -13,6 +15,10 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import reverse_geocoder as rg
+import seaborn as sns
+from haversine import haversine
+from scipy import stats
 
 from evaluation_utils import (
     AADR_ANOMALOUS_LOCALITY_PREFIXES,
@@ -30,19 +36,95 @@ from evaluation_utils import (
     load_aadr_npz_arrays,
 )
 
-OUTPUT_DIR = AADR_DIR / "results" / "maps"
+OUTPUT_DIR = AADR_DIR / "results" / "plots"
 MAP_PATH = OUTPUT_DIR / "pmr_map_by_time.pdf"
-CELLS_CSV_PATH = OUTPUT_DIR / "pmr_map_cells.csv"
+REGRESSION_PATH = OUTPUT_DIR / "pmr_vs_migratory_distance.pdf"
+CELLS_CSV_PATH = OUTPUT_DIR / "sites.csv"
 
 OVERLAP_THRESHOLD = 30_000
 MIN_PAIRS_PER_CELL = 5
-
 TIME_BINS: list[tuple[float, float, str]] = [
     (10_000.0, np.inf, ">10,000 BP"),
     (5_000.0, 10_000.0, "10,000-5,000 BP"),
     (2_000.0, 5_000.0, "5,000-2,000 BP"),
     (500.0, 2_000.0, "2,000-500 BP"),
 ]
+
+# Waypoints approximate overland routes around major water bodies, inspired by the
+# approach of Ramachandran et al. 2005 (https://doi.org/10.1073/pnas.0507611102).
+WAYPOINT_COORDS = {
+    "addis_ababa": (9, 38),
+    "cairo": (30, 31),
+    "istanbul": (41, 28),
+    "phnom_penh": (11, 104),
+    "anadyr": (64, 177),
+    "prince_rupert": (54, -130),
+}
+REGION_PATHS = {
+    "africa": ["addis_ababa"],
+    "asia": ["addis_ababa", "cairo"],
+    "europe": ["addis_ababa", "cairo", "istanbul"],
+    "oceania": ["addis_ababa", "cairo", "phnom_penh"],
+    "americas": ["addis_ababa", "cairo", "anadyr", "prince_rupert"],
+}
+# fmt: off
+COUNTRY_TO_REGION: dict[str, str] = {
+    # ── Africa ──
+    "AO": "africa", "BF": "africa", "BI": "africa", "BJ": "africa", "BW": "africa", "CD": "africa", "CF": "africa",
+    "CG": "africa", "CI": "africa", "CM": "africa", "CV": "africa", "DJ": "africa", "DZ": "africa", "EG": "africa",
+    "EH": "africa", "ER": "africa", "ET": "africa", "GA": "africa", "GH": "africa", "GM": "africa", "GN": "africa",
+    "GQ": "africa", "GW": "africa", "KE": "africa", "KM": "africa", "LR": "africa", "LS": "africa", "LY": "africa",
+    "MA": "africa", "MG": "africa", "ML": "africa", "MR": "africa", "MU": "africa", "MW": "africa", "MZ": "africa",
+    "NA": "africa", "NE": "africa", "NG": "africa", "RE": "africa", "RW": "africa", "SC": "africa", "SD": "africa",
+    "SH": "africa", "SL": "africa", "SN": "africa", "SO": "africa", "SS": "africa", "ST": "africa", "SZ": "africa",
+    "TD": "africa", "TG": "africa", "TN": "africa", "TZ": "africa", "UG": "africa", "YT": "africa", "ZA": "africa",
+    "ZM": "africa", "ZW": "africa",
+    # ── Asia ──
+    "AE": "asia", "AF": "asia", "AM": "asia", "AZ": "asia", "BD": "asia", "BH": "asia", "BN": "asia",
+    "BT": "asia", "CN": "asia", "CY": "asia", "GE": "asia", "HK": "asia", "ID": "asia", "IL": "asia",
+    "IN": "asia", "IQ": "asia", "IR": "asia", "JO": "asia", "JP": "asia", "KG": "asia", "KH": "asia",
+    "KP": "asia", "KR": "asia", "KW": "asia", "KZ": "asia", "LA": "asia", "LB": "asia", "LK": "asia",
+    "MM": "asia", "MN": "asia", "MO": "asia", "MV": "asia", "MY": "asia", "NP": "asia", "OM": "asia",
+    "PH": "asia", "PK": "asia", "PS": "asia", "QA": "asia", "RU": "asia", "SA": "asia", "SG": "asia",
+    "SY": "asia", "TH": "asia", "TJ": "asia", "TL": "asia", "TM": "asia", "TR": "asia", "TW": "asia",
+    "UZ": "asia", "VN": "asia", "YE": "asia",
+    # ── Europe ──
+    "AD": "europe", "AL": "europe", "AT": "europe", "AX": "europe", "BA": "europe", "BE": "europe",
+    "BG": "europe", "BY": "europe", "CH": "europe", "CZ": "europe", "DE": "europe", "DK": "europe",
+    "EE": "europe", "ES": "europe", "FI": "europe", "FO": "europe", "FR": "europe", "GB": "europe",
+    "GG": "europe", "GI": "europe", "GR": "europe", "HR": "europe", "HU": "europe", "IE": "europe",
+    "IM": "europe", "IS": "europe", "IT": "europe", "JE": "europe", "LI": "europe", "LT": "europe",
+    "LU": "europe", "LV": "europe", "MC": "europe", "MD": "europe", "ME": "europe", "MK": "europe",
+    "MT": "europe", "NL": "europe", "NO": "europe", "PL": "europe", "PT": "europe", "RO": "europe",
+    "RS": "europe", "SE": "europe", "SI": "europe", "SJ": "europe", "SK": "europe", "SM": "europe",
+    "UA": "europe", "VA": "europe", "XK": "europe",
+    # ── Oceania ──
+    "AS": "oceania", "AU": "oceania", "CK": "oceania", "FJ": "oceania", "FM": "oceania", "GU": "oceania",
+    "KI": "oceania", "MH": "oceania", "MP": "oceania", "NC": "oceania", "NF": "oceania", "NR": "oceania",
+    "NU": "oceania", "NZ": "oceania", "PF": "oceania", "PG": "oceania", "PN": "oceania", "PW": "oceania",
+    "SB": "oceania", "TK": "oceania", "TO": "oceania", "TV": "oceania", "VU": "oceania", "WF": "oceania",
+    "WS": "oceania",
+    # ── Americas ──
+    "AG": "americas", "AI": "americas", "AR": "americas", "AW": "americas", "BB": "americas", "BL": "americas",
+    "BM": "americas", "BO": "americas", "BQ": "americas", "BR": "americas", "BS": "americas", "BZ": "americas",
+    "CA": "americas", "CL": "americas", "CO": "americas", "CR": "americas", "CU": "americas", "CW": "americas",
+    "DM": "americas", "DO": "americas", "EC": "americas", "FK": "americas", "GD": "americas", "GF": "americas",
+    "GL": "americas", "GP": "americas", "GT": "americas", "GY": "americas", "HN": "americas", "HT": "americas",
+    "JM": "americas", "KN": "americas", "KY": "americas", "LC": "americas", "MF": "americas", "MQ": "americas",
+    "MS": "americas", "MX": "americas", "NI": "americas", "PA": "americas", "PE": "americas", "PM": "americas",
+    "PR": "americas", "PY": "americas", "SR": "americas", "SV": "americas", "SX": "americas", "TC": "americas",
+    "TT": "americas", "US": "americas", "UY": "americas", "VC": "americas", "VE": "americas", "VG": "americas",
+    "VI": "americas",
+    # ── Miscellaneous territories ──
+    "CC": "oceania", "CX": "oceania",  # Cocos/Christmas Islands (AU territory)
+    "HM": "oceania",  # Heard/McDonald Islands (AU territory)
+    "IO": "asia",  # British Indian Ocean Territory (nearest path via Cairo→India)
+    "TF": "africa",  # French Southern Territories (least-wrong among five regions)
+    "UM": "oceania",  # US Minor Outlying Islands
+}
+# fmt: on
+# US Pacific territories that reverse_geocoder reports as "US" but should classify as Oceania.
+US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 
 def filter_and_extract(
@@ -233,6 +315,78 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
+def classify_cells(cells: list[tuple[float, float]]) -> list[str]:
+    """Classify (lat, lon) cells into regions using reverse_geocoder."""
+    results = rg.search(cells)
+    regions: list[str] = []
+    for (lat, lon), result in zip(cells, results, strict=True):
+        cc = result["cc"]
+        # US Pacific territories (Guam, CNMI) are returned as "US" by reverse_geocoder
+        if cc == "US" and (result["admin1"] in US_OCEANIA_ADMIN1 or (lon > 144 and lat < 25)):
+            regions.append("oceania")
+            continue
+        region = COUNTRY_TO_REGION[cc]
+        regions.append(region)
+    return regions
+
+
+def migratory_distance(lat: float, lon: float, region: str) -> float:
+    """Approximate migratory distance (km) from Addis Ababa to (lat, lon).
+
+    Routes through a fixed sequence of waypoints determined by the
+    destination's geographic region, then adds the great-circle distance
+    from the last waypoint to the destination.
+    """
+    path = REGION_PATHS[region]
+    total = 0.0
+    for i in range(len(path) - 1):
+        total += haversine(WAYPOINT_COORDS[path[i]], WAYPOINT_COORDS[path[i + 1]])
+    total += haversine(WAYPOINT_COORDS[path[-1]], (lat, lon))
+    return total
+
+
+def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> None:
+    """Scatter plot + linear regression of within-site PMR vs. migratory distance."""
+    x = cells["migratory_distance_km"].to_numpy() / 1_000  # Thousands of km
+    y = cells["median_pmr"].to_numpy()
+    slope, intercept, r_value, p_value, _se = stats.linregress(x, y)
+    p_exponent = int(np.floor(np.log10(p_value)))
+    p_mantissa = p_value / 10**p_exponent
+
+    fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
+    palette = sns.color_palette("colorblind")
+    colors = [palette[i] for i in (0, 1, 4, 2)]  # Blue, orange, purple, teal
+    for bin_i, (_low, _high, label) in enumerate(TIME_BINS):
+        mask = cells["bin_idx"].to_numpy() == bin_i
+        ax.scatter(
+            x[mask],
+            y[mask],
+            label=label,
+            color=colors[bin_i],
+            s=30,
+            alpha=0.7,
+            edgecolor="black",
+            linewidth=0.3,
+        )
+    sns.regplot(
+        x=x,
+        y=y,
+        ci=95,
+        scatter=False,
+        color="black",
+        line_kws={"linewidth": 1.5, "alpha": 0.7},
+        label=f"OLS ($R^2 = {r_value**2:.3f}$, $p = {p_mantissa:.1f} \\times 10^{{{p_exponent}}}$)",
+        ax=ax,
+    )
+    ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=12)
+    ax.set_ylabel("Median within-site PMR", fontsize=12)
+    ax.set_title('Within-site PMR vs. migratory "Out of Africa" distance', fontsize=13)
+    ax.legend(fontsize=9, loc="upper right")
+
+    fig.savefig(output_path, dpi=600)
+    plt.close(fig)
+
+
 def main() -> None:
     ensure_aadr_npz_present(AADR_NPZ_PATH, AADR_METADATA_PATH)
     samples, site_overlaps, mismatch_rates, _mismatch_rates_95_ci_lower, _mismatch_rates_95_ci_upper, covered_snps = (
@@ -249,6 +403,13 @@ def main() -> None:
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     cells_sorted = cells.sort_values(["bin_idx", "median_pmr"]).reset_index(drop=True)
+    cell_coords = list(zip(cells_sorted["lat"], cells_sorted["lon"], strict=True))
+    cell_regions = classify_cells(cell_coords)
+    cells_sorted["region"] = cell_regions
+    cells_sorted["migratory_distance_km"] = [
+        migratory_distance(lat, lon, region)
+        for lat, lon, region in zip(cells_sorted["lat"], cells_sorted["lon"], cell_regions, strict=True)
+    ]
     cells_sorted.to_csv(CELLS_CSV_PATH, index=False)
 
     counts = cells_sorted.groupby("bin_label", sort=False).size().to_dict()
@@ -258,6 +419,9 @@ def main() -> None:
 
     plot_map(cells_sorted, MAP_PATH)
     print(f"\nWrote PMR map to {MAP_PATH}.")
+
+    plot_pmr_vs_migratory_distance(cells_sorted, REGRESSION_PATH)
+    print(f"Wrote PMR vs. migratory distance plot to {REGRESSION_PATH}.")
 
 
 if __name__ == "__main__":
