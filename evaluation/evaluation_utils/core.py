@@ -23,7 +23,7 @@ AADR_RUNS = 1
 AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 AADR_METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
 # Localities with sample pairs that have anomalously low PMRs
-AADR_ANOMALOUS_LOCALITY_PREFIXES = ("Gurgy Les Noisats", "Valdescusa")
+AADR_ANOMALOUS_LOCALITY_PREFIXES = "Valdescusa"
 
 # AADR metadata field names
 LAT_FIELD = "Lat."
