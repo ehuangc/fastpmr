@@ -356,6 +356,8 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
     fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
     palette = sns.color_palette("colorblind")
     colors = [palette[i] for i in (0, 1, 4, 2)]  # Blue, orange, purple, teal
+    n_pairs = cells["n_pairs"].to_numpy()
+    sizes = 20 + 3 * np.clip(n_pairs, 0, 20)
     for bin_i, (_low, _high, label) in enumerate(TIME_BINS):
         mask = cells["bin_idx"].to_numpy() == bin_i
         ax.scatter(
@@ -363,7 +365,7 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
             y[mask],
             label=label,
             color=colors[bin_i],
-            s=30,
+            s=sizes[mask],
             alpha=0.7,
             edgecolor="black",
             linewidth=0.3,
