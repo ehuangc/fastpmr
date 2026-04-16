@@ -4,7 +4,7 @@ Tests for classify_cells region classification.
 
 import pytest
 
-from aadr.plot_pmr_maps import classify_cells
+from aadr.plot_aadr_results import classify_cells
 
 
 @pytest.mark.parametrize(

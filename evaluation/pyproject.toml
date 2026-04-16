@@ -44,7 +44,7 @@ reverse_geocoder = ">=1.5.1, <2"
 prepare-aadr = "python aadr/prepare_aadr_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr_aadr.py"
 scan-aadr = "python aadr/scan_aadr_pmrs.py"
-plot-aadr = "python aadr/plot_pmr_maps.py"
+plot-aadr = "python aadr/plot_aadr_results.py"
 
 prepare-performance = "python performance/prepare_indo_european_data.py"
 pairs-benchmark = "python performance/pair_count_benchmark.py"
