@@ -79,7 +79,7 @@ from zipfile import ZipFile
 path = "fastpmr_output/fastpmr_results.npz"
 
 # Load numpy arrays
-data = np.load(path)
+data = np.load(path, allow_pickle=False)
 covered_snps = data["covered_snps"]          # 1D array (n_samples,)
 mismatch_rates = data["mismatch_rates"]      # 2D symmetric matrix (n_samples, n_samples)
 n_site_overlaps = data["n_site_overlaps"]    # 2D symmetric matrix (n_samples, n_samples)
