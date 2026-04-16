@@ -30,6 +30,7 @@ from evaluation_utils import (
     LOCALITY_FIELD,
     LON_FIELD,
     MASTER_ID_FIELD,
+    PUBLICATION_FIELD,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
     load_aadr_metadata,
@@ -133,10 +134,10 @@ def filter_and_extract(
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
     metadata: dict[str, dict[str, str]],
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     # First pass: collect every sample that passes the per-sample filters,
     # along with its Master ID and covered-SNP count for deduplication.
-    candidates: list[tuple[int, float, float, float, str]] = []
+    candidates: list[tuple[int, float, float, float, str, str]] = []
     candidate_master_ids: list[str] = []
     candidate_covered_snps: list[int] = []
 
@@ -162,7 +163,8 @@ def filter_and_extract(
             continue
 
         master_id = sample_metadata[MASTER_ID_FIELD].strip()
-        candidates.append((sample_idx, lat, lon, date, locality))
+        publication = sample_metadata[PUBLICATION_FIELD].strip()
+        candidates.append((sample_idx, lat, lon, date, locality, publication))
         candidate_master_ids.append(master_id)
         candidate_covered_snps.append(int(covered_snps[sample_idx]))
 
@@ -183,7 +185,8 @@ def filter_and_extract(
     lons: list[float] = []
     dates: list[float] = []
     localities: list[str] = []
-    for pos, (sample_idx, lat, lon, date, locality) in enumerate(candidates):
+    publications: list[str] = []
+    for pos, (sample_idx, lat, lon, date, locality, publication) in enumerate(candidates):
         if pos not in selected_positions:
             continue
         keep.append(sample_idx)
@@ -191,6 +194,7 @@ def filter_and_extract(
         lons.append(lon)
         dates.append(date)
         localities.append(locality)
+        publications.append(publication)
 
     keep_arr = np.asarray(keep, dtype=int)
     return (
@@ -200,6 +204,7 @@ def filter_and_extract(
         np.asarray(lons, dtype=float),
         np.asarray(dates, dtype=float),
         np.asarray(localities, dtype=object),
+        np.asarray(publications, dtype=object),
     )
 
 
@@ -212,12 +217,13 @@ def assign_time_bins(dates: np.ndarray) -> np.ndarray:
 
 
 def compute_site_cells(
+    bin_indices: np.ndarray,
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
     lats: np.ndarray,
     lons: np.ndarray,
     localities: np.ndarray,
-    bin_indices: np.ndarray,
+    publications: np.ndarray,
 ) -> pd.DataFrame:
     """For each (locality, time bin) group with enough valid within-site pairs,
     compute median PMR + mean coordinates."""
@@ -230,6 +236,7 @@ def compute_site_cells(
     rows: list[dict[str, object]] = []
     for (locality, bin_idx), sample_indices in groups.items():
         sample_indices_arr = np.asarray(sample_indices, dtype=int)
+        pubs = sorted({publications[i] for i in sample_indices_arr if publications[i]})
         sub_rates = mismatch_rates[np.ix_(sample_indices_arr, sample_indices_arr)]
         sub_overlaps = site_overlaps[np.ix_(sample_indices_arr, sample_indices_arr)]
 
@@ -244,6 +251,7 @@ def compute_site_cells(
         rows.append(
             {
                 "locality": locality,
+                "publications": "; ".join(pubs),
                 "bin_idx": bin_idx,
                 "bin_label": TIME_BINS[bin_idx][2],
                 "n_samples": len(sample_indices),
@@ -253,7 +261,7 @@ def compute_site_cells(
                 "lon": float(np.mean(lons[sample_indices_arr])),
             }
         )
-    columns = ["locality", "bin_idx", "bin_label", "n_samples", "n_pairs", "median_pmr", "lat", "lon"]
+    columns = ["locality", "publications", "bin_idx", "bin_label", "n_samples", "n_pairs", "median_pmr", "lat", "lon"]
     return pd.DataFrame.from_records(rows, columns=columns)
 
 
@@ -397,11 +405,13 @@ def main() -> None:
     metadata = load_aadr_metadata(AADR_METADATA_PATH)
     assert len(samples) == mismatch_rates.shape[0] == site_overlaps.shape[0]
 
-    site_overlaps_filt, mismatch_rates_filt, lats, lons, dates, localities = filter_and_extract(
+    site_overlaps_filt, mismatch_rates_filt, lats, lons, dates, localities, publications = filter_and_extract(
         samples, covered_snps, site_overlaps, mismatch_rates, metadata
     )
     bin_indices = assign_time_bins(dates)
-    cells = compute_site_cells(site_overlaps_filt, mismatch_rates_filt, lats, lons, localities, bin_indices)
+    cells = compute_site_cells(
+        bin_indices, site_overlaps_filt, mismatch_rates_filt, lats, lons, localities, publications
+    )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     cells_sorted = cells.sort_values(["bin_idx", "median_pmr"]).reset_index(drop=True)
