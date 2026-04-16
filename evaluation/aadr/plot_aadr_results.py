@@ -357,9 +357,7 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
     """Scatter plot + linear regression of within-site PMR vs. migratory distance."""
     x = cells["migratory_distance_km"].to_numpy() / 1_000  # Thousands of km
     y = cells["median_pmr"].to_numpy()
-    slope, intercept, r_value, p_value, _se = stats.linregress(x, y)
-    p_exponent = int(np.floor(np.log10(p_value)))
-    p_mantissa = p_value / 10**p_exponent
+    slope, intercept, r_value, _p_value, _se = stats.linregress(x, y)
 
     fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
     palette = sns.color_palette("colorblind")
@@ -385,7 +383,7 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
         scatter=False,
         color="black",
         line_kws={"linewidth": 1.5, "alpha": 0.7},
-        label=f"OLS ($R^2 = {r_value**2:.3f}$, $p = {p_mantissa:.1f} \\times 10^{{{p_exponent}}}$)",
+        label=f"OLS ($R^2 = {r_value**2:.3f}$)",
         ax=ax,
     )
     ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=12)
