@@ -388,7 +388,7 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
     )
     ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=12)
     ax.set_ylabel("Median within-site PMR", fontsize=12)
-    ax.set_title('Within-site PMR vs. migratory "Out of Africa" distance', fontsize=13)
+    ax.set_title('Median within-site PMR vs. migratory "Out of Africa" distance', fontsize=13)
     ax.legend(fontsize=9, loc="upper right")
 
     fig.savefig(output_path, dpi=600)
