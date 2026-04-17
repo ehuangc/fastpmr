@@ -1,10 +1,10 @@
 """
-Tests for classify_cells region classification.
+Tests for classify_coords region classification.
 """
 
 import pytest
 
-from aadr.plot_aadr_results import classify_cells
+from evaluation_utils import classify_coords
 
 
 @pytest.mark.parametrize(
@@ -71,13 +71,13 @@ from aadr.plot_aadr_results import classify_cells
         (-53.08, 73.50, "africa"),  # French Southern Territories (TF → africa)
     ],
 )
-def test_classify_cells(lat: float, lon: float, expected_region: str) -> None:
-    [region] = classify_cells([(lat, lon)])
+def test_classify_coords(lat: float, lon: float, expected_region: str) -> None:
+    [region] = classify_coords([(lat, lon)])
     assert region == expected_region, f"({lat}, {lon}): expected {expected_region}, got {region}"
 
 
-def test_classify_cells_batch_order() -> None:
+def test_classify_coords_batch_order() -> None:
     """Verify batch results match the input order."""
     cells = [(30, 31), (61, -150), (-33.87, 151.21)]
-    regions = classify_cells(cells)
+    regions = classify_coords(cells)
     assert regions == ["africa", "americas", "oceania"]

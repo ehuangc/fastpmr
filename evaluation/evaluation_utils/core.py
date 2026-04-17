@@ -13,6 +13,7 @@ from multiprocessing.connection import Connection
 from pathlib import Path
 
 import numpy as np
+import reverse_geocoder as rg
 
 EVALUATION_DIR = Path(__file__).resolve().parent.parent
 FASTPMR_BIN = "fastpmr"
@@ -101,6 +102,8 @@ COUNTRY_TO_REGION: dict[str, str] = {
 }
 # fmt: on
 EURASIA_REGIONS = {"asia", "europe"}
+# US Pacific territories that reverse_geocoder reports as "US" but should classify as Oceania.
+US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
 COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "southern_cone"
@@ -242,6 +245,19 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
             command = "pixi run prepare-performance"
             dataset = "Indo-European dataset"
         raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to download and unpack the {dataset}.")
+
+
+def classify_coords(coords: list[tuple[float, float]]) -> list[str]:
+    """Classify (lat, lon) coordinates into regions using reverse_geocoder."""
+    results = rg.search(coords)
+    regions: list[str] = []
+    for (lat, lon), result in zip(coords, results, strict=True):
+        cc = result["cc"]
+        if cc == "US" and (result["admin1"] in US_OCEANIA_ADMIN1 or (lon > 144 and lat < 25)):
+            regions.append("oceania")
+        else:
+            regions.append(COUNTRY_TO_REGION[cc])
+    return regions
 
 
 def measure_worker(command: str, conn: Connection) -> None:

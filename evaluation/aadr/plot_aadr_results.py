@@ -15,7 +15,6 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import reverse_geocoder as rg
 import seaborn as sns
 from haversine import haversine
 from scipy import stats
@@ -25,13 +24,13 @@ from evaluation_utils import (
     AADR_DIR,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
-    COUNTRY_TO_REGION,
     DATE_MEAN_BP_FIELD,
     INDIVIDUAL_ID_FIELD,
     LAT_FIELD,
     LOCALITY_FIELD,
     LON_FIELD,
     PUBLICATION_FIELD,
+    classify_coords,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
     load_aadr_metadata,
@@ -69,8 +68,6 @@ REGION_PATHS = {
     "oceania": ["addis_ababa", "cairo", "phnom_penh"],
     "americas": ["addis_ababa", "cairo", "anadyr", "prince_rupert"],
 }
-# US Pacific territories that reverse_geocoder reports as "US" but should classify as Oceania.
-US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 
 def filter_and_extract(
@@ -268,21 +265,6 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
-def classify_cells(cells: list[tuple[float, float]]) -> list[str]:
-    """Classify (lat, lon) cells into regions using reverse_geocoder."""
-    results = rg.search(cells)
-    regions: list[str] = []
-    for (lat, lon), result in zip(cells, results, strict=True):
-        cc = result["cc"]
-        # US Pacific territories (Guam, CNMI) are returned as "US" by reverse_geocoder
-        if cc == "US" and (result["admin1"] in US_OCEANIA_ADMIN1 or (lon > 144 and lat < 25)):
-            regions.append("oceania")
-            continue
-        region = COUNTRY_TO_REGION[cc]
-        regions.append(region)
-    return regions
-
-
 def migratory_distance(lat: float, lon: float, region: str) -> float:
     """Approximate migratory distance (km) from Addis Ababa to (lat, lon).
 
@@ -359,7 +341,7 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     cells_sorted = cells.sort_values(["bin_idx", "median_pmr"]).reset_index(drop=True)
     cell_coords = list(zip(cells_sorted["lat"], cells_sorted["lon"], strict=True))
-    cell_regions = classify_cells(cell_coords)
+    cell_regions = classify_coords(cell_coords)
     cells_sorted["region"] = cell_regions
     cells_sorted["migratory_distance_km"] = [
         migratory_distance(lat, lon, region)

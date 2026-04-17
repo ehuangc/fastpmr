@@ -3,7 +3,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import reverse_geocoder as rg
 from haversine import haversine
 
 from evaluation_utils import (
@@ -11,7 +10,6 @@ from evaluation_utils import (
     AADR_DIR,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
-    COUNTRY_TO_REGION,
     EURASIA_REGIONS,
     FULL_DATE_FIELD,
     GROUP_ID_FIELD,
@@ -22,6 +20,7 @@ from evaluation_utils import (
     POLITICAL_ENTITY_FIELD,
     PUBLICATION_FIELD,
     SKELETAL_CODE_FIELD,
+    classify_coords,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
     load_aadr_metadata,
@@ -39,11 +38,6 @@ IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
 FIRST_DEGREE_PMR_THRESHOLD = 0.18
 OVERLAP_THRESHOLD = 30000
-
-
-def classify_coords(coords: list[tuple[float, float]]) -> list[str]:
-    results = rg.search(coords)
-    return [COUNTRY_TO_REGION[r["cc"]] for r in results]
 
 
 def filter_samples(
