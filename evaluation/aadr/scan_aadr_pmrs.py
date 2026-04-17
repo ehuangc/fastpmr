@@ -3,6 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import reverse_geocoder as rg
 from haversine import haversine
 
 from evaluation_utils import (
@@ -10,6 +11,8 @@ from evaluation_utils import (
     AADR_DIR,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
+    COUNTRY_TO_REGION,
+    EURASIA_REGIONS,
     FULL_DATE_FIELD,
     GROUP_ID_FIELD,
     INDIVIDUAL_ID_FIELD,
@@ -37,8 +40,10 @@ NON_IDENTICAL_PMR_THRESHOLD = 0.17
 FIRST_DEGREE_PMR_THRESHOLD = 0.18
 OVERLAP_THRESHOLD = 30000
 
-EURASIA_LAT_RANGE = (0.0, 85.0)
-EURASIA_LON_RANGE = (-30.0, 180.0)
+
+def classify_coords(coords: list[tuple[float, float]]) -> list[str]:
+    results = rg.search(coords)
+    return [COUNTRY_TO_REGION[r["cc"]] for r in results]
 
 
 def filter_samples(
@@ -51,7 +56,8 @@ def filter_samples(
     eurasia_only: bool,
     exclude_localities: bool,
 ) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    keep_indices: list[int] = []
+    candidate_indices: list[int] = []
+    candidate_coords: list[tuple[float, float]] = []
     for idx, sample in enumerate(samples):
         if is_archaic_or_reference_sample(sample, metadata[sample]):
             continue
@@ -60,13 +66,18 @@ def filter_samples(
             lon = float(metadata[sample][LON_FIELD])
         except (TypeError, ValueError):
             continue
-        if eurasia_only and not (
-            EURASIA_LAT_RANGE[0] <= lat <= EURASIA_LAT_RANGE[1] and EURASIA_LON_RANGE[0] <= lon <= EURASIA_LON_RANGE[1]
-        ):
-            continue
         if exclude_localities and metadata[sample][LOCALITY_FIELD].startswith(AADR_ANOMALOUS_LOCALITY_PREFIXES):
             continue
-        keep_indices.append(idx)
+        candidate_indices.append(idx)
+        candidate_coords.append((lat, lon))
+
+    if eurasia_only and candidate_coords:
+        regions = classify_coords(candidate_coords)
+        keep_indices = [
+            idx for idx, region in zip(candidate_indices, regions, strict=True) if region in EURASIA_REGIONS
+        ]
+    else:
+        keep_indices = candidate_indices
 
     keep = np.array(keep_indices, dtype=int)
     return (
