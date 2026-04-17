@@ -12,10 +12,10 @@ from evaluation_utils import (
     AADR_NPZ_PATH,
     FULL_DATE_FIELD,
     GROUP_ID_FIELD,
+    INDIVIDUAL_ID_FIELD,
     LAT_FIELD,
     LOCALITY_FIELD,
     LON_FIELD,
-    MASTER_ID_FIELD,
     POLITICAL_ENTITY_FIELD,
     PUBLICATION_FIELD,
     SKELETAL_CODE_FIELD,
@@ -26,11 +26,11 @@ from evaluation_utils import (
 )
 
 OUTPUT_DIR = AADR_DIR / "results" / "scans"
-SAME_MASTER_OUTPUT_CSV = OUTPUT_DIR / "potential_spurious_duplicates.csv"
-DIFF_MASTER_OUTPUT_CSV = OUTPUT_DIR / "potential_missed_duplicates.csv"
+SAME_INDIVIDUAL_OUTPUT_CSV = OUTPUT_DIR / "potential_spurious_duplicates.csv"
+DIFF_INDIVIDUAL_OUTPUT_CSV = OUTPUT_DIR / "potential_missed_duplicates.csv"
 DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "potential_cross_site_relatives.csv"
-SAME_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "same_master_id_pmrs.pdf"
-DIFF_MASTER_HISTOGRAM_PATH = OUTPUT_DIR / "diff_master_id_pmrs.pdf"
+SAME_INDIVIDUAL_HISTOGRAM_PATH = OUTPUT_DIR / "same_individual_id_pmrs.pdf"
+DIFF_INDIVIDUAL_HISTOGRAM_PATH = OUTPUT_DIR / "diff_individual_id_pmrs.pdf"
 
 IDENTICAL_PMR_THRESHOLD = 0.14
 NON_IDENTICAL_PMR_THRESHOLD = 0.17
@@ -99,10 +99,10 @@ def get_pair_metadata(metadata: dict[str, dict[str, str]], sample1: str, sample2
     }
 
 
-def find_same_master_id_high_pmr_pairs(
+def find_same_individual_id_high_pmr_pairs(
     metadata: dict[str, dict[str, str]],
     samples: list[str],
-    master_ids: list[str],
+    individual_ids: list[str],
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
     mismatch_rates_95_ci_lower: np.ndarray,
@@ -110,14 +110,14 @@ def find_same_master_id_high_pmr_pairs(
     threshold: float,
     overlap_threshold: int,
 ) -> pd.DataFrame:
-    master_id_to_indices: dict[str, list[int]] = {}
-    for idx, master_id in enumerate(master_ids):
-        if not master_id:
+    individual_id_to_indices: dict[str, list[int]] = {}
+    for idx, individual_id in enumerate(individual_ids):
+        if not individual_id:
             continue
-        master_id_to_indices.setdefault(master_id, []).append(idx)
+        individual_id_to_indices.setdefault(individual_id, []).append(idx)
 
     rows: list[dict[str, str | int | float]] = []
-    for master_id, indices in master_id_to_indices.items():
+    for individual_id, indices in individual_id_to_indices.items():
         if len(indices) < 2:
             continue
         for offset, idx_i in enumerate(indices[:-1]):
@@ -130,7 +130,7 @@ def find_same_master_id_high_pmr_pairs(
                     continue
                 if pmr > threshold:
                     row = {
-                        "master_id": master_id,
+                        "individual_id": individual_id,
                         "genetic_id1": samples[idx_i],
                         "genetic_id2": samples[idx_j],
                         "site_overlap": n_overlap,
@@ -144,10 +144,10 @@ def find_same_master_id_high_pmr_pairs(
     return pd.DataFrame.from_records(rows)
 
 
-def find_diff_master_id_low_pmr_pairs(
+def find_diff_individual_id_low_pmr_pairs(
     metadata: dict[str, dict[str, str]],
     samples: list[str],
-    master_ids: list[str],
+    individual_ids: list[str],
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
     mismatch_rates_95_ci_lower: np.ndarray,
@@ -155,18 +155,18 @@ def find_diff_master_id_low_pmr_pairs(
     threshold: float,
     overlap_threshold: int,
 ) -> pd.DataFrame:
-    master_ids_array = np.asarray(master_ids, dtype=object)
+    individual_ids_array = np.asarray(individual_ids, dtype=object)
     rows: list[dict[str, str | int | float]] = []
     for idx_i in range(len(samples) - 1):
-        master_id_i = master_ids_array[idx_i]
-        if not master_id_i:
+        individual_id_i = individual_ids_array[idx_i]
+        if not individual_id_i:
             continue
         row_rates = mismatch_rates[idx_i, idx_i + 1 :]
         row_overlaps = site_overlaps[idx_i, idx_i + 1 :]
-        row_master_ids = master_ids_array[idx_i + 1 :]
+        row_individual_ids = individual_ids_array[idx_i + 1 :]
         mask = (
-            (row_master_ids != "")
-            & (row_master_ids != master_id_i)
+            (row_individual_ids != "")
+            & (row_individual_ids != individual_id_i)
             & (row_rates < threshold)
             & (row_overlaps >= overlap_threshold)
         )
@@ -175,8 +175,8 @@ def find_diff_master_id_low_pmr_pairs(
         for offset in match_offsets:
             idx_j = idx_i + 1 + int(offset)
             row = {
-                "master_id1": master_id_i,
-                "master_id2": row_master_ids[offset],
+                "individual_id1": individual_id_i,
+                "individual_id2": row_individual_ids[offset],
                 "genetic_id1": samples[idx_i],
                 "genetic_id2": samples[idx_j],
                 "site_overlap": int(row_overlaps[offset]),
@@ -193,7 +193,7 @@ def find_diff_master_id_low_pmr_pairs(
 def find_diff_locality_low_pmr_pairs(
     metadata: dict[str, dict[str, str]],
     samples: list[str],
-    master_ids: list[str],
+    individual_ids: list[str],
     localities: list[str],
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
@@ -203,23 +203,23 @@ def find_diff_locality_low_pmr_pairs(
     upper_threshold: float,
     overlap_threshold: int,
 ) -> pd.DataFrame:
-    master_ids_array = np.asarray(master_ids, dtype=object)
+    individual_ids_array = np.asarray(individual_ids, dtype=object)
     localities_array = np.asarray(localities, dtype=object)
     rows: list[dict[str, str | int | float]] = []
     for idx_i in range(len(samples) - 1):
         locality_i = localities_array[idx_i]
-        master_id_i = master_ids_array[idx_i]
-        if not locality_i or not master_id_i:
+        individual_id_i = individual_ids_array[idx_i]
+        if not locality_i or not individual_id_i:
             continue
         row_rates = mismatch_rates[idx_i, idx_i + 1 :]
         row_overlaps = site_overlaps[idx_i, idx_i + 1 :]
         row_localities = localities_array[idx_i + 1 :]
-        row_master_ids = master_ids_array[idx_i + 1 :]
+        row_individual_ids = individual_ids_array[idx_i + 1 :]
         mask = (
             (row_localities != "")
             & (row_localities != locality_i)
-            & (row_master_ids != "")
-            & (row_master_ids != master_id_i)
+            & (row_individual_ids != "")
+            & (row_individual_ids != individual_id_i)
             & (row_rates >= lower_threshold)
             & (row_rates < upper_threshold)
             & (row_overlaps >= overlap_threshold)
@@ -229,8 +229,8 @@ def find_diff_locality_low_pmr_pairs(
         for offset in match_offsets:
             idx_j = idx_i + 1 + int(offset)
             row = {
-                "master_id1": master_id_i,
-                "master_id2": row_master_ids[offset],
+                "individual_id1": individual_id_i,
+                "individual_id2": row_individual_ids[offset],
                 "genetic_id1": samples[idx_i],
                 "genetic_id2": samples[idx_j],
                 "site_overlap": int(row_overlaps[offset]),
@@ -252,21 +252,23 @@ def find_diff_locality_low_pmr_pairs(
 
 
 def collect_pairwise_mismatch_rates(
-    master_ids: list[str],
+    individual_ids: list[str],
     rates: np.ndarray,
     site_overlaps: np.ndarray,
     overlap_threshold: int,
 ) -> tuple[np.ndarray, np.ndarray]:
-    master_ids_array = np.asarray(master_ids, dtype=object)
-    pair_i, pair_j = np.triu_indices(len(master_ids_array), k=1)
+    individual_ids_array = np.asarray(individual_ids, dtype=object)
+    pair_i, pair_j = np.triu_indices(len(individual_ids_array), k=1)
     pair_rates = rates[pair_i, pair_j]
     pair_site_overlaps = site_overlaps[pair_i, pair_j]
-    master_i = master_ids_array[pair_i]
-    master_j = master_ids_array[pair_j]
+    individual_i = individual_ids_array[pair_i]
+    individual_j = individual_ids_array[pair_j]
 
-    valid = (pair_site_overlaps >= overlap_threshold) & ~np.isnan(pair_rates) & (master_i != "") & (master_j != "")
-    same_mask = valid & (master_i == master_j)
-    diff_mask = valid & (master_i != master_j)
+    valid = (
+        (pair_site_overlaps >= overlap_threshold) & ~np.isnan(pair_rates) & (individual_i != "") & (individual_j != "")
+    )
+    same_mask = valid & (individual_i == individual_j)
+    diff_mask = valid & (individual_i != individual_j)
     return pair_rates[same_mask], pair_rates[diff_mask]
 
 
@@ -291,11 +293,11 @@ def plot_pairwise_mismatch_rate_histograms(
         plt.close(fig)
 
     plot_histogram(
-        same_rates, f"AADR Sample Pairs, Matching Master IDs\n(n={len(same_rates)})", "#4C78A8", same_output_path
+        same_rates, f"AADR Sample Pairs, Matching Individual IDs\n(n={len(same_rates)})", "#4C78A8", same_output_path
     )
     plot_histogram(
         diff_rates,
-        f"AADR Sample Pairs, Non-Matching Master IDs\n(n={len(diff_rates)}, y-axis limit={Y_AXIS_LIMIT})",
+        f"AADR Sample Pairs, Non-Matching Individual IDs\n(n={len(diff_rates)}, y-axis limit={Y_AXIS_LIMIT})",
         "#F58518",
         diff_output_path,
     )
@@ -326,23 +328,24 @@ def main() -> None:
         eurasia_only=False,
         exclude_localities=False,
     )
-    filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in filtered_samples]
+    filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in filtered_samples]
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     same_rates, diff_rates = collect_pairwise_mismatch_rates(
-        filtered_master_ids, filtered_mismatch_rates, filtered_site_overlaps, OVERLAP_THRESHOLD
+        filtered_individual_ids, filtered_mismatch_rates, filtered_site_overlaps, OVERLAP_THRESHOLD
     )
     plot_pairwise_mismatch_rate_histograms(
-        same_rates, diff_rates, SAME_MASTER_HISTOGRAM_PATH, DIFF_MASTER_HISTOGRAM_PATH
+        same_rates, diff_rates, SAME_INDIVIDUAL_HISTOGRAM_PATH, DIFF_INDIVIDUAL_HISTOGRAM_PATH
     )
     print(
-        f"Wrote pairwise mismatch rate histograms to {SAME_MASTER_HISTOGRAM_PATH} and {DIFF_MASTER_HISTOGRAM_PATH}.\n"
+        f"Wrote pairwise mismatch rate histograms to {SAME_INDIVIDUAL_HISTOGRAM_PATH} "
+        f"and {DIFF_INDIVIDUAL_HISTOGRAM_PATH}.\n"
     )
 
-    high_pmr_pairs = find_same_master_id_high_pmr_pairs(
+    high_pmr_pairs = find_same_individual_id_high_pmr_pairs(
         metadata,
         filtered_samples,
-        filtered_master_ids,
+        filtered_individual_ids,
         filtered_site_overlaps,
         filtered_mismatch_rates,
         filtered_mismatch_rates_95_ci_lower,
@@ -352,16 +355,16 @@ def main() -> None:
     )
     rate_cols = ["mismatch_rate", "mismatch_rate_95_ci_lower", "mismatch_rate_95_ci_upper"]
     high_pmr_pairs[rate_cols] = high_pmr_pairs[rate_cols].round(6)
-    high_pmr_pairs.to_csv(SAME_MASTER_OUTPUT_CSV, index=False)
+    high_pmr_pairs.to_csv(SAME_INDIVIDUAL_OUTPUT_CSV, index=False)
     print(
-        f"Wrote {len(high_pmr_pairs)} same-master-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
-        f"and site overlap >= {OVERLAP_THRESHOLD} to {SAME_MASTER_OUTPUT_CSV}.\n"
+        f"Wrote {len(high_pmr_pairs)} same-individual-ID pairs with PMR > {NON_IDENTICAL_PMR_THRESHOLD} "
+        f"and site overlap >= {OVERLAP_THRESHOLD} to {SAME_INDIVIDUAL_OUTPUT_CSV}.\n"
     )
 
-    low_pmr_pairs = find_diff_master_id_low_pmr_pairs(
+    low_pmr_pairs = find_diff_individual_id_low_pmr_pairs(
         metadata,
         filtered_samples,
-        filtered_master_ids,
+        filtered_individual_ids,
         filtered_site_overlaps,
         filtered_mismatch_rates,
         filtered_mismatch_rates_95_ci_lower,
@@ -370,10 +373,10 @@ def main() -> None:
         OVERLAP_THRESHOLD,
     )
     low_pmr_pairs[rate_cols] = low_pmr_pairs[rate_cols].round(6)
-    low_pmr_pairs.to_csv(DIFF_MASTER_OUTPUT_CSV, index=False)
+    low_pmr_pairs.to_csv(DIFF_INDIVIDUAL_OUTPUT_CSV, index=False)
     print(
-        f"Wrote {len(low_pmr_pairs)} different-master-ID pairs with PMR < {IDENTICAL_PMR_THRESHOLD} "
-        f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_MASTER_OUTPUT_CSV}.\n"
+        f"Wrote {len(low_pmr_pairs)} different-individual-ID pairs with PMR < {IDENTICAL_PMR_THRESHOLD} "
+        f"and site overlap >= {OVERLAP_THRESHOLD} to {DIFF_INDIVIDUAL_OUTPUT_CSV}.\n"
     )
 
     (
@@ -392,12 +395,12 @@ def main() -> None:
         eurasia_only=True,
         exclude_localities=True,
     )
-    eurasia_filtered_master_ids = [metadata[sample][MASTER_ID_FIELD] for sample in eurasia_filtered_samples]
+    eurasia_filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in eurasia_filtered_samples]
     eurasia_filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in eurasia_filtered_samples]
     diff_locality_pairs = find_diff_locality_low_pmr_pairs(
         metadata,
         eurasia_filtered_samples,
-        eurasia_filtered_master_ids,
+        eurasia_filtered_individual_ids,
         eurasia_filtered_localities,
         eurasia_filtered_site_overlaps,
         eurasia_filtered_mismatch_rates,

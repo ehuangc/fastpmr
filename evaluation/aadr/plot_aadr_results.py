@@ -26,10 +26,10 @@ from evaluation_utils import (
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
     DATE_MEAN_BP_FIELD,
+    INDIVIDUAL_ID_FIELD,
     LAT_FIELD,
     LOCALITY_FIELD,
     LON_FIELD,
-    MASTER_ID_FIELD,
     PUBLICATION_FIELD,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
@@ -136,9 +136,9 @@ def filter_and_extract(
     metadata: dict[str, dict[str, str]],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     # First pass: collect every sample that passes the per-sample filters,
-    # along with its Master ID and covered-SNP count for deduplication.
+    # along with its Individual ID and covered-SNP count for deduplication.
     candidates: list[tuple[int, float, float, float, str, str]] = []
-    candidate_master_ids: list[str] = []
+    candidate_individual_ids: list[str] = []
     candidate_covered_snps: list[int] = []
 
     def parse_float(value: str) -> float:
@@ -162,23 +162,23 @@ def filter_and_extract(
         if not (np.isfinite(lat) and np.isfinite(lon) and np.isfinite(date)):
             continue
 
-        master_id = sample_metadata[MASTER_ID_FIELD].strip()
+        individual_id = sample_metadata[INDIVIDUAL_ID_FIELD].strip()
         publication = sample_metadata[PUBLICATION_FIELD].strip()
         candidates.append((sample_idx, lat, lon, date, locality, publication))
-        candidate_master_ids.append(master_id)
+        candidate_individual_ids.append(individual_id)
         candidate_covered_snps.append(int(covered_snps[sample_idx]))
 
-    # Drop known duplicates by AADR master ID, keeping the sample with the most covered SNPs in each group.
-    # Samples without a master ID are kept as-is.
-    best_pos_by_master: dict[str, int] = {}
-    for pos, master_id in enumerate(candidate_master_ids):
-        if not master_id or master_id == "..":
+    # Drop known duplicates by AADR individual ID, keeping the sample with the most covered SNPs in each group.
+    # Samples without a individual ID are kept as-is.
+    best_pos_by_individual: dict[str, int] = {}
+    for pos, individual_id in enumerate(candidate_individual_ids):
+        if not individual_id or individual_id == "..":
             continue
-        prev = best_pos_by_master.get(master_id)
+        prev = best_pos_by_individual.get(individual_id)
         if prev is None or candidate_covered_snps[pos] > candidate_covered_snps[prev]:
-            best_pos_by_master[master_id] = pos
-    selected_positions = {pos for pos, mid in enumerate(candidate_master_ids) if not mid or mid == ".."}
-    selected_positions.update(best_pos_by_master.values())
+            best_pos_by_individual[individual_id] = pos
+    selected_positions = {pos for pos, mid in enumerate(candidate_individual_ids) if not mid or mid == ".."}
+    selected_positions.update(best_pos_by_individual.values())
 
     keep: list[int] = []
     lats: list[float] = []

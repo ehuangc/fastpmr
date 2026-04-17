@@ -17,19 +17,19 @@ import numpy as np
 EVALUATION_DIR = Path(__file__).resolve().parent.parent
 FASTPMR_BIN = "fastpmr"
 AADR_DIR = EVALUATION_DIR / "aadr"
-AADR_DATA_PREFIX = AADR_DIR / "data" / "v62.0_1240k_public"
+AADR_DATA_PREFIX = AADR_DIR / "data" / "v66.1240K.aadr.PUB"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
-AADR_METADATA_PATH = AADR_DIR / "data" / "v62.0_1240k_public.anno"
+AADR_METADATA_PATH = AADR_DIR / "data" / "v66.1240K.aadr.PUB.anno"
 # Localities with sample pairs that have anomalously low PMRs
 AADR_ANOMALOUS_LOCALITY_PREFIXES = "Valdescusa"
 
 # AADR metadata field names
-LAT_FIELD = "Lat."
-LON_FIELD = "Long."
+LAT_FIELD = "Latitude"
+LON_FIELD = "Longitude"
 LOCALITY_FIELD = "Locality"
-MASTER_ID_FIELD = "Master ID"
+INDIVIDUAL_ID_FIELD = "Individual ID"
 GROUP_ID_FIELD = "Group ID"
 DATE_MEAN_BP_FIELD = (
     "Date mean in BP in years before 1950 CE "
@@ -37,7 +37,7 @@ DATE_MEAN_BP_FIELD = (
 )
 FULL_DATE_FIELD = (
     "Full Date One of two formats. (Format 1) 95.4% CI calibrated radiocarbon age "
-    "(Conventional Radiocarbon Age BP, Lab number) e.g. 2624-2350 calBCE (3990±40 BP, Ua-35016). "
+    "(Conventional Radiocarbon Age BP, Lab number) e.g. 2624-2350 calBCE (3990+-40 BP, Ua-35016). "
     "(Format 2) Archaeological context range, e.g. 2500-1700 BCE"
 )
 PUBLICATION_FIELD = "Publication abbreviation"

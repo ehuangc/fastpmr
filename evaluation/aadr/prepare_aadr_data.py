@@ -3,20 +3,20 @@ from evaluation_utils import AADR_DIR, download_file
 DATA_DIR = AADR_DIR / "data"
 REMOTE_FILES = [
     (
-        "v62.0_1240k_public.anno",
-        "https://dataverse.harvard.edu/api/access/datafile/10537413?version=9.1",
+        "v66.1240K.aadr.PUB.anno",
+        "https://dataverse.harvard.edu/api/access/datafile/13663706?version=10.0",
     ),
     (
-        "v62.0_1240k_public.ind",
-        "https://dataverse.harvard.edu/api/access/datafile/10537414?version=9.1",
+        "v66.1240K.aadr.PUB.ind",
+        "https://dataverse.harvard.edu/api/access/datafile/13663698?version=10.0",
     ),
     (
-        "v62.0_1240k_public.snp",
-        "https://dataverse.harvard.edu/api/access/datafile/10537415?version=9.1",
+        "v66.1240K.aadr.PUB.snp",
+        "https://dataverse.harvard.edu/api/access/datafile/13664260?version=10.0",
     ),
     (
-        "v62.0_1240k_public.geno",
-        "https://dataverse.harvard.edu/api/access/datafile/10537126?version=9.1",
+        "v66.1240K.aadr.PUB.geno",
+        "https://dataverse.harvard.edu/api/access/datafile/13664080?version=10.0",
     ),
 ]
 
