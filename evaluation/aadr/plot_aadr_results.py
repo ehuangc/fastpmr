@@ -1,11 +1,11 @@
 """
-1) Plot median within-site pairwise mismatch rate (PMR) over space and time.
+1) Plot median within-locality pairwise mismatch rate (PMR) over space and time.
 
-   For each (locality, time bin) cell with at least MIN_PAIRS_PER_CELL within-site
+   For each (locality, time bin) cell with at least MIN_PAIRS_PER_CELL within-locality
    sample pairs with site overlap > OVERLAP_THRESHOLD, the median PMR is plotted
    on a global map stratified by time period.
 
-2) Plot within-site PMR vs. migratory distance from Addis Ababa, Ethiopia.
+2) Plot within-locality PMR vs. migratory distance from Addis Ababa, Ethiopia.
 """
 
 from pathlib import Path
@@ -167,7 +167,7 @@ def compute_site_cells(
     localities: np.ndarray,
     publications: np.ndarray,
 ) -> pd.DataFrame:
-    """For each (locality, time bin) group with enough valid within-site pairs,
+    """For each (locality, time bin) group with enough valid within-locality pairs,
     compute median PMR + mean coordinates."""
     groups: dict[tuple[str, int], list[int]] = {}
     for idx, (locality, bin_idx) in enumerate(zip(localities, bin_indices, strict=True)):
@@ -257,7 +257,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
             aspect=40,
             extend="both",
         )
-        cbar.set_label("Median within-site pairwise mismatch rate", fontsize=12)
+        cbar.set_label("Median within-locality pairwise mismatch rate", fontsize=12)
         cbar.ax.tick_params(labelsize=12)
 
     fig.suptitle("AADR median pairwise mismatch rates, by site and era", fontsize=14)
@@ -281,7 +281,7 @@ def migratory_distance(lat: float, lon: float, region: str) -> float:
 
 
 def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> None:
-    """Scatter plot + linear regression of within-site PMR vs. migratory distance."""
+    """Scatter plot + linear regression of within-locality PMR vs. migratory distance."""
     x = cells["migratory_distance_km"].to_numpy() / 1_000  # Thousands of km
     y = cells["median_pmr"].to_numpy()
     slope, intercept, r_value, _p_value, _se = stats.linregress(x, y)
@@ -314,8 +314,8 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
         ax=ax,
     )
     ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=12)
-    ax.set_ylabel("Median within-site PMR", fontsize=12)
-    ax.set_title('Median within-site PMR vs. migratory "Out of Africa" distance', fontsize=13)
+    ax.set_ylabel("Median within-locality PMR", fontsize=12)
+    ax.set_title('Median within-locality PMR vs. migratory "Out of Africa" distance', fontsize=13)
     ax.legend(fontsize=9, loc="upper right")
 
     fig.savefig(output_path, dpi=600)
