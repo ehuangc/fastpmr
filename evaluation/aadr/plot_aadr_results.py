@@ -189,7 +189,7 @@ def compute_site_cells(
         n_valid = int(valid.sum())
         if n_valid < MIN_PAIRS_PER_CELL:
             continue
-        median_pmr = float(np.median(pair_rates[valid]))
+        median_pmr = round(float(np.median(pair_rates[valid])), 6)
         rows.append(
             {
                 "locality": locality,
@@ -344,7 +344,7 @@ def main() -> None:
     cell_regions = classify_coords(cell_coords)
     cells_sorted["region"] = cell_regions
     cells_sorted["migratory_distance_km"] = [
-        migratory_distance(lat, lon, region)
+        round(migratory_distance(lat, lon, region), 1)
         for lat, lon, region in zip(cells_sorted["lat"], cells_sorted["lon"], cell_regions, strict=True)
     ]
     cells_sorted.to_csv(CELLS_CSV_PATH, index=False)
