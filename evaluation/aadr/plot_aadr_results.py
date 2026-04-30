@@ -306,10 +306,10 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
     sns.regplot(
         x=x,
         y=y,
-        ci=95,
+        ci=None,
         scatter=False,
         color="black",
-        line_kws={"linewidth": 1.5, "alpha": 0.7},
+        line_kws={"linewidth": 1.5, "alpha": 0.5},
         label=f"OLS ($R^2 = {r_value**2:.3f}$)",
         ax=ax,
     )
