@@ -40,6 +40,7 @@ from evaluation_utils import (
 OUTPUT_DIR = AADR_DIR / "results" / "plots"
 MAP_PATH = OUTPUT_DIR / "pmr_map_by_time.pdf"
 REGRESSION_PATH = OUTPUT_DIR / "pmr_vs_migratory_distance.pdf"
+BOXPLOT_PATH = OUTPUT_DIR / "pmr_boxplot_by_time.pdf"
 CELLS_CSV_PATH = OUTPUT_DIR / "sites.csv"
 
 OVERLAP_THRESHOLD = 30_000
@@ -322,6 +323,74 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
     plt.close(fig)
 
 
+def format_p_value(p: float) -> str:
+    if p < 0.001:
+        return "***"
+    if p < 0.01:
+        return "**"
+    if p < 0.05:
+        return "*"
+    return "n.s."
+
+
+def draw_significance_brackets(ax: plt.Axes, data: pd.DataFrame, bins: list[str]) -> None:
+    """Draw brackets between time bins, using Mann-Whitney U p-values"""
+    groups = [data.loc[data["bin_label"] == b, "median_pmr"].to_numpy() for b in bins]
+    comparisons = [(0, 1), (1, 2), (0, 2)]
+
+    y_max = max(g.max() for g in groups if len(g) > 0)
+    y_range = ax.get_ylim()[1] - ax.get_ylim()[0]
+    bracket_gap = 0.06 * y_range
+    tip_len = 0.012 * y_range
+
+    # Sort comparisons by span so narrower brackets are drawn lower
+    comparisons.sort(key=lambda pair: pair[1] - pair[0])
+
+    y_cursor = y_max + bracket_gap
+    for i, j in comparisons:
+        _stat, p = stats.mannwhitneyu(groups[i], groups[j], alternative="two-sided")
+        label = format_p_value(p)
+
+        y = y_cursor
+        ax.plot([i, i, j, j], [y - tip_len, y, y, y - tip_len], lw=1.0, color="black")
+        ax.text((i + j) / 2, y, label, ha="center", va="bottom", fontsize=9)
+        y_cursor = y + bracket_gap + tip_len
+
+
+def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
+    """Multi-panel box plot of median within-locality PMR,
+    stratified by time period for Europe, Asia, and the Americas."""
+    bins = ["10,000-5,000 BP", "5,000-2,000 BP", "2,000-500 BP"]
+    panels = [
+        ("europe", "Europe"),
+        ("asia", "Asia"),
+        ("americas", "Americas"),
+    ]
+
+    fig, axes = plt.subplots(1, 3, figsize=(16, 5.5), constrained_layout=True, sharey=True)
+
+    for ax, (region, title) in zip(axes, panels, strict=True):
+        region_cells = cells[(cells["region"] == region) & (cells["bin_label"].isin(bins))].copy()
+        region_cells["bin_label"] = pd.Categorical(region_cells["bin_label"], categories=bins, ordered=True)
+        sns.boxplot(
+            data=region_cells,
+            x="bin_label",
+            y="median_pmr",
+            fliersize=4,
+            ax=ax,
+        )
+        draw_significance_brackets(ax, region_cells, bins)
+        ax.set_xlabel("Time period", fontsize=12)
+        ax.set_title(title, fontsize=13)
+
+    bottom, top = axes[0].get_ylim()
+    axes[0].set_ylim(bottom, top * 1.02)
+    axes[0].set_ylabel("Median within-locality PMR", fontsize=12)
+    fig.suptitle("Within-locality PMR by time period", fontsize=14)
+    fig.savefig(output_path, dpi=600)
+    plt.close(fig)
+
+
 def main() -> None:
     ensure_aadr_npz_present(AADR_NPZ_PATH, AADR_METADATA_PATH)
     samples, site_overlaps, mismatch_rates, _mismatch_rates_95_ci_lower, _mismatch_rates_95_ci_upper, covered_snps = (
@@ -359,6 +428,9 @@ def main() -> None:
 
     plot_pmr_vs_migratory_distance(cells_sorted, REGRESSION_PATH)
     print(f"\nWrote PMR vs. migratory distance plot to {REGRESSION_PATH}.")
+
+    plot_pmr_box_plot(cells_sorted, BOXPLOT_PATH)
+    print(f"\nWrote PMR box plot to {BOXPLOT_PATH}.")
 
 
 if __name__ == "__main__":
