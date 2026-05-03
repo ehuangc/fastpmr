@@ -358,7 +358,7 @@ def main() -> None:
     print(f"\nWrote PMR map to {MAP_PATH}.")
 
     plot_pmr_vs_migratory_distance(cells_sorted, REGRESSION_PATH)
-    print(f"Wrote PMR vs. migratory distance plot to {REGRESSION_PATH}.")
+    print(f"\nWrote PMR vs. migratory distance plot to {REGRESSION_PATH}.")
 
 
 if __name__ == "__main__":
