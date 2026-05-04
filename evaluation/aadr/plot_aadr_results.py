@@ -314,6 +314,37 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
         label=f"OLS ($R^2 = {r_value**2:.3f}$)",
         ax=ax,
     )
+
+    # Circle outliers
+    outliers = [
+        (
+            "Norwich (England, Norwich, Chapelfield Shopping Center, well shaft)",
+            "Medieval Ashkenazi\nJewish individuals",
+        ),
+        ("(Eastern Settlement)", "Norse Greenland\nindividuals"),
+    ]
+    localities = cells["locality"].to_numpy()
+    for match_str, label in outliers:
+        idxs = [i for i, loc in enumerate(localities) if match_str in loc]
+        ox = np.mean([x[i] for i in idxs])
+        oy = np.mean([y[i] for i in idxs])
+        ax.scatter(
+            [ox],
+            [oy],
+            s=250,
+            facecolors="none",
+            edgecolors="black",
+            alpha=0.5,
+        )
+        ax.annotate(
+            label,
+            xy=(ox, oy),
+            xytext=(16, -18),
+            textcoords="offset points",
+            fontsize=9,
+            bbox={"boxstyle": "round,pad=0.4", "fc": "white", "ec": "black", "alpha": 0.5},
+        )
+
     ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=12)
     ax.set_ylabel("Median within-locality PMR", fontsize=12)
     ax.set_title('Median within-locality PMR vs. migratory "Out of Africa" distance', fontsize=13)
