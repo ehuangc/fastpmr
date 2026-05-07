@@ -283,7 +283,10 @@ def plot_pairwise_mismatch_rate_histograms(
     same_output_path: Path,
     diff_output_path: Path,
 ) -> None:
-    Y_AXIS_LIMIT = 100
+    Y_AXIS_LIMIT = 350
+    # The same-individual-ID histogram should fit within the y-axis limit
+    same_bin_counts, _ = np.histogram(same_rates, bins=50)
+    assert same_bin_counts.max() <= Y_AXIS_LIMIT
 
     def plot_histogram(rates: np.ndarray, title: str, color: str, output_path: Path) -> None:
         bins = np.histogram_bin_edges(rates, bins=50)
