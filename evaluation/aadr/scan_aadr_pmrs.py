@@ -402,6 +402,9 @@ def main() -> None:
     )
     eurasia_filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in eurasia_filtered_samples]
     eurasia_filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in eurasia_filtered_samples]
+    n_eurasia = len(eurasia_filtered_samples)
+    n_eurasia_pairs = n_eurasia * (n_eurasia - 1) // 2
+    print(f"Eurasian-filtered samples: {n_eurasia}, pairs: {n_eurasia_pairs}.\n")
     diff_locality_pairs = find_diff_locality_low_pmr_pairs(
         metadata,
         eurasia_filtered_samples,
