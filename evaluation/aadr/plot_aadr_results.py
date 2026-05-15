@@ -417,7 +417,7 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
     bottom, top = axes[0].get_ylim()
     axes[0].set_ylim(bottom, top * 1.02)
     axes[0].set_ylabel("Median within-locality PMR", fontsize=12)
-    fig.suptitle("Within-locality PMR by time period", fontsize=14)
+    fig.suptitle("Within-locality PMR by region and time period", fontsize=14)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
