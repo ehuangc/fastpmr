@@ -41,7 +41,7 @@ OUTPUT_DIR = AADR_DIR / "results" / "plots"
 MAP_PATH = OUTPUT_DIR / "pmr_map_by_time.pdf"
 REGRESSION_PATH = OUTPUT_DIR / "pmr_vs_migratory_distance.pdf"
 BOXPLOT_PATH = OUTPUT_DIR / "pmr_boxplot_by_time.pdf"
-CELLS_CSV_PATH = OUTPUT_DIR / "sites.csv"
+CELLS_CSV_PATH = OUTPUT_DIR / "localities.csv"
 
 OVERLAP_THRESHOLD = 30_000
 MIN_PAIRS_PER_CELL = 5
@@ -159,7 +159,7 @@ def assign_time_bins(dates: np.ndarray) -> np.ndarray:
     return bin_indices
 
 
-def compute_site_cells(
+def compute_locality_cells(
     bin_indices: np.ndarray,
     site_overlaps: np.ndarray,
     mismatch_rates: np.ndarray,
@@ -233,7 +233,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
         ax.add_feature(cfeature.COASTLINE, linewidth=0.4, edgecolor="#555555")
 
         bin_cells = cells[cells["bin_idx"] == bin_i]
-        ax.set_title(f"{label}\n(n={len(bin_cells)} sites)", fontsize=12)
+        ax.set_title(f"{label}\n(n={len(bin_cells)} localities)", fontsize=12)
         sizes = 20 + 3 * np.clip(bin_cells["n_pairs"].to_numpy(), 0, 20)
         scatter = ax.scatter(
             bin_cells["lon"].to_numpy(),
@@ -261,7 +261,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
         cbar.set_label("Median within-locality pairwise mismatch rate", fontsize=12)
         cbar.ax.tick_params(labelsize=12)
 
-    fig.suptitle("AADR median pairwise mismatch rates, by site and era", fontsize=14)
+    fig.suptitle("AADR median pairwise mismatch rates, by locality and era", fontsize=14)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
@@ -434,7 +434,7 @@ def main() -> None:
         samples, covered_snps, site_overlaps, mismatch_rates, metadata
     )
     bin_indices = assign_time_bins(dates)
-    cells = compute_site_cells(
+    cells = compute_locality_cells(
         bin_indices, site_overlaps_filt, mismatch_rates_filt, lats, lons, localities, publications
     )
 
