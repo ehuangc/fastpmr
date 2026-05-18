@@ -43,8 +43,10 @@ from evaluation_utils.core import (
     quote_path,
     run_benchmark,
 )
+from evaluation_utils.plot import add_panel_label
 
 __all__ = [
+    "add_panel_label",
     "AADR_DATA_PREFIX",
     "AADR_DIR",
     "AADR_ANOMALOUS_LOCALITY_PREFIXES",

@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+from evaluation_utils import add_panel_label
+
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
-PLOTS_DIR = RESULTS_DIR / "plots"
 READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"
 
 
@@ -47,19 +48,18 @@ def format_memory(bytes: float) -> str:
         return f"{bytes:.0f} B"
 
 
-def save_bar_plot(
+def plot_bar(
+    ax: plt.Axes,
     data: pd.DataFrame,
     label_col: str,
     y_col: str,
     err_col: str,
     ylabel: str,
     title: str,
-    output_path: Path,
     seconds_col: str | None = None,
     bytes_col: str | None = None,
 ) -> None:
     assert seconds_col or bytes_col
-    fig, ax = plt.subplots(figsize=(5, 5), constrained_layout=True)
     ax.bar(
         data[label_col],
         data[y_col],
@@ -91,36 +91,43 @@ def save_bar_plot(
     ax.set_ylim(bottom=0, top=y_max * 1.08)
     ax.grid(True, axis="y", linewidth=0.8, alpha=0.4)
     sns.despine(ax=ax)
-    fig.savefig(output_path, bbox_inches="tight", dpi=600)
-    plt.close(fig)
 
 
 def main() -> None:
-    PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     readv2_df = pd.read_csv(READV2_CSV)
     readv2_df = bytes_to_gb(readv2_df)
     readv2_df = seconds_to_minutes(readv2_df)
-    save_bar_plot(
+
+    fig, (ax_rt, ax_mem) = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
+
+    plot_bar(
+        ax_rt,
         readv2_df,
         "label",
         "mean_min",
         "stddev_min",
         "Mean Runtime (min)",
         "Runtime: fastpmr vs. READv2",
-        PLOTS_DIR / "readv2_comparison_benchmark_runtime.pdf",
         seconds_col="mean_s",
     )
-    save_bar_plot(
+    add_panel_label(ax_rt, "A")
+
+    plot_bar(
+        ax_mem,
         readv2_df,
         "label",
         "mean_gb",
         "stddev_gb",
         "Peak RSS (GB)",
         "Peak Memory: fastpmr vs. READv2",
-        PLOTS_DIR / "readv2_comparison_benchmark_memory.pdf",
         bytes_col="mean_bytes",
     )
+    add_panel_label(ax_mem, "B")
+
+    fig.savefig(RESULTS_DIR / "comparison_results.pdf", bbox_inches="tight", dpi=600)
+    plt.close(fig)
 
 
 if __name__ == "__main__":
