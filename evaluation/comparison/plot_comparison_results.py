@@ -1,36 +1,12 @@
-import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib.colors import LogNorm
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
 READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"
-OUTPUTS_DIR = RESULTS_DIR / "outputs"
-FASTPMR_NPZ = OUTPUTS_DIR / "fastpmr" / "fastpmr_results.npz"
-READV2_TSV = OUTPUTS_DIR / "readv2" / "Read_Results.tsv"
-PMR_TOLERANCE = 1e-6
-
-DEGREE_ORDER = [
-    "Identical/Twin",
-    "First Degree",
-    "Second Degree",
-    "Third Degree",
-    "Unrelated",
-]
-
-READV2_DEGREE_MAP = {
-    "IdenticalTwins/SameIndividual": "Identical/Twin",
-    "First Degree": "First Degree",
-    "Second Degree": "Second Degree",
-    "Third Degree": "Third Degree",
-    "Unrelated/Consistent with Third Degree": "Unrelated",
-    "Unrelated": "Unrelated",
-}
 
 
 def seconds_to_minutes(df: pd.DataFrame) -> pd.DataFrame:
@@ -119,109 +95,8 @@ def save_bar_plot(
     plt.close(fig)
 
 
-def build_pair_comparison() -> pd.DataFrame:
-    # Load fastpmr results
-    npz = np.load(FASTPMR_NPZ, allow_pickle=True)
-    samples = json.loads(npz["samples.json"])
-    degree_labels = json.loads(npz["degree_labels.json"])
-    degrees = npz["degrees"]
-    mismatch_rates = npz["mismatch_rates"]
-
-    # Map IID -> sample index (READv2 uses IID from the .fam file)
-    iid_to_idx = {}
-    for idx, name in enumerate(samples):
-        iid = name.split(":", 1)[1]
-        iid_to_idx[iid] = idx
-
-    # Load READv2 results
-    readv2_df = pd.read_csv(READV2_TSV, sep="\t")
-
-    rows = []
-    for _, row in readv2_df.iterrows():
-        id_a, id_b = row["PairIndividuals"].split(",")
-        idx_a = iid_to_idx[id_a]
-        idx_b = iid_to_idx[id_b]
-        rows.append(
-            {
-                "fastpmr_degree": degree_labels[degrees[idx_a, idx_b]],
-                "READv2_degree": READV2_DEGREE_MAP[row["Rel"]],
-                "fastpmr_mismatch_rate": float(mismatch_rates[idx_a, idx_b]),
-                "READv2_mismatch_rate": float(row["Nonnormalized_P0"]),
-            }
-        )
-    return pd.DataFrame(rows)
-
-
-def save_confusion_matrix(comparison: pd.DataFrame, output_path: Path) -> None:
-    ct = pd.crosstab(
-        comparison["READv2_degree"],
-        comparison["fastpmr_degree"],
-        dropna=False,
-    )
-    # Reindex to canonical degree order (fill missing with 0)
-    ct = ct.reindex(index=DEGREE_ORDER, columns=DEGREE_ORDER, fill_value=0)
-
-    # Mask zero cells so they render as a neutral background; apply LogNorm
-    # to the remaining non-zero cells to keep small counts visible alongside
-    # the dominant diagonal. Annotations still display "0" in masked cells.
-    mask = ct == 0
-    cmap = plt.get_cmap("Blues").copy()
-    cmap.set_bad(color="#f2f2f2")
-
-    fig, ax = plt.subplots(figsize=(7, 6), constrained_layout=True)
-    sns.heatmap(
-        ct,
-        annot=True,
-        fmt="d",
-        cmap=cmap,
-        mask=mask,
-        norm=LogNorm(vmin=1, vmax=ct.values.max()),
-        linewidths=0.5,
-        linecolor="white",
-        square=True,
-        cbar_kws={"label": "Number of Pairs"},
-        ax=ax,
-    )
-    # Redraw annotations for the masked (zero) cells, which seaborn skips.
-    for i in range(ct.shape[0]):
-        for j in range(ct.shape[1]):
-            if mask.iat[i, j]:
-                ax.text(
-                    j + 0.5,
-                    i + 0.5,
-                    "0",
-                    ha="center",
-                    va="center",
-                    color="#999999",
-                    fontsize=10,
-                )
-    ax.set_xlabel("fastpmr", fontsize=14)
-    ax.set_ylabel("READv2", fontsize=14)
-    ax.set_title("Degree Classification Confusion Matrix", fontsize=15)
-    ax.tick_params(axis="both", labelsize=11)
-    # Rotate labels for readability
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha="right")
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
-
-    fig.savefig(output_path, bbox_inches="tight", dpi=600)
-    plt.close(fig)
-
-
-def check_pmr_agreement(comparison: pd.DataFrame) -> None:
-    diffs = (comparison["fastpmr_mismatch_rate"] - comparison["READv2_mismatch_rate"]).abs()
-    max_diff = float(diffs.max())
-    if max_diff < PMR_TOLERANCE:
-        print(f"All mismatch rates match within {PMR_TOLERANCE} (max diff = {max_diff:.2e}).")
-    else:
-        print(f"Some mismatch rates differ by more than {PMR_TOLERANCE} (max diff = {max_diff:.2e}).")
-
-
 def main() -> None:
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
-
-    pair_comparison = build_pair_comparison()
-    save_confusion_matrix(pair_comparison, PLOTS_DIR / "degree_classification_confusion_matrix.pdf")
-    check_pmr_agreement(pair_comparison)
 
     readv2_df = pd.read_csv(READV2_CSV)
     readv2_df = bytes_to_gb(readv2_df)
