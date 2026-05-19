@@ -92,7 +92,7 @@ def main() -> None:
     pairs_df = bytes_to_mb(pairs_df)
 
     fig, axes = plt.subplots(3, 2, figsize=(10, 14), constrained_layout=True)
-    fig.get_layout_engine().set(hspace=0.04)
+    fig.get_layout_engine().set(wspace=0.04, hspace=0.04)
 
     plot_line(
         axes[0, 0],

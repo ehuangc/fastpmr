@@ -101,6 +101,7 @@ def main() -> None:
     readv2_df = seconds_to_minutes(readv2_df)
 
     fig, (ax_rt, ax_mem) = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
+    fig.get_layout_engine().set(wspace=0.04)
 
     plot_bar(
         ax_rt,
