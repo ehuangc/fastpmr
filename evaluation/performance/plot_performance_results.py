@@ -91,30 +91,21 @@ def main() -> None:
     pairs_df = pairs_df.sort_values("pairs")
     pairs_df = bytes_to_mb(pairs_df)
 
-    fig, axes = plt.subplots(3, 2, figsize=(10, 14), constrained_layout=True)
-    fig.get_layout_engine().set(wspace=0.04, hspace=0.04)
+    fig, axes = plt.subplots(3, 2, figsize=(10, 12), constrained_layout=True)
+    fig.get_layout_engine().set(wspace=0.04, hspace=0.06)
 
     plot_line(
-        axes[0, 0],
-        threads_df,
-        "threads",
-        "mean_s",
-        "stddev_s",
-        "Threads",
-        "Mean Runtime (s)",
-        "Runtime vs. Thread Count",
-        x_left=-20,
+        axes[0, 0], pairs_df, "pairs", "mean_s", "stddev_s", "Samples", "Mean Runtime (s)", "Runtime vs. Sample Count"
     )
     plot_line(
         axes[0, 1],
-        threads_df,
-        "threads",
+        pairs_df,
+        "pairs",
         "mean_mb",
         "stddev_mb",
-        "Threads",
+        "Samples",
         "Peak RSS (MB)",
-        "Peak Memory vs. Thread Count",
-        x_left=-20,
+        "Peak Memory vs. Sample Count",
     )
     plot_line(
         axes[1, 0],
@@ -139,17 +130,26 @@ def main() -> None:
         x_scale=1e5,
     )
     plot_line(
-        axes[2, 0], pairs_df, "pairs", "mean_s", "stddev_s", "Samples", "Mean Runtime (s)", "Runtime vs. Sample Count"
+        axes[2, 0],
+        threads_df,
+        "threads",
+        "mean_s",
+        "stddev_s",
+        "Threads",
+        "Mean Runtime (s)",
+        "Runtime vs. Thread Count",
+        x_left=-20,
     )
     plot_line(
         axes[2, 1],
-        pairs_df,
-        "pairs",
+        threads_df,
+        "threads",
         "mean_mb",
         "stddev_mb",
-        "Samples",
+        "Threads",
         "Peak RSS (MB)",
-        "Peak Memory vs. Sample Count",
+        "Peak Memory vs. Thread Count",
+        x_left=-20,
     )
 
     for idx, ax in enumerate(axes.flat):
