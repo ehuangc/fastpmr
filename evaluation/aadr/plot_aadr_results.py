@@ -51,6 +51,13 @@ TIME_BINS: list[tuple[float, float, str]] = [
     (2_000.0, 5_000.0, "5,000-2,000 BP"),
     (500.0, 2_000.0, "2,000-500 BP"),
 ]
+PALETTE = sns.color_palette("colorblind")
+BIN_COLORS = {
+    ">10,000 BP": PALETTE[0],  # Blue
+    "10,000-5,000 BP": PALETTE[1],  # Orange
+    "5,000-2,000 BP": PALETTE[4],  # Purple
+    "2,000-500 BP": PALETTE[2],  # Teal
+}
 
 # Waypoints approximate overland routes around major water bodies, inspired by the
 # approach of Ramachandran et al. 2005 (https://doi.org/10.1073/pnas.0507611102).
@@ -215,9 +222,10 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
     fig, axes = plt.subplots(
         2,
         2,
-        figsize=(14, 8.75),
+        figsize=(10, 6.75),
         subplot_kw={"projection": ccrs.Robinson(central_longitude=150)},
         constrained_layout=True,
+        gridspec_kw={"hspace": 0.05},
     )
     axes_flat = axes.ravel()
 
@@ -233,7 +241,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
         ax.add_feature(cfeature.COASTLINE, linewidth=0.4, edgecolor="#555555")
 
         bin_cells = cells[cells["bin_idx"] == bin_i]
-        ax.set_title(f"{label}\n(n={len(bin_cells)} localities)", fontsize=12)
+        ax.set_title(f"{label}\n(n={len(bin_cells)} localities)", fontsize=14, pad=6)
         sizes = 20 + 3 * np.clip(bin_cells["n_pairs"].to_numpy(), 0, 20)
         scatter = ax.scatter(
             bin_cells["lon"].to_numpy(),
@@ -257,11 +265,12 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
             shrink=0.5,
             aspect=40,
             extend="both",
+            pad=0.04,
         )
-        cbar.set_label("Median within-locality pairwise mismatch rate", fontsize=12)
-        cbar.ax.tick_params(labelsize=12)
+        cbar.set_label("Median within-locality pairwise mismatch rate", fontsize=14)
+        cbar.ax.tick_params(labelsize=14)
 
-    fig.suptitle("AADR median pairwise mismatch rates, by locality and era", fontsize=14)
+    fig.suptitle("AADR median pairwise mismatch rates, by locality and era", fontsize=16)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
@@ -287,18 +296,16 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
     y = cells["median_pmr"].to_numpy()
     slope, intercept, r_value, _p_value, _se = stats.linregress(x, y)
 
-    fig, ax = plt.subplots(figsize=(8, 5.5), constrained_layout=True)
-    palette = sns.color_palette("colorblind")
-    colors = [palette[i] for i in (0, 1, 4, 2)]  # Blue, orange, purple, teal
+    fig, ax = plt.subplots(figsize=(10, 6.875), constrained_layout=True)
     n_pairs = cells["n_pairs"].to_numpy()
-    sizes = 20 + 3 * np.clip(n_pairs, 0, 20)
+    sizes = 30 + 5 * np.clip(n_pairs, 0, 20)
     for bin_i, (_low, _high, label) in enumerate(TIME_BINS):
         mask = cells["bin_idx"].to_numpy() == bin_i
         ax.scatter(
             x[mask],
             y[mask],
             label=label,
-            color=colors[bin_i],
+            color=BIN_COLORS[label],
             s=sizes[mask],
             alpha=0.7,
             edgecolor="black",
@@ -345,10 +352,11 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
             bbox={"boxstyle": "round,pad=0.4", "fc": "white", "ec": "black", "alpha": 0.5},
         )
 
-    ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=12)
-    ax.set_ylabel("Median within-locality PMR", fontsize=12)
-    ax.set_title('Median within-locality PMR vs. migratory "Out of Africa" distance', fontsize=13)
-    ax.legend(fontsize=9, loc="upper right")
+    ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=16)
+    ax.set_ylabel("Median within-locality PMR", fontsize=16)
+    ax.set_title('Median within-locality PMR vs. migratory "Out of Africa" distance', fontsize=16)
+    ax.tick_params(axis="both", labelsize=14)
+    ax.legend(fontsize=11, loc="upper right")
 
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
@@ -364,15 +372,14 @@ def format_p_value(p: float) -> str:
     return "n.s."
 
 
-def draw_significance_brackets(ax: plt.Axes, data: pd.DataFrame, bins: list[str]) -> None:
+def draw_significance_brackets(
+    ax: plt.Axes, data: pd.DataFrame, bins: list[str], bracket_gap: float, tip_len: float
+) -> None:
     """Draw brackets between time bins, using Mann-Whitney U p-values"""
     groups = [data.loc[data["bin_label"] == b, "median_pmr"].to_numpy() for b in bins]
     comparisons = [(0, 1), (1, 2), (0, 2)]
 
     y_max = max(g.max() for g in groups if len(g) > 0)
-    y_range = ax.get_ylim()[1] - ax.get_ylim()[0]
-    bracket_gap = 0.06 * y_range
-    tip_len = 0.012 * y_range
 
     # Sort comparisons by span so narrower brackets are drawn lower
     comparisons.sort(key=lambda pair: pair[1] - pair[0])
@@ -383,8 +390,10 @@ def draw_significance_brackets(ax: plt.Axes, data: pd.DataFrame, bins: list[str]
         label = format_p_value(p)
 
         y = y_cursor
-        ax.plot([i, i, j, j], [y - tip_len, y, y, y - tip_len], lw=1.0, color="black")
-        ax.text((i + j) / 2, y, label, ha="center", va="bottom", fontsize=9)
+        xi = i
+        xj = j
+        ax.plot([xi, xi, xj, xj], [y - tip_len, y, y, y - tip_len], lw=1.0, color="black")
+        ax.text((i + j) / 2, y, label, ha="center", va="bottom", fontsize=12)
         y_cursor = y + bracket_gap + tip_len
 
 
@@ -398,7 +407,13 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
         ("americas", "Americas"),
     ]
 
-    fig, axes = plt.subplots(1, 3, figsize=(16, 5.5), constrained_layout=True, sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(10, 4.5), constrained_layout=True, sharey=True)
+
+    # Compute shared bracket spacing from the global y-range
+    all_pmr = cells[cells["bin_label"].isin(bins)]["median_pmr"]
+    y_range = all_pmr.max() - all_pmr.min()
+    bracket_gap = 0.06 * y_range
+    tip_len = 0.012 * y_range
 
     for ax, (region, title) in zip(axes, panels, strict=True):
         region_cells = cells[(cells["region"] == region) & (cells["bin_label"].isin(bins))].copy()
@@ -407,17 +422,32 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
             data=region_cells,
             x="bin_label",
             y="median_pmr",
+            hue="bin_label",
+            palette=BIN_COLORS,
+            dodge=False,
             fliersize=4,
+            width=0.6,
+            legend=False,
             ax=ax,
         )
-        draw_significance_brackets(ax, region_cells, bins)
-        ax.set_xlabel("Time period", fontsize=12)
-        ax.set_title(title, fontsize=13)
+        ax.set_xlabel("")
+        ax.set_xticks(range(len(bins)))
+        ax.set_xticklabels([""] * len(bins))
+        ax.tick_params(axis="x", length=0)
+        ax.margins(x=0.15)
+        ax.set_title(title, fontsize=14)
+        ax.tick_params(axis="y", labelsize=14)
+        draw_significance_brackets(ax, region_cells, bins, bracket_gap, tip_len)
 
-    bottom, top = axes[0].get_ylim()
-    axes[0].set_ylim(bottom, top * 1.02)
-    axes[0].set_ylabel("Median within-locality PMR", fontsize=12)
-    fig.suptitle("Within-locality PMR by region and time period", fontsize=14)
+    # Set shared y-limits: preserve auto lower bound, add modest headroom on top
+    y_lo, y_hi = axes[0].get_ylim()
+    axes[0].set_ylim(y_lo, y_hi + 0.03 * (y_hi - y_lo))
+
+    handles = [plt.Rectangle((0, 0), 1, 1, facecolor=BIN_COLORS[b], edgecolor="black", linewidth=0.8) for b in bins]
+    fig.legend(handles, bins, loc="outside lower center", ncol=len(bins), fontsize=14, frameon=False)
+
+    axes[0].set_ylabel("Median within-locality PMR", fontsize=14)
+    fig.suptitle("Within-locality PMR by region and time period", fontsize=16)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
