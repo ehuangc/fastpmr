@@ -338,7 +338,7 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
         ax.scatter(
             [ox],
             [oy],
-            s=250,
+            s=400,
             facecolors="none",
             edgecolors="black",
             alpha=0.5,
