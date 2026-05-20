@@ -102,7 +102,7 @@ COUNTRY_TO_REGION: dict[str, str] = {
 }
 # fmt: on
 EURASIA_REGIONS = {"asia", "europe"}
-# US Pacific territories that reverse_geocoder reports as "US" but should classify as Oceania.
+# US Pacific territories that reverse_geocoder reports as "US" but should classify as Oceania
 US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"

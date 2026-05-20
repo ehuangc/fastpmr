@@ -18,7 +18,7 @@ SEX_CHROMOSOMES = {23, 24}
 
 
 # Filter sex chromosomes at the data level for comparison benchmark because READv2 doesn't
-# support filtering by chromosome.
+# support filtering by chromosome
 def filter_sex_chromosomes(prefix: Path, chrs_to_exclude: set[int]) -> None:
     plink_in = plinkfile.open(str(prefix))
     samples = plink_in.get_samples()

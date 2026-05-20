@@ -60,7 +60,7 @@ BIN_COLORS = {
 }
 
 # Waypoints approximate overland routes around major water bodies, inspired by the
-# approach of Ramachandran et al. 2005 (https://doi.org/10.1073/pnas.0507611102).
+# approach of Ramachandran et al. 2005 (https://doi.org/10.1073/pnas.0507611102)
 WAYPOINT_COORDS = {
     "addis_ababa": (9, 38),
     "cairo": (30, 31),
@@ -86,7 +86,7 @@ def filter_and_extract(
     metadata: dict[str, dict[str, str]],
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     # First pass: collect every sample that passes the per-sample filters,
-    # along with its Individual ID and covered-SNP count for deduplication.
+    # along with its Individual ID and covered-SNP count for deduplication
     candidates: list[tuple[int, float, float, float, str, str]] = []
     candidate_individual_ids: list[str] = []
     candidate_covered_snps: list[int] = []
@@ -118,8 +118,8 @@ def filter_and_extract(
         candidate_individual_ids.append(individual_id)
         candidate_covered_snps.append(int(covered_snps[sample_idx]))
 
-    # Drop known duplicates by AADR individual ID, keeping the sample with the most covered SNPs in each group.
-    # Samples without a individual ID are kept as-is.
+    # Drop known duplicates by AADR individual ID, keeping the sample with the most covered SNPs in each group
+    # Samples without a individual ID are kept as-is
     best_pos_by_individual: dict[str, int] = {}
     for pos, individual_id in enumerate(candidate_individual_ids):
         if not individual_id or individual_id == "..":
