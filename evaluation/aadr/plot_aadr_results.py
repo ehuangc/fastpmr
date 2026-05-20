@@ -47,16 +47,16 @@ OVERLAP_THRESHOLD = 30_000
 MIN_PAIRS_PER_CELL = 5
 TIME_BINS: list[tuple[float, float, str]] = [
     (10_000.0, np.inf, ">10,000 BP"),
-    (5_000.0, 10_000.0, "10,000-5,000 BP"),
-    (2_000.0, 5_000.0, "5,000-2,000 BP"),
-    (500.0, 2_000.0, "2,000-500 BP"),
+    (5_000.0, 10_000.0, "10,000–5,000 BP"),
+    (2_000.0, 5_000.0, "5,000–2,000 BP"),
+    (500.0, 2_000.0, "2,000–500 BP"),
 ]
 PALETTE = sns.color_palette("colorblind")
 BIN_COLORS = {
     ">10,000 BP": PALETTE[0],  # Blue
-    "10,000-5,000 BP": PALETTE[1],  # Orange
-    "5,000-2,000 BP": PALETTE[4],  # Purple
-    "2,000-500 BP": PALETTE[2],  # Teal
+    "10,000–5,000 BP": PALETTE[1],  # Orange
+    "5,000–2,000 BP": PALETTE[4],  # Purple
+    "2,000–500 BP": PALETTE[2],  # Teal
 }
 
 # Waypoints approximate overland routes around major water bodies, inspired by the
@@ -400,7 +400,7 @@ def draw_significance_brackets(
 def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
     """Multi-panel box plot of median within-locality PMR,
     stratified by time period for Europe, Asia, and the Americas."""
-    bins = ["10,000-5,000 BP", "5,000-2,000 BP", "2,000-500 BP"]
+    bins = ["10,000–5,000 BP", "5,000–2,000 BP", "2,000–500 BP"]
     panels = [
         ("europe", "Europe"),
         ("asia", "Asia"),
