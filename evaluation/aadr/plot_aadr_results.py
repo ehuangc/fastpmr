@@ -346,9 +346,9 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
         ax.annotate(
             label,
             xy=(ox, oy),
-            xytext=(16, -18),
+            xytext=(18, -18),
             textcoords="offset points",
-            fontsize=9,
+            fontsize=11,
             bbox={"boxstyle": "round,pad=0.4", "fc": "white", "ec": "black", "alpha": 0.5},
         )
 
