@@ -270,7 +270,7 @@ def plot_map(cells: pd.DataFrame, output_path: Path) -> None:
         cbar.set_label("Median within-locality pairwise mismatch rate", fontsize=14)
         cbar.ax.tick_params(labelsize=14)
 
-    fig.suptitle("AADR median pairwise mismatch rates, by locality and era", fontsize=16)
+    fig.suptitle("AADR median PMRs by locality and time period", fontsize=16)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
