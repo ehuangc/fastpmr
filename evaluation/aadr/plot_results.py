@@ -354,7 +354,7 @@ def plot_pmr_vs_migratory_distance(cells: pd.DataFrame, output_path: Path) -> No
 
     ax.set_xlabel("Waypoint distance from Addis Ababa (×1000 km)", fontsize=16)
     ax.set_ylabel("Median within-locality PMR", fontsize=16)
-    ax.set_title('Median within-locality PMR vs. migratory "Out of Africa" distance', fontsize=16)
+    ax.set_title('AADR median within-locality PMR vs. migratory "Out of Africa" distance', fontsize=16)
     ax.tick_params(axis="both", labelsize=14)
     ax.legend(fontsize=11, loc="upper right")
 
@@ -447,7 +447,7 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
     fig.legend(handles, bins, loc="outside lower center", ncol=len(bins), fontsize=14, frameon=False)
 
     axes[0].set_ylabel("Median within-locality PMR", fontsize=14)
-    fig.suptitle("Within-locality PMR by region and time period", fontsize=16)
+    fig.suptitle("AADR median within-locality PMR by region and time period", fontsize=16)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
