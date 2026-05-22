@@ -398,7 +398,7 @@ def draw_significance_brackets(
 
 
 def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
-    """Multi-panel box plot of median within-locality PMR,
+    """Multi-panel box plot of median within-locality PMRs,
     stratified by time period for Europe, Asia, and the Americas."""
     bins = ["10,000–5,000 BP", "5,000–2,000 BP", "2,000–500 BP"]
     panels = [
@@ -447,7 +447,7 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
     fig.legend(handles, bins, loc="outside lower center", ncol=len(bins), fontsize=14, frameon=False)
 
     axes[0].set_ylabel("Median within-locality PMR", fontsize=14)
-    fig.suptitle("AADR median within-locality PMR by region and time period", fontsize=16)
+    fig.suptitle("AADR median within-locality PMRs by region and time period", fontsize=16)
     fig.savefig(output_path, dpi=600)
     plt.close(fig)
 
