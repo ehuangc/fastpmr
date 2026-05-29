@@ -6,6 +6,8 @@
    on a global map stratified by time period.
 
 2) Plot within-locality PMR vs. migratory distance from Addis Ababa, Ethiopia.
+
+3) Plot box plots of within-locality PMRs by time period for Europe, Asia, and the Americas.
 """
 
 from pathlib import Path
