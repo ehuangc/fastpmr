@@ -1,5 +1,4 @@
 from evaluation_utils.core import (
-    AADR_ANOMALOUS_LOCALITY_PREFIXES,
     AADR_DATA_PREFIX,
     AADR_DIR,
     AADR_EXTS,
@@ -49,7 +48,6 @@ __all__ = [
     "add_panel_label",
     "AADR_DATA_PREFIX",
     "AADR_DIR",
-    "AADR_ANOMALOUS_LOCALITY_PREFIXES",
     "AADR_EXTS",
     "AADR_METADATA_PATH",
     "AADR_NPZ_PATH",

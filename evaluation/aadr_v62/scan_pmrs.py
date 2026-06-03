@@ -15,7 +15,6 @@ from evaluation_utils import (
 AADR_V62_DIR = Path(__file__).resolve().parent
 AADR_V62_NPZ_PATH = AADR_V62_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 AADR_V62_METADATA_PATH = AADR_V62_DIR / "data" / "v62.0_1240k_public.anno"
-AADR_V62_ANOMALOUS_LOCALITY_PREFIXES = "Valdescusa"
 
 # v62 AADR metadata field names
 LAT_FIELD = "Lat."
@@ -71,7 +70,6 @@ def filter_samples(
     mismatch_rates_95_ci_upper: np.ndarray,
     metadata: dict[str, dict[str, str]],
     eurasia_only: bool,
-    exclude_localities: bool,
 ) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     candidate_indices: list[int] = []
     candidate_coords: list[tuple[float, float]] = []
@@ -82,8 +80,6 @@ def filter_samples(
             lat = float(metadata[sample][LAT_FIELD])
             lon = float(metadata[sample][LON_FIELD])
         except (TypeError, ValueError):
-            continue
-        if exclude_localities and metadata[sample][LOCALITY_FIELD].startswith(AADR_V62_ANOMALOUS_LOCALITY_PREFIXES):
             continue
         candidate_indices.append(idx)
         candidate_coords.append((lat, lon))
@@ -357,7 +353,6 @@ def main() -> None:
         mismatch_rates_95_ci_upper,
         metadata,
         eurasia_only=False,
-        exclude_localities=False,
     )
     filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in filtered_samples]
 
@@ -424,7 +419,6 @@ def main() -> None:
         mismatch_rates_95_ci_upper,
         metadata,
         eurasia_only=True,
-        exclude_localities=True,
     )
     eurasia_filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in eurasia_filtered_samples]
     eurasia_filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in eurasia_filtered_samples]

@@ -6,7 +6,6 @@ import pandas as pd
 from haversine import haversine
 
 from evaluation_utils import (
-    AADR_ANOMALOUS_LOCALITY_PREFIXES,
     AADR_DIR,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
@@ -48,7 +47,6 @@ def filter_samples(
     mismatch_rates_95_ci_upper: np.ndarray,
     metadata: dict[str, dict[str, str]],
     eurasia_only: bool,
-    exclude_localities: bool,
 ) -> tuple[list[str], np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     candidate_indices: list[int] = []
     candidate_coords: list[tuple[float, float]] = []
@@ -59,8 +57,6 @@ def filter_samples(
             lat = float(metadata[sample][LAT_FIELD])
             lon = float(metadata[sample][LON_FIELD])
         except (TypeError, ValueError):
-            continue
-        if exclude_localities and metadata[sample][LOCALITY_FIELD].startswith(AADR_ANOMALOUS_LOCALITY_PREFIXES):
             continue
         candidate_indices.append(idx)
         candidate_coords.append((lat, lon))
@@ -334,7 +330,6 @@ def main() -> None:
         mismatch_rates_95_ci_upper,
         metadata,
         eurasia_only=False,
-        exclude_localities=False,
     )
     filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in filtered_samples]
 
@@ -401,7 +396,6 @@ def main() -> None:
         mismatch_rates_95_ci_upper,
         metadata,
         eurasia_only=True,
-        exclude_localities=True,
     )
     eurasia_filtered_individual_ids = [metadata[sample][INDIVIDUAL_ID_FIELD] for sample in eurasia_filtered_samples]
     eurasia_filtered_localities = [metadata[sample][LOCALITY_FIELD] for sample in eurasia_filtered_samples]
