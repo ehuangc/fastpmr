@@ -50,6 +50,10 @@ scan-aadr = "python aadr/scan_pmrs.py"
 plot-aadr = "python aadr/plot_results.py"
 fit-gp-aadr = "python aadr/fit_gp.py"
 
+prepare-aadr-v62 = "python aadr_v62/prepare_aadr_data.py"
+fastpmr-aadr-v62 = "python aadr_v62/run_fastpmr.py"
+scan-aadr-v62 = "python aadr_v62/scan_pmrs.py"
+
 prepare-performance = "python performance/prepare_indo_european_data.py"
 pairs-benchmark = "python performance/pair_count_benchmark.py"
 variants-benchmark = "python performance/variant_count_benchmark.py"
@@ -67,6 +71,11 @@ aadr-pipeline = [
     { task = "fastpmr-aadr" },
     { task = "scan-aadr" },
     { task = "plot-aadr" },
+]
+aadr-v62-pipeline = [
+    { task = "prepare-aadr-v62" },
+    { task = "fastpmr-aadr-v62" },
+    { task = "scan-aadr-v62" },
 ]
 performance-pipeline = [
     { task = "prepare-performance" },

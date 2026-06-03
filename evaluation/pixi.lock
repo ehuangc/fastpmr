@@ -1032,7 +1032,7 @@ packages:
 - pypi: ./
   name: evaluation-utils
   version: 0.1.0
-  sha256: 08dab565554554d86b1db737bed6ad377f5348a1e2c2e6edbc7bcb780b722adb
+  sha256: cf642d52393a92f9545798aff4932b078caa2e93008b1fea2e85893579de11f2
   requires_python: '>=3.10'
 - conda: https://conda.anaconda.org/conda-forge/noarch/exceptiongroup-1.3.1-pyhd8ed1ab_0.conda
   sha256: ee6cf346d017d954255bbcbdb424cddea4d14e4ed7e9813e429db1d795d01144
