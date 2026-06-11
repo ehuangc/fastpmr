@@ -72,7 +72,7 @@ LEARNING_RATE = 0.01
 # Equal-area projection used for both training inputs and map plotting
 PROJECTION = ccrs.LambertAzimuthalEqualArea(central_longitude=15, central_latitude=50)
 
-TIME_SLICES_BP = [8_000, 5_000, 3_000, 1_000]
+TIME_SLICES_BP = [9_000, 6_000, 3_000, 1_000]
 GRID_RESOLUTION_DEG = 1.0
 
 # Lat/lon bounding box used for sample filtering, as (lon_min, lon_max, lat_min, lat_max).
