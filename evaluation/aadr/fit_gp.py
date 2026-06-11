@@ -236,13 +236,22 @@ class SwapSymmetricKernel(gpytorch.kernels.Kernel):
         diag: bool = False,
         **params: object,
     ) -> torch.Tensor:
+        # Split each 6-d pair encoding into its two 3-d points: (..., n, 3) each
         si1, sj1 = x1[..., :3], x1[..., 3:]
         si2, sj2 = x2[..., :3], x2[..., 3:]
+        # Stack along a new batch dim of size 4 so that a[t], b[t] enumerate
+        # all 2x2 point combinations: (i1, i2), (i1, j2), (j1, i2), (j1, j2)
         a = torch.stack([si1, si1, sj1, sj1])
         b = torch.stack([si2, sj2, si2, sj2])
+        # One batched kernel call: K[t] = k(a[t], b[t]), shape (4, ..., n, m)
+        # (or (4, ..., n) if diag=True). Hyperparameters broadcast over the 4.
         K = self.base_kernel(a, b, diag=diag)
         if not isinstance(K, torch.Tensor):
             K = K.to_dense()
+        # By bilinearity of covariance,
+        # Cov(f(si1) + f(sj1), f(si2) + f(sj2))
+        #   = k(si1, si2) + k(si1, sj2) + k(sj1, si2) + k(sj1, sj2),
+        # which is exactly K[0] + K[1] + K[2] + K[3]
         return K.sum(0)
 
 
