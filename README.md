@@ -37,7 +37,7 @@ fastpmr -p PREFIX [-o OUTPUT_DIRECTORY] [-n] [-d] [-i] [-s SAMPLE_PAIRS_CSV] [-v
 
 **Degrees** (`-d`, `--degrees`) (*flag*): Call degrees of relatedness for each sample pair, using the procedure described in [READv2](https://doi.org/10.1186/s13059-024-03350-3) (Kuhn et al. 2018). Each pair is classified as Identical/Twin, First Degree, Second Degree, Third Degree, or Unrelated based on normalized mismatch rates (mismatch rate divided by the median across all pairs). Third degree inference additionally requires an "expected mismatch" count of at least 3000.
 
-**Confidence Intervals** (`-i`, `--ci`) (*flag*): Compute 95% confidence intervals for pairwise mismatch rates using the Wald method.
+**Confidence Intervals** (`-i`, `--ci`) (*flag*): Compute 95% confidence intervals for pairwise mismatch rates using the Wald method. *Note that these intervals assume independence between sites and will likely result in an aggressively narrow CI.*
 
 **Sample Pairs CSV** (`-s`, `--sample-pairs-csv`) (*optional*): CSV with no header that controls which sample pairs are computed. This parameter accepts 1-column CSVs and 2-column CSVs. 1-column CSVs specify a sample list, and PMRs for all pairs of these samples are computed. 2-column CSVs specify the exact sample pairs for which PMRs are computed.
 
