@@ -33,7 +33,7 @@ POLITICAL_ENTITY_FIELD = "Political Entity"
 
 OUTPUT_DIR = AADR_V62_DIR / "results" / "scans"
 SAME_INDIVIDUAL_OUTPUT_CSV = OUTPUT_DIR / "potential_spurious_duplicates.csv"
-DIFF_INDIVIDUAL_OUTPUT_CSV = OUTPUT_DIR / "potential_missed_duplicates.csv"
+DIFF_INDIVIDUAL_OUTPUT_CSV = OUTPUT_DIR / "potential_cryptic_duplicates.csv"
 DIFF_LOCALITY_OUTPUT_CSV = OUTPUT_DIR / "potential_cross_site_relatives.csv"
 SAME_INDIVIDUAL_HISTOGRAM_PATH = OUTPUT_DIR / "same_individual_id_pmrs.pdf"
 DIFF_INDIVIDUAL_HISTOGRAM_PATH = OUTPUT_DIR / "diff_individual_id_pmrs.pdf"
