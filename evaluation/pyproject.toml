@@ -56,9 +56,9 @@ fastpmr-aadr-v62 = "python aadr_v62/run_fastpmr.py"
 scan-aadr-v62 = "python aadr_v62/scan_pmrs.py"
 
 prepare-performance = "python performance/prepare_data.py"
-pairs-benchmark = "python performance/pair_count_benchmark.py"
-variants-benchmark = "python performance/variant_count_benchmark.py"
-threads-benchmark = "python performance/thread_count_benchmark.py"
+pairs-benchmark = "python performance/run_pair_count_benchmark.py"
+variants-benchmark = "python performance/run_variant_count_benchmark.py"
+threads-benchmark = "python performance/run_thread_count_benchmark.py"
 plot-performance = "python performance/plot_results.py"
 
 prepare-comparison = "python comparison/prepare_data.py"
