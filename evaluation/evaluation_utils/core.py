@@ -159,7 +159,7 @@ def extract_files(archive_path: Path, destination: Path, prefix: Path, exts: tup
             for member in zf.namelist():
                 path = Path(member)
                 if path.suffix in target_exts:
-                    out_path = prefix.with_suffix(path.suffix)
+                    out_path = prefix.with_name(prefix.name + path.suffix)
                     out_path.write_bytes(zf.read(member))
                     extracted.append(out_path.name)
     elif "".join(archive_path.suffixes[-2:]) == ".tar.gz":
@@ -167,7 +167,7 @@ def extract_files(archive_path: Path, destination: Path, prefix: Path, exts: tup
             for member in tar.getmembers():
                 path = Path(member.name)
                 if path.suffix in target_exts:
-                    out_path = prefix.with_suffix(path.suffix)
+                    out_path = prefix.with_name(prefix.name + path.suffix)
                     file_obj = tar.extractfile(member)
                     out_path.write_bytes(file_obj.read())
                     extracted.append(out_path.name)
