@@ -104,11 +104,11 @@ EURASIA_REGIONS = {"asia", "europe"}
 US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
-COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "southern_cone"
+COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "maravall_lopez_et_al"
 
 PERFORMANCE_DIR = EVALUATION_DIR / "performance"
-PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "IEdata"
-PERFORMANCE_SAMPLE_SET_DIR = PERFORMANCE_DIR / "data" / "indo_european_sample_sets"
+PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "lazaridis_et_al"
+PERFORMANCE_SAMPLE_SET_DIR = PERFORMANCE_DIR / "data" / "lazaridis_et_al_sample_sets"
 PERFORMANCE_SAMPLE_SET_SIZES = (
     128,
     256,
@@ -238,10 +238,10 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
             dataset = "AADR dataset"
         elif prefix == COMPARISON_DATA_PREFIX:
             command = "pixi run prepare-comparison"
-            dataset = "Southern Cone dataset"
+            dataset = "Maravall-López et al. dataset"
         else:
             command = "pixi run prepare-performance"
-            dataset = "Indo-European dataset"
+            dataset = "Lazaridis et al. dataset"
         raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to download and unpack the {dataset}.")
 
 

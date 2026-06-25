@@ -12,8 +12,8 @@ from evaluation_utils import (
 )
 
 DATA_DIR = COMPARISON_DATA_PREFIX.parent
-SOUTHERN_CONE_URL = "https://dataverse.harvard.edu/api/access/datafile/12077020?version=2.0"
-ARCHIVE_PATH = DATA_DIR / "southern_cone_dataset.zip"
+MARAVALL_LOPEZ_URL = "https://dataverse.harvard.edu/api/access/datafile/12077020?version=2.0"
+ARCHIVE_PATH = DATA_DIR / "maravall_lopez_et_al_dataset.zip"
 SEX_CHROMOSOMES = {23, 24}
 
 
@@ -40,7 +40,7 @@ def filter_sex_chromosomes(prefix: Path, chrs_to_exclude: set[int]) -> None:
 
 
 def main() -> None:
-    download_file(SOUTHERN_CONE_URL, ARCHIVE_PATH)
+    download_file(MARAVALL_LOPEZ_URL, ARCHIVE_PATH)
     extract_files(ARCHIVE_PATH, DATA_DIR, COMPARISON_DATA_PREFIX, PLINK_EXTS)
     filter_sex_chromosomes(COMPARISON_DATA_PREFIX, SEX_CHROMOSOMES)
 

@@ -44,24 +44,24 @@ plinkio = ">=0.9.8, <0.10"
 reverse_geocoder = ">=1.5.1, <2"
 
 [tool.pixi.tasks]
-prepare-aadr = "python aadr/prepare_aadr_data.py"
+prepare-aadr = "python aadr/prepare_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr.py"
 scan-aadr = "python aadr/scan_pmrs.py"
 plot-aadr = "python aadr/plot_results.py"
 
 fit-gp-aadr = "python aadr/fit_gp.py"
 
-prepare-aadr-v62 = "python aadr_v62/prepare_aadr_data.py"
+prepare-aadr-v62 = "python aadr_v62/prepare_data.py"
 fastpmr-aadr-v62 = "python aadr_v62/run_fastpmr.py"
 scan-aadr-v62 = "python aadr_v62/scan_pmrs.py"
 
-prepare-performance = "python performance/prepare_indo_european_data.py"
+prepare-performance = "python performance/prepare_data.py"
 pairs-benchmark = "python performance/pair_count_benchmark.py"
 variants-benchmark = "python performance/variant_count_benchmark.py"
 threads-benchmark = "python performance/thread_count_benchmark.py"
 plot-performance = "python performance/plot_results.py"
 
-prepare-comparison = "python comparison/prepare_southern_cone_data.py"
+prepare-comparison = "python comparison/prepare_data.py"
 readv2-benchmark = "python comparison/run_readv2_benchmark.py"
 plot-comparison = "python comparison/plot_results.py"
 
