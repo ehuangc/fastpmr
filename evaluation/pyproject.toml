@@ -48,6 +48,7 @@ prepare-aadr = "python aadr/prepare_aadr_data.py"
 fastpmr-aadr = "python aadr/run_fastpmr.py"
 scan-aadr = "python aadr/scan_pmrs.py"
 plot-aadr = "python aadr/plot_results.py"
+
 fit-gp-aadr = "python aadr/fit_gp.py"
 
 prepare-aadr-v62 = "python aadr_v62/prepare_aadr_data.py"
@@ -71,6 +72,9 @@ aadr-pipeline = [
     { task = "fastpmr-aadr" },
     { task = "scan-aadr" },
     { task = "plot-aadr" },
+]
+gp-pipeline = [
+    { task = "fit-gp-aadr" },
 ]
 aadr-v62-pipeline = [
     { task = "prepare-aadr-v62" },
