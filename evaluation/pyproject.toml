@@ -35,6 +35,7 @@ pandas = ">=3.0.1,<4"
 pytest = ">=9.0.3,<10"
 python = ">=3.10,<3.15"
 pytorch = ">=2.10.0,<3"
+samtools = ">=1.21,<2"
 scipy = ">=1.17.0,<2"
 seaborn = ">=0.13.2,<0.14"
 
@@ -42,6 +43,23 @@ seaborn = ">=0.13.2,<0.14"
 evaluation-utils = { path = ".", editable = true }
 plinkio = ">=0.9.8, <0.10"
 reverse_geocoder = ">=1.5.1, <2"
+
+# nf-core/eager 2.4.0 is a DSL1 pipeline, so nextflow must be <= 22.10.6, which
+# pins an old libcurl (<8) that conflicts with samtools and the analysis stack
+[tool.pixi.feature.eager.dependencies]
+python = ">=3.10,<3.15"
+matplotlib = ">=3.10.8,<4"
+nextflow = "<=22.10.6"
+numpy = ">=2.4.1,<3"
+
+[tool.pixi.feature.eager.pypi-dependencies]
+evaluation-utils = { path = ".", editable = true }
+
+[tool.pixi.environments]
+eager = { features = ["eager"], no-default-feature = true }
+
+[tool.pixi.feature.eager.tasks]
+eager-chichen-itza = "python chichen_itza/run_eager.py"
 
 [tool.pixi.tasks]
 prepare-aadr = "python aadr/prepare_data.py"
@@ -60,6 +78,11 @@ pairs-benchmark = "python performance/run_pair_count_benchmark.py"
 variants-benchmark = "python performance/run_variant_count_benchmark.py"
 threads-benchmark = "python performance/run_thread_count_benchmark.py"
 plot-performance = "python performance/plot_results.py"
+
+# Chichen Itza pipeline: prepare-bams -> eager -> fastpmr.
+# eager-chichen-itza runs in the isolated "eager" env, so there's no Pixi pipeline.
+prepare-bams-chichen-itza = "python chichen_itza/prepare_bams.py"
+fastpmr-chichen-itza = "python chichen_itza/run_fastpmr.py"
 
 prepare-comparison = "python comparison/prepare_data.py"
 readv2-benchmark = "python comparison/run_readv2_benchmark.py"

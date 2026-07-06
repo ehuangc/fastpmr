@@ -13,7 +13,6 @@ from multiprocessing.connection import Connection
 from pathlib import Path
 
 import numpy as np
-import reverse_geocoder as rg
 
 EVALUATION_DIR = Path(__file__).resolve().parent.parent
 FASTPMR_BIN = "fastpmr"
@@ -23,6 +22,18 @@ AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 AADR_METADATA_PATH = AADR_DIR / "data" / "v66.1240K.aadr.PUB.anno"
+
+CHICHEN_ITZA_DIR = EVALUATION_DIR / "chichen_itza"
+CHICHEN_ITZA_DATA_DIR = CHICHEN_ITZA_DIR / "data"
+# ENA file report (PRJEB73567) listing the submitted BAMs to download
+CHICHEN_ITZA_FILEREPORT = CHICHEN_ITZA_DATA_DIR / "filereport_read_run_PRJEB73567.json"
+CHICHEN_ITZA_BAM_DIR = CHICHEN_ITZA_DIR / "bams"
+CHICHEN_ITZA_RENAMED_BAM_DIR = CHICHEN_ITZA_BAM_DIR / "renamed"
+CHICHEN_ITZA_TSV = CHICHEN_ITZA_DIR / "config_eager_ych.tsv"
+CHICHEN_ITZA_RESULTS_DIR = CHICHEN_ITZA_DIR / "results"
+# Directory nf-core/eager's pileupcaller genotyping writes into (the per-strandedness and
+# merged EIGENSTRAT prefixes are defined in run_fastpmr.py)
+CHICHEN_ITZA_GENO_DIR = CHICHEN_ITZA_RESULTS_DIR / "genotyping"
 
 # AADR metadata field names
 LAT_FIELD = "Latitude"
@@ -240,6 +251,9 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
         if prefix == AADR_DATA_PREFIX:
             command = "pixi run prepare-aadr"
             dataset = "AADR dataset"
+        elif prefix.parent == CHICHEN_ITZA_GENO_DIR:
+            command = "pixi run eager-chichen-itza"
+            dataset = "Chichen Itza genotypes"
         elif prefix == COMPARISON_DATA_PREFIX:
             command = "pixi run prepare-comparison"
             dataset = "Maravall-López et al. dataset"
@@ -251,6 +265,8 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
 
 def classify_coords(coords: list[tuple[float, float]]) -> list[str]:
     """Classify (lat, lon) coordinates into regions using reverse_geocoder."""
+    import reverse_geocoder as rg
+
     results = rg.search(coords)
     regions: list[str] = []
     for (lat, lon), result in zip(coords, results, strict=True):
