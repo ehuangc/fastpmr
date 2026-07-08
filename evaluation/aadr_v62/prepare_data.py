@@ -5,20 +5,20 @@ from evaluation_utils import download_file
 DATA_DIR = Path(__file__).resolve().parent / "data"
 REMOTE_FILES = [
     (
-        "v62.0_1240k_public.anno",
-        "https://dataverse.harvard.edu/api/access/datafile/10537413?version=9.1",
+        "v62.0.p1_1240k_public.anno",
+        "https://dataverse.harvard.edu/api/access/datafile/13994492?version=11.0",
     ),
     (
-        "v62.0_1240k_public.ind",
-        "https://dataverse.harvard.edu/api/access/datafile/10537414?version=9.1",
+        "v62.0.p1_1240k_public.ind",
+        "https://dataverse.harvard.edu/api/access/datafile/13987487?version=11.0",
     ),
     (
-        "v62.0_1240k_public.snp",
-        "https://dataverse.harvard.edu/api/access/datafile/10537415?version=9.1",
+        "v62.0.p1_1240k_public.snp",
+        "https://dataverse.harvard.edu/api/access/datafile/13987485?version=11.0",
     ),
     (
-        "v62.0_1240k_public.geno",
-        "https://dataverse.harvard.edu/api/access/datafile/10537126?version=9.1",
+        "v62.0.p1_1240k_public.geno",
+        "https://dataverse.harvard.edu/api/access/datafile/13994086?version=11.0",
     ),
 ]
 

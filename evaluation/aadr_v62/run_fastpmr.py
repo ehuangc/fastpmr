@@ -9,7 +9,7 @@ from evaluation_utils import (
 )
 
 AADR_V62_DIR = Path(__file__).resolve().parent
-AADR_V62_DATA_PREFIX = AADR_V62_DIR / "data" / "v62.0_1240k_public"
+AADR_V62_DATA_PREFIX = AADR_V62_DIR / "data" / "v62.0.p1_1240k_public"
 
 
 def ensure_v62_data_present() -> None:

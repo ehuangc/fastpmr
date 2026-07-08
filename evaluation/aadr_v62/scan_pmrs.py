@@ -14,7 +14,7 @@ from evaluation_utils import (
 
 AADR_V62_DIR = Path(__file__).resolve().parent
 AADR_V62_NPZ_PATH = AADR_V62_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
-AADR_V62_METADATA_PATH = AADR_V62_DIR / "data" / "v62.0_1240k_public.anno"
+AADR_V62_METADATA_PATH = AADR_V62_DIR / "data" / "v62.0.p1_1240k_public.anno"
 
 # v62 AADR metadata field names
 LAT_FIELD = "Lat."
