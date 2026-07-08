@@ -25,8 +25,16 @@ AADR_METADATA_PATH = AADR_DIR / "data" / "v66.1240K.aadr.PUB.anno"
 
 CHICHEN_ITZA_DIR = EVALUATION_DIR / "chichen_itza"
 CHICHEN_ITZA_DATA_DIR = CHICHEN_ITZA_DIR / "data"
-# ENA file report (PRJEB73567) listing the submitted BAMs to download
-CHICHEN_ITZA_FILEREPORT = CHICHEN_ITZA_DATA_DIR / "filereport_read_run_PRJEB73567.json"
+# ENA accession with the submitted BAMs
+CHICHEN_ITZA_ACCESSION = "PRJEB73567"
+CHICHEN_ITZA_FILEREPORT = CHICHEN_ITZA_DATA_DIR / f"filereport_read_run_{CHICHEN_ITZA_ACCESSION}.json"
+# ENA portal API query fetching the file report as JSON; submitted_ftp gives the BAM/BAI
+# URLs and library_construction_protocol encodes single- vs. double-stranded (see run_eager.py)
+CHICHEN_ITZA_FILEREPORT_URL = (
+    "https://www.ebi.ac.uk/ena/portal/api/filereport"
+    f"?accession={CHICHEN_ITZA_ACCESSION}&result=read_run"
+    "&fields=submitted_ftp,library_construction_protocol&format=json"
+)
 CHICHEN_ITZA_BAM_DIR = CHICHEN_ITZA_DIR / "bams"
 CHICHEN_ITZA_RENAMED_BAM_DIR = CHICHEN_ITZA_BAM_DIR / "renamed"
 CHICHEN_ITZA_TSV = CHICHEN_ITZA_DIR / "config_eager_ych.tsv"

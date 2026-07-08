@@ -5,6 +5,7 @@ import subprocess
 from evaluation_utils import (
     CHICHEN_ITZA_BAM_DIR,
     CHICHEN_ITZA_FILEREPORT,
+    CHICHEN_ITZA_FILEREPORT_URL,
     CHICHEN_ITZA_RENAMED_BAM_DIR,
     download_file,
 )
@@ -48,6 +49,7 @@ def rename_bams() -> None:
 
 
 def main() -> None:
+    download_file(CHICHEN_ITZA_FILEREPORT_URL, CHICHEN_ITZA_FILEREPORT)
     download_bams()
     rename_bams()
 
