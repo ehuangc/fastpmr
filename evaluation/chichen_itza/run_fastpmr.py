@@ -1,6 +1,8 @@
 import subprocess
 from pathlib import Path
 
+import pandas as pd
+
 from evaluation_utils import (
     CHICHEN_ITZA_GENO_DIR,
     CHICHEN_ITZA_RESULTS_DIR,
@@ -51,6 +53,14 @@ def build_command(prefix: Path, output_dir: Path) -> str:
     return " ".join(parts)
 
 
+def sort_results(results_path: Path) -> Path:
+    # Sort fastpmr pair results by increasing PMR
+    sorted_path = results_path.with_name(f"{results_path.stem}_sorted{results_path.suffix}")
+    df = pd.read_csv(results_path).sort_values("mismatch_rate")
+    df.to_csv(sorted_path, index=False)
+    return sorted_path
+
+
 def main() -> None:
     ensure_data_present(CHICHEN_ITZA_GENO_SINGLE_PREFIX, EIGENSTRAT_EXTS)
     ensure_data_present(CHICHEN_ITZA_GENO_DOUBLE_PREFIX, EIGENSTRAT_EXTS)
@@ -61,6 +71,7 @@ def main() -> None:
 
     command = build_command(CHICHEN_ITZA_GENO_MERGED_PREFIX, fastpmr_output_dir)
     subprocess.run(command, shell=True, check=True)
+    sort_results(fastpmr_output_dir / "fastpmr_pair_results.csv")
 
 
 if __name__ == "__main__":
