@@ -1,4 +1,5 @@
-from evaluation_utils import AADR_DIR, download_file
+from evaluation_utils.constants import AADR_DIR
+from evaluation_utils.core import download_file
 
 DATA_DIR = AADR_DIR / "data"
 REMOTE_FILES = [

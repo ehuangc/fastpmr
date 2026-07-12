@@ -1,9 +1,11 @@
 from pathlib import Path
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     AADR_EXTS,
     AADR_RUNS,
     FASTPMR_BIN,
+)
+from evaluation_utils.core import (
     quote_path,
     run_benchmark,
 )

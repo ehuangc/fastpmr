@@ -3,11 +3,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     CHICHEN_ITZA_GENO_DIR,
     CHICHEN_ITZA_RESULTS_DIR,
     EIGENSTRAT_EXTS,
     FASTPMR_BIN,
+)
+from evaluation_utils.core import (
     ensure_data_present,
     quote_path,
 )

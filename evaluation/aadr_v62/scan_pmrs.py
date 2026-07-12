@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from haversine import haversine
 
-from evaluation_utils import (
-    EURASIA_REGIONS,
+from evaluation_utils.constants import EURASIA_REGIONS
+from evaluation_utils.core import (
     classify_coords,
     load_aadr_metadata,
     load_aadr_npz_arrays,

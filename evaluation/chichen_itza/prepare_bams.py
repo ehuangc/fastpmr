@@ -2,13 +2,13 @@ import json
 import re
 import subprocess
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     CHICHEN_ITZA_BAM_DIR,
     CHICHEN_ITZA_FILEREPORT,
     CHICHEN_ITZA_FILEREPORT_URL,
     CHICHEN_ITZA_RENAMED_BAM_DIR,
-    download_file,
 )
+from evaluation_utils.core import download_file
 
 
 def collect_urls() -> list[str]:

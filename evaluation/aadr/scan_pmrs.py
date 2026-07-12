@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from haversine import haversine
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     AADR_DIR,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
@@ -19,6 +19,8 @@ from evaluation_utils import (
     POLITICAL_ENTITY_FIELD,
     PUBLICATION_FIELD,
     SKELETAL_CODE_FIELD,
+)
+from evaluation_utils.core import (
     classify_coords,
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,

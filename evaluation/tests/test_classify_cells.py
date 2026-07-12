@@ -4,7 +4,7 @@ Tests for classify_coords region classification.
 
 import pytest
 
-from evaluation_utils import classify_coords
+from evaluation_utils.core import classify_coords
 
 # (lat, lon, expected_region). reverse_geocoder.search has some fixed
 # multiprocessing overhead per call, so we classify all coords in one batch

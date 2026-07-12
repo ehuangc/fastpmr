@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from evaluation_utils import PERFORMANCE_DIR, add_panel_label
+from evaluation_utils.constants import PERFORMANCE_DIR
+from evaluation_utils.plot import add_panel_label
 
 RESULTS_DIR = PERFORMANCE_DIR / "results"
 

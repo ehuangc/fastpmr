@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from evaluation_utils import download_file
+from evaluation_utils.core import download_file
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 REMOTE_FILES = [

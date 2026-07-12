@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     CHICHEN_ITZA_FILEREPORT,
     CHICHEN_ITZA_RENAMED_BAM_DIR,
     CHICHEN_ITZA_RESULTS_DIR,

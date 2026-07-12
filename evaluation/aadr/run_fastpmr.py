@@ -1,11 +1,13 @@
 from pathlib import Path
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     AADR_DATA_PREFIX,
     AADR_DIR,
     AADR_EXTS,
     AADR_RUNS,
     FASTPMR_BIN,
+)
+from evaluation_utils.core import (
     ensure_data_present,
     quote_path,
     run_benchmark,

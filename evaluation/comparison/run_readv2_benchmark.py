@@ -2,11 +2,13 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     COMPARISON_DATA_PREFIX,
     FASTPMR_BIN,
     PERFORMANCE_RUNS,
     PLINK_EXTS,
+)
+from evaluation_utils.core import (
     ensure_data_present,
     quote_path,
     run_benchmark,

@@ -4,9 +4,11 @@ from pathlib import Path
 
 from plinkio import plinkfile
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     COMPARISON_DATA_PREFIX,
     PLINK_EXTS,
+)
+from evaluation_utils.core import (
     download_file,
     extract_files,
 )

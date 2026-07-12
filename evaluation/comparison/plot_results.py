@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from evaluation_utils import add_panel_label
+from evaluation_utils.plot import add_panel_label
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 READV2_CSV = RESULTS_DIR / "readv2_comparison_benchmark.csv"

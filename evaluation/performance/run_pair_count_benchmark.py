@@ -1,13 +1,15 @@
 import tempfile
 from pathlib import Path
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     FASTPMR_BIN,
     PERFORMANCE_DATA_PREFIX,
     PERFORMANCE_DIR,
     PERFORMANCE_RUNS,
     PERFORMANCE_SAMPLE_SET_DIR,
     PERFORMANCE_SAMPLE_SET_SIZES,
+)
+from evaluation_utils.core import (
     ensure_data_present,
     quote_path,
     run_benchmark,
