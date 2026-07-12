@@ -13,7 +13,8 @@ evaluation/comparison/results/outputs
 evaluation/performance/data
 evaluation/chichen_itza/data
 evaluation/chichen_itza/bams
-evaluation/chichen_itza/results
+evaluation/chichen_itza/results/*
+!evaluation/chichen_itza/results/fastpmr/
 evaluation/chichen_itza/work
 evaluation/chichen_itza/config_eager_ych.tsv
 
