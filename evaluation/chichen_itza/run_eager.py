@@ -9,6 +9,7 @@ from evaluation_utils.constants import (
     CHICHEN_ITZA_RENAMED_BAM_DIR,
     CHICHEN_ITZA_RESULTS_DIR,
     CHICHEN_ITZA_TSV,
+    CHICHEN_ITZA_WORK_DIR,
 )
 
 # ============================= CONFIG ========================================
@@ -22,7 +23,6 @@ SEQTYPE = "SE"  # Merged aDNA BAMs are usually SE
 # The paths below are specific to the GRACE cluster at MPI-EVA (Leipzig)
 PROFILE = "eva_grace"  # Public nf-core institutional config
 EAGER_VER = "2.4.0"
-WORK = Path("/home/edward_ciaoyang_huang/work/chichen_itza_pmrs/work")
 # Cluster-specific resource request overrides; not necessary for reproducing results
 CUSTOM_CONFIG = Path("/home/edward_ciaoyang_huang/work/chichen_itza_pmrs/custom.config")
 REFDIR = Path("/mnt/archgen/Reference_Genomes/Human/hs37d5")
@@ -120,7 +120,7 @@ def eager_command() -> list[str]:
         "-c",
         str(CUSTOM_CONFIG),
         "-w",
-        str(WORK),
+        str(CHICHEN_ITZA_WORK_DIR),
         "--run_bam_filtering",
         "--bam_mapping_quality_threshold",
         "25",
@@ -164,6 +164,7 @@ def eager_command() -> list[str]:
 
 def run_eager() -> None:
     CHICHEN_ITZA_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    CHICHEN_ITZA_WORK_DIR.mkdir(parents=True, exist_ok=True)
     # `module` is a shell function from the cluster's env-modules: load apptainer in a
     # login shell, then exec the nextflow argv unchanged so no manual quoting is needed
     subprocess.run(["bash", "-lc", 'module load apptainer && exec "$@"', "eager", *eager_command()], check=True)

@@ -25,6 +25,7 @@ CHICHEN_ITZA_BAM_DIR = CHICHEN_ITZA_DIR / "bams"
 CHICHEN_ITZA_RENAMED_BAM_DIR = CHICHEN_ITZA_BAM_DIR / "renamed"
 CHICHEN_ITZA_TSV = CHICHEN_ITZA_DIR / "config_eager_ych.tsv"
 CHICHEN_ITZA_RESULTS_DIR = CHICHEN_ITZA_DIR / "results"
+CHICHEN_ITZA_WORK_DIR = CHICHEN_ITZA_DIR / "work"
 # Directory nf-core/eager's pileupcaller genotyping writes into (the per-strandedness and
 # merged EIGENSTRAT prefixes are defined in run_fastpmr.py)
 CHICHEN_ITZA_GENO_DIR = CHICHEN_ITZA_RESULTS_DIR / "genotyping"
