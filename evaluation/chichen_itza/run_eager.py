@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 
 from evaluation_utils.constants import (
+    CHICHEN_ITZA_CUSTOM_CONFIG,
     CHICHEN_ITZA_FILEREPORT,
     CHICHEN_ITZA_RENAMED_BAM_DIR,
     CHICHEN_ITZA_RESULTS_DIR,
@@ -23,8 +24,6 @@ SEQTYPE = "SE"  # Merged aDNA BAMs are usually SE
 # The paths below are specific to the GRACE cluster at MPI-EVA (Leipzig)
 PROFILE = "eva_grace"  # Public nf-core institutional config
 EAGER_VER = "2.4.0"
-# Cluster-specific resource request overrides; not necessary for reproducing results
-CUSTOM_CONFIG = Path("/home/edward_ciaoyang_huang/work/chichen_itza_pmrs/custom.config")
 REFDIR = Path("/mnt/archgen/Reference_Genomes/Human/hs37d5")
 FASTA = REFDIR / "hs37d5.fa"
 FASTA_IDX = REFDIR / "hs37d5.fa.fai"
@@ -118,7 +117,7 @@ def eager_command() -> list[str]:
         "--outdir",
         str(CHICHEN_ITZA_RESULTS_DIR),
         "-c",
-        str(CUSTOM_CONFIG),
+        str(CHICHEN_ITZA_CUSTOM_CONFIG),
         "-w",
         str(CHICHEN_ITZA_WORK_DIR),
         "--run_bam_filtering",
