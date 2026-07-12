@@ -43,12 +43,14 @@ import torch
 from gpytorch.settings import _linalg_dtype_cholesky
 from torch.utils.data import DataLoader, TensorDataset
 
-from evaluation_utils import (
+from evaluation_utils.constants import (
     AADR_DIR,
     DATE_MEAN_BP_FIELD,
     INDIVIDUAL_ID_FIELD,
     LAT_FIELD,
     LON_FIELD,
+)
+from evaluation_utils.core import (
     ensure_aadr_npz_present,
     is_archaic_or_reference_sample,
     load_aadr_metadata,
