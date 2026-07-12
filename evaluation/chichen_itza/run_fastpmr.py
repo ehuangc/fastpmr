@@ -22,6 +22,14 @@ CHICHEN_ITZA_GENO_DOUBLE_PREFIX = CHICHEN_ITZA_GENO_DIR / "pileupcaller.double"
 CHICHEN_ITZA_GENO_MERGED_PREFIX = CHICHEN_ITZA_GENO_DIR / "pileupcaller.merged"
 
 
+def strip_txt_suffix(prefix: Path) -> None:
+    # eager's pileupcaller appends an additional .txt suffix to its EIGENSTRAT output
+    for ext in EIGENSTRAT_EXTS:
+        txt_path = prefix.parent / f"{prefix.name}{ext}.txt"
+        if txt_path.is_file():
+            txt_path.rename(prefix.parent / f"{prefix.name}{ext}")
+
+
 def merge_eigenstrat(single_prefix: Path, double_prefix: Path, merged_prefix: Path) -> Path:
     par_path = merged_prefix.parent / f"{merged_prefix.name}.par"
     par_path.write_text(
@@ -64,6 +72,8 @@ def sort_results(results_path: Path) -> Path:
 
 
 def main() -> None:
+    strip_txt_suffix(CHICHEN_ITZA_GENO_SINGLE_PREFIX)
+    strip_txt_suffix(CHICHEN_ITZA_GENO_DOUBLE_PREFIX)
     ensure_data_present(CHICHEN_ITZA_GENO_SINGLE_PREFIX, EIGENSTRAT_EXTS)
     ensure_data_present(CHICHEN_ITZA_GENO_DOUBLE_PREFIX, EIGENSTRAT_EXTS)
     merge_eigenstrat(CHICHEN_ITZA_GENO_SINGLE_PREFIX, CHICHEN_ITZA_GENO_DOUBLE_PREFIX, CHICHEN_ITZA_GENO_MERGED_PREFIX)
