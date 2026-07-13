@@ -32,10 +32,13 @@ from evaluation_utils.constants import (
 def download_file(url: str, destination: Path) -> None:
     print(f"Downloading {url}...")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    # Download to a temporary file and rename only on success, so an
-    # interrupted download never leaves a partial file at the final path
+    # Download to a temporary file and rename only on success, so an interrupted download
+    # never leaves a partial file at the final path; retry network failures
     partial = destination.with_name(destination.name + ".part")
-    subprocess.run(["curl", "-L", "-#", "-o", str(partial), url], check=True)
+    subprocess.run(
+        ["curl", "-L", "-#", "--retry", "5", "--retry-all-errors", "-o", str(partial), url],
+        check=True,
+    )
     partial.replace(destination)
     print(f"Downloaded {url} -> {destination}\n")
 
