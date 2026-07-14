@@ -49,9 +49,22 @@ evaluation-utils = { path = ".", editable = true }
 plinkio = ">=0.9.8, <0.10"
 reverse_geocoder = ">=1.5.1, <2"
 
-# When CUDA is available, use pytorch-gpu
-[tool.pixi.target.linux-64-gpu.dependencies]
+[tool.pixi.environments]
+eager = { features = ["eager"], no-default-feature = true }
+gpu = { features = ["gpu"] }
+
+# (Optional) GPU feature for the GP analysis
+[tool.pixi.feature.gpu]
+platforms = ["linux-64-gpu"]
+
+[tool.pixi.feature.gpu.dependencies]
 pytorch-gpu = ">=2.10.0,<3"
+
+# See the plain gp-pipeline below for non-GPU runs
+[tool.pixi.feature.gpu.tasks]
+gp-pipeline-gpu = [
+    { task = "fit-gp-aadr", environment = "gpu" },
+]
 
 # nf-core/eager 2.4.0 is a DSL1 pipeline, so nextflow must be <= 22.10.6, which
 # pins an old libcurl (<8) that conflicts with samtools and the analysis stack
@@ -61,9 +74,6 @@ nextflow = ">=22,<=22.10.6"
 
 [tool.pixi.feature.eager.pypi-dependencies]
 evaluation-utils = { path = ".", editable = true }
-
-[tool.pixi.environments]
-eager = { features = ["eager"], no-default-feature = true }
 
 [tool.pixi.feature.eager.tasks]
 eager-chichen-itza = "python chichen_itza/run_eager.py"
