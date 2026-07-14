@@ -23,6 +23,7 @@ platforms = [
     "osx-64",
     "osx-arm64",
 ]
+requires-pixi = ">=0.72.2"
 
 [tool.pixi.dependencies]
 admixtools = ">=8.0.2,<9"
