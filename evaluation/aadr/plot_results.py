@@ -22,6 +22,7 @@ from haversine import haversine
 from scipy import stats
 
 from evaluation_utils.constants import (
+    AADR_ANOMALOUS_LOCALITY_PREFIXES,
     AADR_DIR,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
@@ -106,6 +107,8 @@ def filter_and_extract(
             continue
         locality = sample_metadata[LOCALITY_FIELD].strip()
         if not locality or locality == ".." or locality.lower() == "n/a":
+            continue
+        if locality.startswith(AADR_ANOMALOUS_LOCALITY_PREFIXES):
             continue
         lat = parse_float(sample_metadata[LAT_FIELD])
         lon = parse_float(sample_metadata[LON_FIELD])

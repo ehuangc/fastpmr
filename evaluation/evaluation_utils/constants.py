@@ -8,6 +8,8 @@ AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
 AADR_METADATA_PATH = AADR_DIR / "data" / "v66.1240K.aadr.PUB.anno"
+# Localities with anomalously low PMRs
+AADR_ANOMALOUS_LOCALITY_PREFIXES = ("Valdescusa",)
 
 CHICHEN_ITZA_DIR = EVALUATION_DIR / "chichen_itza"
 CHICHEN_ITZA_DATA_DIR = CHICHEN_ITZA_DIR / "data"
