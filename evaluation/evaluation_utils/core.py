@@ -33,12 +33,14 @@ def download_file(url: str, destination: Path) -> None:
     print(f"Downloading {url}...")
     destination.parent.mkdir(parents=True, exist_ok=True)
     # Download to a temporary file and rename only on success, so an interrupted download
-    # never leaves a partial file at the final path; retry network failures
+    # never leaves a partial file at the final path
     partial = destination.with_name(destination.name + ".part")
-    # Discard any partial from a previous run so each run downloads fresh
-    partial.unlink(missing_ok=True)
+    # The ENA server drops large transfers mid-download. wget retries and resumes within this single
+    # invocation by default, so progress accumulates across drops until the file completes. Omitting
+    # -c redownloads from scratch so that every run downloads fresh, and -O writes that fresh download
+    # over our .part instead of a new .part.1.
     subprocess.run(
-        ["curl", "-L", "-#", "--retry", "10", "--retry-all-errors", "-C", "-", "-o", str(partial), url],
+        ["wget", "--tries=100", "--waitretry=10", "--retry-connrefused", "--timeout=60", "-O", str(partial), url],
         check=True,
     )
     partial.replace(destination)
