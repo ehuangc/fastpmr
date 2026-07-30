@@ -15,7 +15,7 @@ from evaluation_utils.core import (
 
 DATA_DIR = COMPARISON_DATA_PREFIX.parent
 MARAVALL_LOPEZ_URL = "https://dataverse.harvard.edu/api/access/datafile/12077020?version=2.0"
-ARCHIVE_PATH = DATA_DIR / "maravall_lopez_et_al_dataset.zip"
+ARCHIVE_PATH = DATA_DIR / "maravall_lopez_dataset.zip"
 SEX_CHROMOSOMES = {23, 24}
 
 

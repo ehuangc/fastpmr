@@ -113,11 +113,11 @@ EURASIA_REGIONS = {"asia", "europe"}
 US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
-COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "maravall_lopez_et_al"
+COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "maravall_lopez"
 
 PERFORMANCE_DIR = EVALUATION_DIR / "performance"
-PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "lazaridis_et_al"
-PERFORMANCE_SAMPLE_SET_DIR = PERFORMANCE_DIR / "data" / "lazaridis_et_al_sample_sets"
+PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "lazaridis"
+PERFORMANCE_SAMPLE_SET_DIR = PERFORMANCE_DIR / "data" / "lazaridis_sample_sets"
 PERFORMANCE_SAMPLE_SET_SIZES = (
     128,
     256,

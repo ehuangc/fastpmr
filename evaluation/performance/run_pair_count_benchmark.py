@@ -21,9 +21,9 @@ THREADS = 512
 
 def ensure_sample_set_data_present() -> None:
     missing = [
-        PERFORMANCE_SAMPLE_SET_DIR / f"lazaridis_et_al_samples_{size}.csv"
+        PERFORMANCE_SAMPLE_SET_DIR / f"lazaridis_samples_{size}.csv"
         for size in PERFORMANCE_SAMPLE_SET_SIZES
-        if not (PERFORMANCE_SAMPLE_SET_DIR / f"lazaridis_et_al_samples_{size}.csv").is_file()
+        if not (PERFORMANCE_SAMPLE_SET_DIR / f"lazaridis_samples_{size}.csv").is_file()
     ]
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
@@ -57,7 +57,7 @@ def main() -> None:
     def sample_size(path: Path) -> int:
         return int(path.stem.rsplit("_", 1)[1])
 
-    csv_files = sorted(PERFORMANCE_SAMPLE_SET_DIR.glob("lazaridis_et_al_samples_*.csv"), key=sample_size)
+    csv_files = sorted(PERFORMANCE_SAMPLE_SET_DIR.glob("lazaridis_samples_*.csv"), key=sample_size)
 
     results_dir = PERFORMANCE_DIR / "results"
     export_path = results_dir / "pair_count_benchmark.csv"
