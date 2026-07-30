@@ -35,8 +35,10 @@ def download_file(url: str, destination: Path) -> None:
     # Download to a temporary file and rename only on success, so an interrupted download
     # never leaves a partial file at the final path; retry network failures
     partial = destination.with_name(destination.name + ".part")
+    # Discard any partial from a previous run so each run downloads fresh
+    partial.unlink(missing_ok=True)
     subprocess.run(
-        ["curl", "-L", "-#", "--retry", "5", "--retry-all-errors", "-o", str(partial), url],
+        ["curl", "-L", "-#", "--retry", "10", "--retry-all-errors", "-C", "-", "-o", str(partial), url],
         check=True,
     )
     partial.replace(destination)
