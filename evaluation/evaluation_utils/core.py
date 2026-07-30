@@ -32,15 +32,30 @@ from evaluation_utils.constants import (
 def download_file(url: str, destination: Path) -> None:
     print(f"Downloading {url}...")
     destination.parent.mkdir(parents=True, exist_ok=True)
+    # Space out requests to lighten server load and avoid the rate-limiting 403s the ENA server
+    # returns when many files are fetched back-to-back
+    time.sleep(2)
     # Download to a temporary file and rename only on success, so an interrupted download
     # never leaves a partial file at the final path
     partial = destination.with_name(destination.name + ".part")
     # The ENA server drops large transfers mid-download. wget retries and resumes within this single
     # invocation by default, so progress accumulates across drops until the file completes. Omitting
     # -c redownloads from scratch so that every run downloads fresh, and -O writes that fresh download
-    # over our .part instead of a new .part.1.
+    # over our .part instead of a new .part.1. The server also returns transient 403/5xx under load,
+    # which wget treats as fatal unless the codes are listed in --retry-on-http-error.
     subprocess.run(
-        ["wget", "--tries=100", "--waitretry=10", "--retry-connrefused", "--timeout=60", "-O", str(partial), url],
+        [
+            "wget",
+            "-nv",
+            "--tries=100",
+            "--waitretry=10",
+            "--retry-connrefused",
+            "--retry-on-http-error=403,429,500,502,503,504",
+            "--timeout=60",
+            "-O",
+            str(partial),
+            url,
+        ],
         check=True,
     )
     partial.replace(destination)
