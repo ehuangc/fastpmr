@@ -26,6 +26,15 @@ PLINK_PREFIX = COMPARISON_DATA_PREFIX
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 OUTPUTS_DIR = RESULTS_DIR / "outputs"
 PMR_TOLERANCE = 1e-6
+# READv2 relatedness classifications and their fastpmr equivalents
+READV2_DEGREES = {
+    "IdenticalTwins/SameIndividual": "Identical/Twin",
+    "First Degree": "First Degree",
+    "Second Degree": "Second Degree",
+    "Third Degree": "Third Degree",
+    "Unrelated/Consistent with Third Degree": "Unrelated",
+    "Unrelated": "Unrelated",
+}
 
 
 def clone_readv2(readv2_dir: Path) -> None:
@@ -59,13 +68,15 @@ def build_readv2_command(readv2_script: Path, prefix: Path, work_dir: Path) -> s
     return f"cd {quote_path(work_dir)} && python {quote_path(readv2_script)} -i {quote_path(prefix)}"
 
 
-def check_pmrs_match(fastpmr_output_dir: Path, readv2_output_dir: Path) -> None:
-    """Check that fastpmr and READv2 report the same PMR for every pair."""
+def check_results_match(fastpmr_output_dir: Path, readv2_output_dir: Path) -> None:
+    """Check that fastpmr and READv2 report the same PMR and degree of relatedness for every pair."""
     npz_path = fastpmr_output_dir / "fastpmr_results.npz"
     with np.load(npz_path, allow_pickle=False) as npz:
         mismatch_rates = npz["mismatch_rates"]
+        degrees = npz["degrees"]
     with zipfile.ZipFile(npz_path) as archive:
         samples = json.loads(archive.read("samples.json").decode("utf-8"))
+        degree_labels = json.loads(archive.read("degree_labels.json").decode("utf-8"))
     # fastpmr labels samples as "<family ID>:<individual ID>" while READv2 uses the individual ID alone
     sample_indices = {sample.split(":", 1)[-1]: i for i, sample in enumerate(samples)}
 
@@ -74,11 +85,19 @@ def check_pmrs_match(fastpmr_output_dir: Path, readv2_output_dir: Path) -> None:
         readv2_rows = list(csv.DictReader(handle, delimiter="\t"))
     for readv2_row in readv2_rows:
         first, second = readv2_row["PairIndividuals"].split(",")
+        pair_indices = sample_indices[first], sample_indices[second]
         readv2_pmr = float(readv2_row["Nonnormalized_P0"])
-        fastpmr_pmr = mismatch_rates[sample_indices[first], sample_indices[second]]
+        fastpmr_pmr = mismatch_rates[pair_indices]
         if abs(fastpmr_pmr - readv2_pmr) > PMR_TOLERANCE:
             raise SystemExit(f"PMR mismatch for {first},{second}: fastpmr={fastpmr_pmr:.10g}, READv2={readv2_pmr:.10g}")
+        readv2_degree = READV2_DEGREES[readv2_row["Rel"]]
+        fastpmr_degree = degree_labels[degrees[pair_indices]]
+        if fastpmr_degree != readv2_degree:
+            raise SystemExit(
+                f"Degree mismatch for {first},{second}: fastpmr={fastpmr_degree}, READv2={readv2_row['Rel']}"
+            )
     print(f"\nAll {len(readv2_rows)} pairwise PMRs match between fastpmr and READv2 to within {PMR_TOLERANCE:g}")
+    print(f"All {len(readv2_rows)} pairwise degrees of relatedness match between fastpmr and READv2")
 
 
 def main() -> None:
@@ -98,7 +117,7 @@ def main() -> None:
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
     run_benchmark(configs, export_path, runs=PERFORMANCE_RUNS)
 
-    check_pmrs_match(fastpmr_output_dir, readv2_output_dir)
+    check_results_match(fastpmr_output_dir, readv2_output_dir)
 
 
 if __name__ == "__main__":
