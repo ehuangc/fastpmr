@@ -62,7 +62,6 @@ CHECKPOINT_PATH = OUTPUT_DIR / "gp_model.pt"
 MAP_PATH = OUTPUT_DIR / "gp_pmr_map.pdf"
 
 OVERLAP_THRESHOLD = 30_000
-MAX_PAIRS = 1_000_000
 LOW_PMR_Z_CUT = 5.0
 SEED = 42
 
@@ -127,9 +126,7 @@ def get_device() -> torch.device:
 
 def extract_pair_data(
     overlap_threshold: int = OVERLAP_THRESHOLD,
-    max_pairs: int = MAX_PAIRS,
     low_pmr_z_cut: float = LOW_PMR_Z_CUT,
-    seed: int = SEED,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Load AADR data and extract pairwise observations for GP fitting.
 
@@ -203,12 +200,6 @@ def extract_pair_data(
     n_dropped = int((~keep_mask).sum())
     pair_positions = pair_positions[keep_mask]
     print(f"Dropped {n_dropped} pairs with PMR < {low_cut:.6f} (z < -{low_pmr_z_cut}); {len(pair_positions)} remain.")
-
-    rng = np.random.default_rng(seed)
-    if len(pair_positions) > max_pairs:
-        pair_positions = rng.choice(pair_positions, size=max_pairs, replace=False)
-        pair_positions.sort()
-        print(f"Subsampled to {max_pairs} pairs.")
 
     pi, pj = triu_i[pair_positions], triu_j[pair_positions]
     # Project to equal-area km coords so kernels operate on true Euclidean distances
