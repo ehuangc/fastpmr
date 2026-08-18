@@ -16,6 +16,7 @@ from evaluation_utils.constants import (
 from evaluation_utils.core import (
     ensure_data_present,
     quote_path,
+    remove_readv2_intermediates,
     run_benchmark,
 )
 
@@ -116,6 +117,7 @@ def main() -> None:
     readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, readv2_output_dir)
     configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
     run_benchmark(configs, export_path, runs=PERFORMANCE_RUNS)
+    remove_readv2_intermediates(PLINK_PREFIX)
 
     check_results_match(fastpmr_output_dir, readv2_output_dir)
 

@@ -239,3 +239,11 @@ def run_benchmark(
         writer.writeheader()
         writer.writerows(rows)
     print(f"\nResults written to {output_path}")
+
+
+# READv2 transposes its input into "<prefix>_test.*" beside the input files
+# and only cleans those up when given a relative path
+def remove_readv2_intermediates(prefix: Path) -> None:
+    for path in sorted(prefix.parent.glob(f"{prefix.name}_test.*")):
+        path.unlink()
+        print(f"Removed READv2 intermediate file {path}")
