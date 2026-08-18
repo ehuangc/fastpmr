@@ -28,11 +28,6 @@ def read_sample_ids(ind_path: Path) -> list[str]:
     return samples
 
 
-def format_pair_count(size: int) -> str:
-    pairs = size * (size - 1) // 2
-    return f"{pairs:,}"
-
-
 def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
     samples = read_sample_ids(prefix.with_suffix(".ind"))
     rng = random.Random(SAMPLE_SHUFFLE_SEED)
