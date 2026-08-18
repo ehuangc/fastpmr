@@ -60,7 +60,7 @@ def main() -> None:
     csv_files = sorted(PERFORMANCE_SAMPLE_SET_DIR.glob("lazaridis_samples_*.csv"), key=sample_size)
 
     results_dir = PERFORMANCE_DIR / "results"
-    export_path = results_dir / "pair_count_benchmark.csv"
+    export_path = results_dir / "sample_count_benchmark.csv"
 
     def count_lines(path: Path) -> int:
         with path.open("r", encoding="utf-8") as handle:

@@ -9,7 +9,7 @@ RESULTS_DIR = PERFORMANCE_DIR / "results"
 
 THREADS_CSV = RESULTS_DIR / "thread_count_benchmark.csv"
 VARIANTS_CSV = RESULTS_DIR / "variant_count_benchmark.csv"
-PAIRS_CSV = RESULTS_DIR / "pair_count_benchmark.csv"
+SAMPLES_CSV = RESULTS_DIR / "sample_count_benchmark.csv"
 
 
 def parse_thread_count(label: str) -> int:
@@ -23,7 +23,7 @@ def parse_variant_count(label: str) -> int:
     return int(spec)
 
 
-def parse_pair_count(label: str) -> int:
+def parse_sample_count(label: str) -> int:
     fields = {}
     for part in label.split("_"):
         if "=" not in part:
@@ -87,21 +87,28 @@ def main() -> None:
     variants_df = variants_df.sort_values("variants")
     variants_df = bytes_to_mb(variants_df)
 
-    pairs_df = pd.read_csv(PAIRS_CSV)
-    pairs_df["pairs"] = pairs_df["label"].apply(parse_pair_count)
-    pairs_df = pairs_df.sort_values("pairs")
-    pairs_df = bytes_to_mb(pairs_df)
+    samples_df = pd.read_csv(SAMPLES_CSV)
+    samples_df["samples"] = samples_df["label"].apply(parse_sample_count)
+    samples_df = samples_df.sort_values("samples")
+    samples_df = bytes_to_mb(samples_df)
 
     fig, axes = plt.subplots(3, 2, figsize=(10, 12), constrained_layout=True)
     fig.get_layout_engine().set(wspace=0.04, hspace=0.06)
 
     plot_line(
-        axes[0, 0], pairs_df, "pairs", "mean_s", "stddev_s", "Samples", "Mean Runtime (s)", "Runtime vs. Sample Count"
+        axes[0, 0],
+        samples_df,
+        "samples",
+        "mean_s",
+        "stddev_s",
+        "Samples",
+        "Mean Runtime (s)",
+        "Runtime vs. Sample Count",
     )
     plot_line(
         axes[0, 1],
-        pairs_df,
-        "pairs",
+        samples_df,
+        "samples",
         "mean_mb",
         "stddev_mb",
         "Samples",

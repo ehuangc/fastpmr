@@ -92,7 +92,7 @@ fastpmr-aadr-v62 = "python aadr_v62/run_fastpmr.py"
 scan-aadr-v62 = "python aadr_v62/scan_pmrs.py"
 
 prepare-performance = "python performance/prepare_data.py"
-pairs-benchmark = "python performance/run_pair_count_benchmark.py"
+samples-benchmark = "python performance/run_sample_count_benchmark.py"
 variants-benchmark = "python performance/run_variant_count_benchmark.py"
 threads-benchmark = "python performance/run_thread_count_benchmark.py"
 plot-performance = "python performance/plot_results.py"
@@ -124,7 +124,7 @@ aadr-v62-pipeline = [
 ]
 performance-pipeline = [
     { task = "prepare-performance" },
-    { task = "pairs-benchmark" },
+    { task = "samples-benchmark" },
     { task = "variants-benchmark" },
     { task = "threads-benchmark" },
     { task = "plot-performance" },
