@@ -16,12 +16,8 @@ import numpy as np
 import reverse_geocoder as rg
 
 from evaluation_utils.constants import (
-    AADR_DATA_PREFIX,
     AADR_METADATA_PATH,
     AADR_NPZ_PATH,
-    CHICHEN_ITZA_GENO_DIR,
-    COMPARISON_DATA_PREFIX,
-    COMPARISON_SAMPLE_SET_DIR,
     COUNTRY_TO_REGION,
     CSV_FIELDS,
     EIGENSTRAT_EXTS,
@@ -144,25 +140,13 @@ def is_archaic_or_reference_sample(sample: str, sample_metadata: dict[str, str])
     return False
 
 
-def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -> None:
+def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS, *, command: str, dataset: str) -> None:
     def data_file(ext: str) -> Path:
         return prefix.parent / f"{prefix.name}{ext}"
 
     missing = [data_file(ext) for ext in exts if not data_file(ext).is_file()]
     if missing:
         missing_str = ", ".join(str(path) for path in missing)
-        if prefix == AADR_DATA_PREFIX:
-            command = "pixi run prepare-aadr"
-            dataset = "AADR dataset"
-        elif prefix.parent == CHICHEN_ITZA_GENO_DIR:
-            command = "pixi run eager-chichen-itza"
-            dataset = "Chichen Itza genotypes"
-        elif prefix == COMPARISON_DATA_PREFIX or prefix.parent == COMPARISON_SAMPLE_SET_DIR:
-            command = "pixi run prepare-comparison"
-            dataset = "Maravall-López et al. dataset"
-        else:
-            command = "pixi run prepare-performance"
-            dataset = "Lazaridis et al. dataset"
         raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to prepare the {dataset}.")
 
 

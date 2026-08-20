@@ -103,7 +103,12 @@ def check_results_match(fastpmr_output_dir: Path, readv2_output_dir: Path) -> No
 
 def main() -> None:
     for size in COMPARISON_SAMPLE_SET_SIZES:
-        ensure_data_present(subset_prefix(size), PLINK_EXTS)
+        ensure_data_present(
+            subset_prefix(size),
+            PLINK_EXTS,
+            command="pixi run prepare-comparison",
+            dataset="Maravall-López et al. dataset",
+        )
     clone_readv2(READV2_DIR)
 
     fastpmr_output_dir = OUTPUTS_DIR / "fastpmr"

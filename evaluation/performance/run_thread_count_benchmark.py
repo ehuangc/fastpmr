@@ -31,7 +31,7 @@ def build_command(prefix: Path, threads: int, output_dir: Path) -> str:
 
 def main() -> None:
     data_prefix = Path(PERFORMANCE_DATA_PREFIX)
-    ensure_data_present(data_prefix)
+    ensure_data_present(data_prefix, command="pixi run prepare-performance", dataset="Lazaridis et al. dataset")
 
     results_dir = PERFORMANCE_DIR / "results"
     export_path = results_dir / "thread_count_benchmark.csv"

@@ -45,7 +45,7 @@ def build_command(prefix: Path, spec: str, output_dir: Path) -> str:
 def main() -> None:
     variant_specs = list(VARIANT_SPECS)
     data_prefix = Path(PERFORMANCE_DATA_PREFIX)
-    ensure_data_present(data_prefix)
+    ensure_data_present(data_prefix, command="pixi run prepare-performance", dataset="Lazaridis et al. dataset")
 
     results_dir = PERFORMANCE_DIR / "results"
     export_path = results_dir / "variant_count_benchmark.csv"

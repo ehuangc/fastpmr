@@ -51,7 +51,9 @@ def build_command(
 
 
 def main() -> None:
-    ensure_data_present(PERFORMANCE_DATA_PREFIX)
+    ensure_data_present(
+        PERFORMANCE_DATA_PREFIX, command="pixi run prepare-performance", dataset="Lazaridis et al. dataset"
+    )
     ensure_sample_set_data_present()
 
     def sample_size(path: Path) -> int:

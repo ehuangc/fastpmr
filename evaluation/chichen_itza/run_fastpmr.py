@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from evaluation_utils.constants import (
-    CHICHEN_ITZA_GENO_DIR,
+    CHICHEN_ITZA_EAGER_OUTPUTS_DIR,
     CHICHEN_ITZA_RESULTS_DIR,
     EIGENSTRAT_EXTS,
     FASTPMR_BIN,
@@ -13,6 +13,9 @@ from evaluation_utils.core import (
     ensure_data_present,
     quote_path,
 )
+
+# Directory nf-core/eager's pileupcaller genotyping writes into
+CHICHEN_ITZA_GENO_DIR = CHICHEN_ITZA_EAGER_OUTPUTS_DIR / "genotyping"
 
 # eager's pileupcaller genotypes single- and double-stranded libraries into separate
 # EIGENSTRAT sets. The two sets hold disjoint individuals (no YCH sample has both library
@@ -72,10 +75,11 @@ def sort_results(results_path: Path) -> Path:
 
 
 def main() -> None:
-    strip_txt_suffix(CHICHEN_ITZA_GENO_SINGLE_PREFIX)
-    strip_txt_suffix(CHICHEN_ITZA_GENO_DOUBLE_PREFIX)
-    ensure_data_present(CHICHEN_ITZA_GENO_SINGLE_PREFIX, EIGENSTRAT_EXTS)
-    ensure_data_present(CHICHEN_ITZA_GENO_DOUBLE_PREFIX, EIGENSTRAT_EXTS)
+    for prefix in (CHICHEN_ITZA_GENO_SINGLE_PREFIX, CHICHEN_ITZA_GENO_DOUBLE_PREFIX):
+        strip_txt_suffix(prefix)
+        ensure_data_present(
+            prefix, EIGENSTRAT_EXTS, command="pixi run eager-chichen-itza", dataset="Chichen Itza genotypes"
+        )
     merge_eigenstrat(CHICHEN_ITZA_GENO_SINGLE_PREFIX, CHICHEN_ITZA_GENO_DOUBLE_PREFIX, CHICHEN_ITZA_GENO_MERGED_PREFIX)
 
     CHICHEN_ITZA_RESULTS_DIR.mkdir(parents=True, exist_ok=True)

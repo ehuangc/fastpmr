@@ -28,7 +28,7 @@ def build_command(prefix: Path, output_dir: Path) -> str:
 
 
 def main() -> None:
-    ensure_data_present(AADR_DATA_PREFIX, AADR_EXTS)
+    ensure_data_present(AADR_DATA_PREFIX, AADR_EXTS, command="pixi run prepare-aadr", dataset="AADR dataset")
 
     results_dir = AADR_DIR / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
