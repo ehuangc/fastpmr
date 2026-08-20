@@ -133,7 +133,6 @@ def extract_pair_data(
     Returns (pair_coords, pmr), where pair_coords has columns
     (x_km_i, y_km_i, t_i, x_km_j, y_km_j, t_j) in the equal-area projection.
     """
-    ensure_aadr_npz_present()
     samples, site_overlaps, mismatch_rates, _, _, covered_snps = load_aadr_npz_arrays()
     metadata = load_aadr_metadata()
 
@@ -488,14 +487,13 @@ def plot_predictions(
 
 
 def main() -> None:
+    ensure_aadr_npz_present()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
     # Seed all torch RNGs so the variational distribution init is reproducible
     torch.manual_seed(SEED)
 
     print("Loading AADR pairwise data...\n")
     pair_coords, pmr = extract_pair_data()
-
     train_x = torch.from_numpy(pair_coords.astype(np.float32))
     train_y = torch.from_numpy(pmr)
 
