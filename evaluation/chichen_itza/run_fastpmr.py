@@ -78,12 +78,11 @@ def main() -> None:
     ensure_data_present(CHICHEN_ITZA_GENO_DOUBLE_PREFIX, EIGENSTRAT_EXTS)
     merge_eigenstrat(CHICHEN_ITZA_GENO_SINGLE_PREFIX, CHICHEN_ITZA_GENO_DOUBLE_PREFIX, CHICHEN_ITZA_GENO_MERGED_PREFIX)
 
-    fastpmr_output_dir = CHICHEN_ITZA_RESULTS_DIR / "fastpmr"
-    fastpmr_output_dir.mkdir(parents=True, exist_ok=True)
+    CHICHEN_ITZA_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    command = build_command(CHICHEN_ITZA_GENO_MERGED_PREFIX, fastpmr_output_dir)
+    command = build_command(CHICHEN_ITZA_GENO_MERGED_PREFIX, CHICHEN_ITZA_RESULTS_DIR)
     subprocess.run(command, shell=True, check=True)
-    sort_results(fastpmr_output_dir / "fastpmr_pair_results.csv")
+    sort_results(CHICHEN_ITZA_RESULTS_DIR / "fastpmr_pair_results.csv")
 
 
 if __name__ == "__main__":

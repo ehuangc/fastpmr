@@ -6,9 +6,9 @@ from pathlib import Path
 
 from evaluation_utils.constants import (
     CHICHEN_ITZA_CUSTOM_CONFIG,
+    CHICHEN_ITZA_EAGER_OUTPUTS_DIR,
     CHICHEN_ITZA_FILEREPORT,
     CHICHEN_ITZA_RENAMED_BAM_DIR,
-    CHICHEN_ITZA_RESULTS_DIR,
     CHICHEN_ITZA_TSV,
     CHICHEN_ITZA_WORK_DIR,
 )
@@ -115,7 +115,7 @@ def eager_command() -> list[str]:
         "--input",
         str(CHICHEN_ITZA_TSV),
         "--outdir",
-        str(CHICHEN_ITZA_RESULTS_DIR),
+        str(CHICHEN_ITZA_EAGER_OUTPUTS_DIR),
         "-c",
         str(CHICHEN_ITZA_CUSTOM_CONFIG),
         "-w",
@@ -162,7 +162,7 @@ def eager_command() -> list[str]:
 
 
 def run_eager() -> None:
-    CHICHEN_ITZA_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    CHICHEN_ITZA_EAGER_OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
     CHICHEN_ITZA_WORK_DIR.mkdir(parents=True, exist_ok=True)
     # `module` is a shell function from the cluster's env-modules: load apptainer in a
     # login shell, then exec the nextflow argv unchanged so no manual quoting is needed
