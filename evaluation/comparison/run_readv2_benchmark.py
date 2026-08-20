@@ -6,11 +6,12 @@ import zipfile
 from pathlib import Path
 
 import numpy as np
+from prepare_data import subset_prefix
 
 from evaluation_utils.constants import (
-    COMPARISON_DATA_PREFIX,
+    COMPARISON_RUNS,
+    COMPARISON_SAMPLE_SET_SIZES,
     FASTPMR_BIN,
-    PERFORMANCE_RUNS,
     PLINK_EXTS,
 )
 from evaluation_utils.core import (
@@ -23,7 +24,6 @@ from evaluation_utils.core import (
 READV2_REPO = "https://github.com/GuntherLab/READv2"
 READV2_DIR = Path(__file__).resolve().parent / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
-PLINK_PREFIX = COMPARISON_DATA_PREFIX
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 OUTPUTS_DIR = RESULTS_DIR / "outputs"
 PMR_TOLERANCE = 1e-6
@@ -102,8 +102,8 @@ def check_results_match(fastpmr_output_dir: Path, readv2_output_dir: Path) -> No
 
 
 def main() -> None:
-    data_prefix = Path(COMPARISON_DATA_PREFIX)
-    ensure_data_present(data_prefix, PLINK_EXTS)
+    for size in COMPARISON_SAMPLE_SET_SIZES:
+        ensure_data_present(subset_prefix(size), PLINK_EXTS)
     clone_readv2(READV2_DIR)
 
     fastpmr_output_dir = OUTPUTS_DIR / "fastpmr"
@@ -111,13 +111,18 @@ def main() -> None:
     fastpmr_output_dir.mkdir(parents=True, exist_ok=True)
     readv2_output_dir.mkdir(parents=True, exist_ok=True)
 
-    export_path = RESULTS_DIR / "readv2_comparison_benchmark.csv"
-
-    fastpmr_cmd = build_fastpmr_command(PLINK_PREFIX, fastpmr_output_dir)
-    readv2_cmd = build_readv2_command(READV2_SCRIPT, PLINK_PREFIX, readv2_output_dir)
-    configs = [("fastpmr", fastpmr_cmd), ("READv2", readv2_cmd)]
-    run_benchmark(configs, export_path, runs=PERFORMANCE_RUNS)
-    remove_readv2_intermediates(PLINK_PREFIX)
+    export_path = RESULTS_DIR / "comparison_benchmark.csv"
+    # Both tools write to the same output directories for every sample count (each run overwriting
+    # the last), so only the outputs of the final and largest subset, the full dataset, survive for
+    # check_results_match
+    configs = []
+    for size in COMPARISON_SAMPLE_SET_SIZES:
+        prefix = subset_prefix(size)
+        configs.append((f"tool=fastpmr_samples={size}", build_fastpmr_command(prefix, fastpmr_output_dir)))
+        configs.append((f"tool=READv2_samples={size}", build_readv2_command(READV2_SCRIPT, prefix, readv2_output_dir)))
+    run_benchmark(configs, export_path, runs=COMPARISON_RUNS)
+    for size in COMPARISON_SAMPLE_SET_SIZES:
+        remove_readv2_intermediates(subset_prefix(size))
 
     check_results_match(fastpmr_output_dir, readv2_output_dir)
 

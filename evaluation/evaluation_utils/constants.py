@@ -114,6 +114,16 @@ US_OCEANIA_ADMIN1 = {"Guam", "Northern Mariana Islands"}
 
 COMPARISON_DIR = EVALUATION_DIR / "comparison"
 COMPARISON_DATA_PREFIX = COMPARISON_DIR / "data" / "maravall_lopez"
+COMPARISON_SAMPLE_SET_DIR = COMPARISON_DIR / "data" / "maravall_lopez_sample_sets"
+COMPARISON_SAMPLE_SET_SIZES = (
+    38,
+    78,
+    118,
+    158,
+    198,
+    238,
+)
+COMPARISON_RUNS = 1
 
 PERFORMANCE_DIR = EVALUATION_DIR / "performance"
 PERFORMANCE_DATA_PREFIX = PERFORMANCE_DIR / "data" / "lazaridis"

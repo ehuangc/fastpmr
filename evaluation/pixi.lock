@@ -36,6 +36,7 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/linux-64/admixtools-8.0.2-h75d7a4a_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/linux-64/fastpmr-0.2.4-h79ce301_0.conda
       - conda: https://conda.anaconda.org/bioconda/linux-64/htslib-1.23.1-h633afcb_0.conda
+      - conda: https://conda.anaconda.org/bioconda/linux-64/plink-1.90b7.7-h18e278d_1.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/linux-64/samtools-1.23.1-ha83d96e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-7_kmp_llvm.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/alsa-lib-1.2.16.1-hb03c661_0.conda
@@ -260,6 +261,7 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/osx-64/admixtools-8.0.2-h848dfa8_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/osx-64/fastpmr-0.2.4-h82ec203_0.conda
       - conda: https://conda.anaconda.org/bioconda/osx-64/htslib-1.23.1-h09fbe89_0.conda
+      - conda: https://conda.anaconda.org/bioconda/osx-64/plink-1.90b7.7-ha9ccf8d_1.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/osx-64/samtools-1.23.1-head6495_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2026.2.25-hbd8a1cb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/certifi-2026.2.25-pyhd8ed1ab_0.conda
@@ -414,6 +416,7 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/osx-arm64/admixtools-8.0.2-ha8dfbab_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/osx-arm64/fastpmr-0.2.4-h8f6e10a_0.conda
       - conda: https://conda.anaconda.org/bioconda/osx-arm64/htslib-1.23.1-h44a9eb5_0.conda
+      - conda: https://conda.anaconda.org/bioconda/osx-arm64/plink-1.90b7.7-h749606d_1.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/osx-arm64/samtools-1.23.1-hc612e98_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2026.2.25-hbd8a1cb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/certifi-2026.2.25-pyhd8ed1ab_0.conda
@@ -564,6 +567,7 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/linux-64/admixtools-8.0.2-h75d7a4a_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/linux-64/fastpmr-0.2.4-h79ce301_0.conda
       - conda: https://conda.anaconda.org/bioconda/linux-64/htslib-1.23.1-h633afcb_0.conda
+      - conda: https://conda.anaconda.org/bioconda/linux-64/plink-1.90b7.7-h18e278d_1.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/linux-64/samtools-1.23.1-ha83d96e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-7_kmp_llvm.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/alsa-lib-1.2.16.1-hb03c661_0.conda
@@ -1056,6 +1060,7 @@ environments:
       - conda: https://conda.anaconda.org/bioconda/linux-64/admixtools-8.0.2-h75d7a4a_0.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/linux-64/fastpmr-0.2.4-h79ce301_0.conda
       - conda: https://conda.anaconda.org/bioconda/linux-64/htslib-1.24-ha79157c_0.conda
+      - conda: https://conda.anaconda.org/bioconda/linux-64/plink-1.90b7.7-h18e278d_1.tar.bz2
       - conda: https://conda.anaconda.org/bioconda/linux-64/samtools-1.24-h9dcdb79_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-7_kmp_llvm.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/alsa-lib-1.2.16.1-hb03c661_0.conda
@@ -1361,6 +1366,18 @@ packages:
   license_family: MIT
   size: 1166222
   timestamp: 1783611817902
+- conda: https://conda.anaconda.org/bioconda/linux-64/plink-1.90b7.7-h18e278d_1.tar.bz2
+  sha256: 68f21f628450b7a41602c82b15a909099b06c4fe63dd0dec5834f5978e614031
+  md5: 1ab1ae7b594fcb5b98cd1a5b96137aa8
+  depends:
+  - libgcc >=13
+  - libopenblas
+  - libstdcxx >=13
+  - libzlib >=1.3.1,<2.0a0
+  license: GPL
+  purls: []
+  size: 963787
+  timestamp: 1742298270545
 - conda: https://conda.anaconda.org/bioconda/linux-64/samtools-1.23.1-ha83d96e_0.conda
   sha256: 2cb721907a2df7c54580298d655ae7587dbed593bd5536fa8ef4a22c9ae2a496
   md5: 89624fbd17c069abcbc8b19b96d497a0
@@ -1431,6 +1448,17 @@ packages:
   license_family: MIT
   size: 998076
   timestamp: 1773856529790
+- conda: https://conda.anaconda.org/bioconda/osx-64/plink-1.90b7.7-ha9ccf8d_1.tar.bz2
+  sha256: b06b4e2b7b42a302036d86c1b072a612c75ab5cebed3c9c44371d589c84f85df
+  md5: 8cdb59fec961fdc520b64783ceaf186d
+  depends:
+  - libcxx >=18
+  - libopenblas
+  - libzlib >=1.3.1,<2.0a0
+  license: GPL
+  purls: []
+  size: 985618
+  timestamp: 1742298878372
 - conda: https://conda.anaconda.org/bioconda/osx-64/samtools-1.23.1-head6495_0.conda
   sha256: 8c3ff4c331f82049446521fd9f00d8a6010ba65f69c38250860ac320d4fdbe55
   md5: b4af8fd57180f7d7c20048f0c3359736
@@ -1477,6 +1505,17 @@ packages:
   license_family: MIT
   size: 992943
   timestamp: 1773854821372
+- conda: https://conda.anaconda.org/bioconda/osx-arm64/plink-1.90b7.7-h749606d_1.tar.bz2
+  sha256: 20d4507d2fabe949dccb4984397ab06a91ded02bc4f92d569188814b6dcae6b7
+  md5: 4c3e3a952b00613481794ad84710cd3e
+  depends:
+  - libcxx >=18
+  - libopenblas
+  - libzlib >=1.3.1,<2.0a0
+  license: GPL
+  purls: []
+  size: 924089
+  timestamp: 1742298403787
 - conda: https://conda.anaconda.org/bioconda/osx-arm64/samtools-1.23.1-hc612e98_0.conda
   sha256: f5658dba11d98101f8c3e52de87fce4c28da12aeaf80e3c7d9f5727bef29ab4d
   md5: 91112ce67a49fe4a636be59656dbc9ec
@@ -3790,7 +3829,7 @@ packages:
   license: BSD-3-Clause
   license_family: BSD
   purls:
-  - pkg:pypi/numpy?source=compressed-mapping
+  - pkg:pypi/numpy?source=hash-mapping
   run_exports:
     weak:
     - numpy >=1.25,<3
@@ -4039,7 +4078,7 @@ packages:
   - tk >=8.6.13,<8.7.0a0
   license: HPND
   purls:
-  - pkg:pypi/pillow?source=compressed-mapping
+  - pkg:pypi/pillow?source=hash-mapping
   run_exports: {}
   size: 1108174
   timestamp: 1782912080163
@@ -4462,7 +4501,7 @@ packages:
   license: BSD-3-Clause
   license_family: BSD
   purls:
-  - pkg:pypi/scipy?source=compressed-mapping
+  - pkg:pypi/scipy?source=hash-mapping
   run_exports: {}
   size: 17260022
   timestamp: 1781912924009
@@ -5103,7 +5142,7 @@ packages:
   - python >=3.10
   license: ISC
   purls:
-  - pkg:pypi/certifi?source=compressed-mapping
+  - pkg:pypi/certifi?source=hash-mapping
   run_exports: {}
   size: 133877
   timestamp: 1781719949728
@@ -5424,7 +5463,7 @@ packages:
   - python
   license: MIT
   purls:
-  - pkg:pypi/narwhals?source=compressed-mapping
+  - pkg:pypi/narwhals?source=hash-mapping
   run_exports: {}
   size: 289946
   timestamp: 1783943716915
@@ -5639,7 +5678,7 @@ packages:
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/pytest?source=compressed-mapping
+  - pkg:pypi/pytest?source=hash-mapping
   run_exports: {}
   size: 306724
   timestamp: 1782127176429
@@ -5809,7 +5848,7 @@ packages:
   license: PSF-2.0
   license_family: PSF
   purls:
-  - pkg:pypi/typing-extensions?source=compressed-mapping
+  - pkg:pypi/typing-extensions?source=hash-mapping
   run_exports: {}
   size: 52631
   timestamp: 1783002732887

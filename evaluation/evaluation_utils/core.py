@@ -21,6 +21,7 @@ from evaluation_utils.constants import (
     AADR_NPZ_PATH,
     CHICHEN_ITZA_GENO_DIR,
     COMPARISON_DATA_PREFIX,
+    COMPARISON_SAMPLE_SET_DIR,
     COUNTRY_TO_REGION,
     CSV_FIELDS,
     EIGENSTRAT_EXTS,
@@ -156,7 +157,7 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
         elif prefix.parent == CHICHEN_ITZA_GENO_DIR:
             command = "pixi run eager-chichen-itza"
             dataset = "Chichen Itza genotypes"
-        elif prefix == COMPARISON_DATA_PREFIX:
+        elif prefix == COMPARISON_DATA_PREFIX or prefix.parent == COMPARISON_SAMPLE_SET_DIR:
             command = "pixi run prepare-comparison"
             dataset = "Maravall-López et al. dataset"
         else:
