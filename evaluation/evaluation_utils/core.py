@@ -163,7 +163,7 @@ def ensure_data_present(prefix: Path, exts: tuple[str, ...] = EIGENSTRAT_EXTS) -
         else:
             command = "pixi run prepare-performance"
             dataset = "Lazaridis et al. dataset"
-        raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to download and unpack the {dataset}.")
+        raise SystemExit(f"Missing data files: {missing_str}. Run `{command}` to prepare the {dataset}.")
 
 
 def classify_coords(coords: list[tuple[float, float]]) -> list[str]:
