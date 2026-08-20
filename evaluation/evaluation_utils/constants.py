@@ -29,8 +29,6 @@ CHICHEN_ITZA_TSV = CHICHEN_ITZA_DIR / "config_eager_ych.tsv"
 CHICHEN_ITZA_CUSTOM_CONFIG = CHICHEN_ITZA_DIR / "custom.config"
 CHICHEN_ITZA_RESULTS_DIR = CHICHEN_ITZA_DIR / "results"
 CHICHEN_ITZA_WORK_DIR = CHICHEN_ITZA_DIR / "work"
-# Directory nf-core/eager's pileupcaller genotyping writes into (the per-strandedness and
-# merged EIGENSTRAT prefixes are defined in run_fastpmr.py)
 CHICHEN_ITZA_GENO_DIR = CHICHEN_ITZA_RESULTS_DIR / "genotyping"
 
 # AADR metadata field names
