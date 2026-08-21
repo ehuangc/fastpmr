@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from evaluation_utils.plot import add_panel_label
+from evaluation_utils.constants import COMPARISON_SAMPLE_COUNT
+from evaluation_utils.plot import add_panel_label, add_suptitle
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 BENCHMARK_CSV = RESULTS_DIR / "comparison_benchmark.csv"
@@ -140,8 +141,8 @@ def main() -> None:
     benchmark_df["tool"] = benchmark_df["label"].apply(parse_tool)
     benchmark_df["samples"] = benchmark_df["label"].apply(parse_sample_count)
 
-    # The bar panels report the full dataset, which is the largest sample count benchmarked
-    full_dataset_df = benchmark_df[benchmark_df["samples"] == benchmark_df["samples"].max()]
+    # The bar panels report the full dataset rather than any of the smaller sample subsets
+    full_dataset_df = benchmark_df[benchmark_df["samples"] == COMPARISON_SAMPLE_COUNT]
     full_dataset_df = bytes_to_gb(full_dataset_df)
     full_dataset_df = seconds_to_minutes(full_dataset_df)
 
@@ -159,7 +160,7 @@ def main() -> None:
         "mean_min",
         "stddev_min",
         "Mean Runtime (min)",
-        "Runtime: fastpmr vs. READv2",
+        "Runtime",
         seconds_col="mean_s",
     )
     add_panel_label(ax_rt, "A")
@@ -170,14 +171,17 @@ def main() -> None:
         "mean_gb",
         "stddev_gb",
         "Peak RSS (GB)",
-        "Peak Memory: fastpmr vs. READv2",
+        "Peak Memory Usage",
         bytes_col="mean_bytes",
     )
     add_panel_label(ax_mem, "B")
 
-    plot_runtime_vs_samples(ax_samples, benchmark_df, "Log Runtime vs. Sample Count")
+    plot_runtime_vs_samples(ax_samples, benchmark_df, "Runtime vs. Sample Count (Log Scale)")
     add_panel_label(ax_samples, "C", x=-0.09)
 
+    add_suptitle(
+        fig, f"Comparison benchmarks on the Maravall-López dataset (n={COMPARISON_SAMPLE_COUNT} total samples)"
+    )
     fig.savefig(RESULTS_DIR / "comparison_results.pdf", bbox_inches="tight", dpi=600)
     plt.close(fig)
 

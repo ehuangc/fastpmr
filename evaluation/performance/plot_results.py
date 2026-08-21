@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from evaluation_utils.constants import PERFORMANCE_DIR
-from evaluation_utils.plot import add_panel_label
+from evaluation_utils.constants import PERFORMANCE_DIR, PERFORMANCE_SAMPLE_COUNT
+from evaluation_utils.plot import add_panel_label, add_suptitle
 
 RESULTS_DIR = PERFORMANCE_DIR / "results"
 
@@ -121,7 +121,7 @@ def main() -> None:
         "variants",
         "mean_s",
         "stddev_s",
-        r"Variant Count ($\times 10^5$)",
+        r"Variants ($\times 10^5$)",
         "Mean Runtime (s)",
         "Runtime vs. Variant Count",
         x_scale=1e5,
@@ -132,7 +132,7 @@ def main() -> None:
         "variants",
         "mean_mb",
         "stddev_mb",
-        r"Variant Count ($\times 10^5$)",
+        r"Variants ($\times 10^5$)",
         "Peak RSS (MB)",
         "Peak Memory vs. Variant Count",
         x_scale=1e5,
@@ -163,6 +163,7 @@ def main() -> None:
     for idx, ax in enumerate(axes.flat):
         add_panel_label(ax, chr(ord("A") + idx))
 
+    add_suptitle(fig, f"Performance benchmarks on the Lazaridis dataset (n={PERFORMANCE_SAMPLE_COUNT} total samples)")
     fig.savefig(RESULTS_DIR / "performance_benchmarks.pdf", bbox_inches="tight", dpi=600)
     plt.close(fig)
 
