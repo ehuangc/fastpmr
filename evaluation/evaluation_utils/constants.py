@@ -16,12 +16,13 @@ CHICHEN_ITZA_DATA_DIR = CHICHEN_ITZA_DIR / "data"
 # ENA accession with the submitted BAMs
 CHICHEN_ITZA_ACCESSION = "PRJEB73567"
 CHICHEN_ITZA_FILEREPORT = CHICHEN_ITZA_DATA_DIR / f"filereport_read_run_{CHICHEN_ITZA_ACCESSION}.json"
-# ENA portal API query fetching the file report as JSON; submitted_ftp gives the BAM/BAI
-# URLs and library_construction_protocol encodes single- vs. double-stranded (see run_eager.py)
+# ENA portal API query fetching the file report as JSON; submitted_ftp gives the BAM/BAI URLs,
+# submitted_md5 the matching checksums, and library_construction_protocol single- vs. double-stranded
+# info (see run_eager.py)
 CHICHEN_ITZA_FILEREPORT_URL = (
     "https://www.ebi.ac.uk/ena/portal/api/filereport"
     f"?accession={CHICHEN_ITZA_ACCESSION}&result=read_run"
-    "&fields=submitted_ftp,library_construction_protocol&format=json"
+    "&fields=submitted_ftp,submitted_md5,library_construction_protocol&format=json"
 )
 CHICHEN_ITZA_BAM_DIR = CHICHEN_ITZA_DIR / "bams"
 CHICHEN_ITZA_RENAMED_BAM_DIR = CHICHEN_ITZA_BAM_DIR / "renamed"
