@@ -1,8 +1,6 @@
-import hashlib
 import json
 import re
 import subprocess
-from pathlib import Path
 
 from evaluation_utils.constants import (
     CHICHEN_ITZA_BAM_DIR,
@@ -10,7 +8,7 @@ from evaluation_utils.constants import (
     CHICHEN_ITZA_FILEREPORT_URL,
     CHICHEN_ITZA_RENAMED_BAM_DIR,
 )
-from evaluation_utils.core import download_file
+from evaluation_utils.core import download_file, download_verified_file
 
 
 def collect_downloads() -> list[tuple[str, str]]:
@@ -25,34 +23,9 @@ def collect_downloads() -> list[tuple[str, str]]:
     return downloads
 
 
-def get_file_md5(path: Path) -> str:
-    digest = hashlib.md5()
-    with path.open("rb") as handle:
-        while chunk := handle.read(1 << 20):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def download_bams(attempts: int = 5) -> None:
-    """Download the submitted BAMs and BAIs, verifying each against its submitted checksum."""
-    CHICHEN_ITZA_BAM_DIR.mkdir(parents=True, exist_ok=True)
+def download_bams() -> None:
     for url, md5 in collect_downloads():
-        destination = CHICHEN_ITZA_BAM_DIR / url.rsplit("/", 1)[-1]
-        if destination.is_file() and get_file_md5(destination) == md5:
-            print(f"Skipping {url} ({destination.name} already matches its checksum)\n")
-            continue
-
-        for attempt in range(1, attempts + 1):
-            download_file(url, destination)
-            downloaded_md5 = get_file_md5(destination)
-            if downloaded_md5 == md5:
-                break
-            print(
-                f"Checksum mismatch for {destination.name}: expected {md5}, got {downloaded_md5} ({attempt}/{attempts})"
-            )
-            destination.unlink()
-        else:
-            raise SystemExit(f"{url} failed its checksum after {attempts} attempts")
+        download_verified_file(url, CHICHEN_ITZA_BAM_DIR / url.rsplit("/", 1)[-1], md5)
 
 
 def reheader_line(line: str) -> str:

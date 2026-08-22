@@ -13,12 +13,14 @@ from evaluation_utils.constants import (
     PLINK_EXTS,
 )
 from evaluation_utils.core import (
-    download_file,
+    download_verified_file,
     extract_files,
 )
 
 DATA_DIR = COMPARISON_DATA_PREFIX.parent
 MARAVALL_LOPEZ_URL = "https://dataverse.harvard.edu/api/access/datafile/12077020?version=2.0"
+# Checksum published by Dataverse
+MARAVALL_LOPEZ_MD5 = "a03bfca18ad51fbffe2c5bac4e27a11f"
 ARCHIVE_PATH = DATA_DIR / "maravall_lopez_dataset.zip"
 SEX_CHROMOSOMES = {23, 24}
 SAMPLE_SHUFFLE_SEED = 42
@@ -96,7 +98,7 @@ def generate_sample_subsets(prefix: Path, sample_set_dir: Path) -> None:
 
 
 def main() -> None:
-    download_file(MARAVALL_LOPEZ_URL, ARCHIVE_PATH)
+    download_verified_file(MARAVALL_LOPEZ_URL, ARCHIVE_PATH, MARAVALL_LOPEZ_MD5)
     extract_files(ARCHIVE_PATH, DATA_DIR, COMPARISON_DATA_PREFIX, PLINK_EXTS)
     filter_sex_chromosomes(COMPARISON_DATA_PREFIX, SEX_CHROMOSOMES)
     generate_sample_subsets(COMPARISON_DATA_PREFIX, COMPARISON_SAMPLE_SET_DIR)

@@ -8,13 +8,15 @@ from evaluation_utils.constants import (
     PERFORMANCE_SAMPLE_SET_SIZES,
 )
 from evaluation_utils.core import (
-    download_file,
+    download_verified_file,
     extract_files,
 )
 
 DATA_DIR = PERFORMANCE_DATA_PREFIX.parent
 SAMPLE_SHUFFLE_SEED = 42
 LAZARIDIS_URL = "https://dataverse.harvard.edu/api/access/datafile/10629469?version=1.2"
+# Checksum published by Dataverse
+LAZARIDIS_MD5 = "d0f273f6b5b24ae09d3543048097b586"
 ARCHIVE_PATH = DATA_DIR / "lazaridis_dataset.tar.gz"
 
 
@@ -44,7 +46,7 @@ def generate_sample_sets(prefix: Path, sample_dir: Path) -> None:
 
 
 def main() -> None:
-    download_file(LAZARIDIS_URL, ARCHIVE_PATH)
+    download_verified_file(LAZARIDIS_URL, ARCHIVE_PATH, LAZARIDIS_MD5)
     extract_files(ARCHIVE_PATH, DATA_DIR, PERFORMANCE_DATA_PREFIX, EIGENSTRAT_EXTS)
     generate_sample_sets(PERFORMANCE_DATA_PREFIX, PERFORMANCE_SAMPLE_SET_DIR)
 

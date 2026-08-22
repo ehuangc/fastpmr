@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import json
 import multiprocessing
 import resource
@@ -57,6 +58,30 @@ def download_file(url: str, destination: Path) -> None:
     )
     partial.replace(destination)
     print(f"Downloaded {url} -> {destination}\n")
+
+
+def get_file_md5(path: Path) -> str:
+    digest = hashlib.md5()
+    with path.open("rb") as handle:
+        while chunk := handle.read(1 << 20):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def download_verified_file(url: str, destination: Path, md5: str, attempts: int = 5) -> None:
+    """Download url to destination and verify it against the checksum the source publishes."""
+    if destination.is_file() and get_file_md5(destination) == md5:
+        print(f"Skipping {url} ({destination.name} already matches its checksum)\n")
+        return
+
+    for attempt in range(1, attempts + 1):
+        download_file(url, destination)
+        downloaded_md5 = get_file_md5(destination)
+        if downloaded_md5 == md5:
+            return
+        print(f"Checksum mismatch for {destination.name}: expected {md5}, got {downloaded_md5} ({attempt}/{attempts})")
+        destination.unlink()
+    raise SystemExit(f"{url} failed its checksum after {attempts} attempts")
 
 
 def extract_files(archive_path: Path, destination: Path, prefix: Path, exts: tuple[str, ...]) -> None:
