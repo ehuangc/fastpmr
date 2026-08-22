@@ -5,22 +5,22 @@ DATA_DIR = AADR_DIR / "data"
 # Checksums published by Dataverse
 REMOTE_FILES = [
     (
-        "v66.p1_1240K.aadr.PUB.anno",
+        "v66.p1.1240k.aadr.anno",
         "https://dataverse.harvard.edu/api/access/datafile/13994515?version=14.0",
         "a2db1ac16f0f3558ed66fb251e1d5c7d",
     ),
     (
-        "v66.p1_1240K.aadr.PUB.ind",
+        "v66.p1.1240k.aadr.ind",
         "https://dataverse.harvard.edu/api/access/datafile/13994513?version=14.0",
         "19a434ac954bcd10dbb8dba1d1188a09",
     ),
     (
-        "v66.p1_1240K.aadr.PUB.snp",
+        "v66.p1.1240k.aadr.snp",
         "https://dataverse.harvard.edu/api/access/datafile/13994514?version=14.0",
         "50f66178fc81b8aa087cc4b135317e59",
     ),
     (
-        "v66.p1_1240K.aadr.PUB.geno",
+        "v66.p1.1240k.aadr.geno",
         "https://dataverse.harvard.edu/api/access/datafile/13994829?version=14.0",
         "5ea1d2675a271c81e55b8f8b08b3ff3b",
     ),

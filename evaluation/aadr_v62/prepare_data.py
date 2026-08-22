@@ -6,22 +6,22 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 # Checksums published by Dataverse
 REMOTE_FILES = [
     (
-        "v62.0.p1_1240k_public.anno",
+        "v62.0.p1.1240k.aadr.anno",
         "https://dataverse.harvard.edu/api/access/datafile/13994492?version=11.0",
         "6468eb195e6cad5b98dac4a1286a42ae",
     ),
     (
-        "v62.0.p1_1240k_public.ind",
+        "v62.0.p1.1240k.aadr.ind",
         "https://dataverse.harvard.edu/api/access/datafile/13987487?version=11.0",
         "3f23dd87521dc1ccf6335c262571ecef",
     ),
     (
-        "v62.0.p1_1240k_public.snp",
+        "v62.0.p1.1240k.aadr.snp",
         "https://dataverse.harvard.edu/api/access/datafile/13987485?version=11.0",
         "50f66178fc81b8aa087cc4b135317e59",
     ),
     (
-        "v62.0.p1_1240k_public.geno",
+        "v62.0.p1.1240k.aadr.geno",
         "https://dataverse.harvard.edu/api/access/datafile/13994086?version=11.0",
         "24419bbaf673274e21fc9e2dc3dd145f",
     ),
