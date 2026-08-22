@@ -3,11 +3,11 @@ from pathlib import Path
 EVALUATION_DIR = Path(__file__).resolve().parent.parent
 FASTPMR_BIN = "fastpmr"
 AADR_DIR = EVALUATION_DIR / "aadr"
-AADR_DATA_PREFIX = AADR_DIR / "data" / "v66.1240K.aadr.PUB"
+AADR_DATA_PREFIX = AADR_DIR / "data" / "v66.p1_1240K.aadr.PUB"
 AADR_EXTS = (".anno", ".ind", ".snp", ".geno")
 AADR_RUNS = 1
 AADR_NPZ_PATH = AADR_DIR / "results" / "fastpmr" / "fastpmr_results.npz"
-AADR_METADATA_PATH = AADR_DIR / "data" / "v66.1240K.aadr.PUB.anno"
+AADR_METADATA_PATH = AADR_DIR / "data" / "v66.p1_1240K.aadr.PUB.anno"
 # Localities with anomalously low PMRs
 AADR_ANOMALOUS_LOCALITY_PREFIXES = ("Valdescusa",)
 
