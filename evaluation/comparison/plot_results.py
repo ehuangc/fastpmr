@@ -3,6 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from matplotlib.lines import Line2D
 
 from evaluation_utils.constants import COMPARISON_SAMPLE_COUNT
 from evaluation_utils.plot import add_panel_label, add_suptitle
@@ -130,7 +131,13 @@ def plot_runtime_vs_samples(ax: plt.Axes, data: pd.DataFrame, title: str) -> Non
     ax.tick_params(axis="both", labelsize=14)
     ax.ticklabel_format(style="plain", axis="x")
     ax.grid(True, which="both", linewidth=0.8, alpha=0.4)
-    ax.legend(fontsize=14, frameon=False)
+    # Marker-only handles keep the connecting lines and error bars out of the legend. They are listed in reverse so the
+    # legend order matches the vertical order of the curves, with READv2 on top.
+    handles = [
+        Line2D([], [], color=TOOL_COLORS[tool], marker=TOOL_MARKERS[tool], markersize=8, linestyle="none", label=tool)
+        for tool in reversed(data["tool"].unique())
+    ]
+    ax.legend(handles=handles, fontsize=14, frameon=False, handlelength=1, handletextpad=0.4)
     sns.despine(ax=ax)
 
 
