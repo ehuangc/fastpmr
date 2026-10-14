@@ -20,6 +20,7 @@ import pandas as pd
 import seaborn as sns
 from haversine import haversine
 from scipy import stats
+from statsmodels.stats.multitest import multipletests
 
 from evaluation_utils.constants import (
     AADR_ANOMALOUS_LOCALITY_PREFIXES,
@@ -377,21 +378,21 @@ def format_p_value(p: float) -> str:
 
 
 def draw_significance_brackets(
-    ax: plt.Axes, data: pd.DataFrame, bins: list[str], bracket_gap: float, tip_len: float
+    ax: plt.Axes,
+    y_max: float,
+    comparisons: list[tuple[int, int]],
+    p_values: list[float],
+    bracket_gap: float,
+    tip_len: float,
 ) -> None:
-    """Draw brackets between time bins, using Mann-Whitney U p-values"""
-    groups = [data.loc[data["bin_label"] == b, "median_pmr"].to_numpy() for b in bins]
-    comparisons = [(0, 1), (1, 2), (0, 2)]
-
-    y_max = max(g.max() for g in groups if len(g) > 0)
-
+    """Draw brackets between time bins, labeled by significance level"""
     # Sort comparisons by span so narrower brackets are drawn lower
-    comparisons.sort(key=lambda pair: pair[1] - pair[0])
+    order = sorted(range(len(comparisons)), key=lambda k: comparisons[k][1] - comparisons[k][0])
 
     y_cursor = y_max + bracket_gap
-    for i, j in comparisons:
-        _stat, p = stats.mannwhitneyu(groups[i], groups[j], alternative="two-sided")
-        label = format_p_value(p)
+    for k in order:
+        i, j = comparisons[k]
+        label = format_p_value(p_values[k])
 
         y = y_cursor
         xi = i
@@ -419,9 +420,23 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
     bracket_gap = 0.06 * y_range
     tip_len = 0.012 * y_range
 
-    for ax, (region, title) in zip(axes, panels, strict=True):
+    # Run pairwise Mann-Whitney U tests for all regions, then Holm-correct across all of them
+    comparisons = [(0, 1), (1, 2), (0, 2)]
+    region_cells_by_panel = []
+    raw_p_values = []
+    for region, _title in panels:
         region_cells = cells[(cells["region"] == region) & (cells["bin_label"].isin(bins))].copy()
         region_cells["bin_label"] = pd.Categorical(region_cells["bin_label"], categories=bins, ordered=True)
+        region_cells_by_panel.append(region_cells)
+        groups = [region_cells.loc[region_cells["bin_label"] == b, "median_pmr"].to_numpy() for b in bins]
+        for i, j in comparisons:
+            _stat, p = stats.mannwhitneyu(groups[i], groups[j], alternative="two-sided")
+            raw_p_values.append(p)
+    _reject, adjusted_p_values, _sidak, _bonf = multipletests(raw_p_values, method="holm")
+    adjusted_p_values = adjusted_p_values.reshape(len(panels), len(comparisons))
+
+    for panel_idx, (ax, (_region, title)) in enumerate(zip(axes, panels, strict=True)):
+        region_cells = region_cells_by_panel[panel_idx]
         sns.boxplot(
             data=region_cells,
             x="bin_label",
@@ -441,7 +456,14 @@ def plot_pmr_box_plot(cells: pd.DataFrame, output_path: Path) -> None:
         ax.margins(x=0.15)
         ax.set_title(title, fontsize=14)
         ax.tick_params(axis="y", labelsize=14)
-        draw_significance_brackets(ax, region_cells, bins, bracket_gap, tip_len)
+        draw_significance_brackets(
+            ax,
+            region_cells["median_pmr"].max(),
+            comparisons,
+            adjusted_p_values[panel_idx].tolist(),
+            bracket_gap,
+            tip_len,
+        )
 
     # Set shared y-limits: preserve auto lower bound, add modest headroom on top
     y_lo, y_hi = axes[0].get_ylim()

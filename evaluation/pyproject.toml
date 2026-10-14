@@ -45,6 +45,7 @@ pytorch = ">=2.10.0,<3"
 samtools = ">=1.21,<2"
 scipy = ">=1.17.0,<2"
 seaborn = ">=0.13.2,<0.14"
+statsmodels = ">=0.14.6,<0.15"
 wget = ">=1.25.0,<2"
 
 [tool.pixi.pypi-dependencies]
