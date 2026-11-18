@@ -22,6 +22,8 @@ from evaluation_utils.core import (
 )
 
 READV2_REPO = "https://github.com/GuntherLab/READv2"
+# Pinned READv2 commit (2024-05-30) used for the committed benchmark results
+READV2_COMMIT = "73739bef65b3725315417e70ad8edf6aca21f7b3"
 READV2_DIR = Path(__file__).resolve().parent / "READv2"
 READV2_SCRIPT = READV2_DIR / "READ2.py"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
@@ -43,11 +45,14 @@ def clone_readv2(readv2_dir: Path) -> None:
         print(f"Removing existing {readv2_dir}...")
         shutil.rmtree(readv2_dir)
 
-    readv2_dir.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(
-        ["git", "clone", "--depth", "1", READV2_REPO, str(readv2_dir)],
-        check=True,
-    )
+    readv2_dir.mkdir(parents=True)
+    for args in (
+        ["init", "--quiet"],
+        ["remote", "add", "origin", READV2_REPO],
+        ["fetch", "--depth", "1", "origin", READV2_COMMIT],
+        ["checkout", "--quiet", "FETCH_HEAD"],
+    ):
+        subprocess.run(["git", "-C", str(readv2_dir), *args], check=True)
 
 
 def build_fastpmr_command(prefix: Path, output_dir: Path) -> str:
