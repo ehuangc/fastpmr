@@ -60,7 +60,7 @@ pub struct Args {
     #[arg(short, long, default_value_t = false)]
     degrees: bool,
 
-    /// Compute 95% confidence intervals for pairwise mismatch rates using the Wald method.
+    /// Compute 95% confidence intervals for pairwise mismatch rates using the Wilson score method.
     #[arg(short = 'i', long, default_value_t = false)]
     ci: bool,
 
