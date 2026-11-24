@@ -655,7 +655,9 @@ fn build_pair_indices_to_count(
                 return Ok(None);
             }
             let mut keep = HashSet::new();
-            let allowed_indices: Vec<usize> = allowed.into_iter().collect();
+            // Sort so each pair is built as (lower, higher) regardless of HashSet order
+            let mut allowed_indices: Vec<usize> = allowed.into_iter().collect();
+            allowed_indices.sort_unstable();
             for i in 0..allowed_indices.len() {
                 for j in (i + 1)..allowed_indices.len() {
                     keep.insert((allowed_indices[i], allowed_indices[j]));
