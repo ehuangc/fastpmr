@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use std::collections::HashSet;
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufReader, Read};
 use std::path::Path;
 
 use crate::error::{CustomError, Result};
@@ -52,18 +52,19 @@ impl PackedAncestryMapReader {
         })?;
         let mut reader = BufReader::new(f);
 
-        // Read header block
-        let buffer = reader.fill_buf().map_err(|e| CustomError::ReadWithPath {
-            source: e,
-            path: geno_path.as_ref().to_path_buf(),
-        })?;
-        let header_block = &buffer[..block_size];
-        if header_block.len() < MIN_BLOCK_BYTES {
-            return Err(CustomError::PackedAncestryMapFileSize);
-        }
-        let header = parse_header_block(header_block)?;
-        // Consume header block
-        reader.consume(block_size);
+        // Read header block. fill_buf() returns at most the BufReader capacity (8 KiB), so
+        // read_exact is needed for headers longer than that (more than 32,768 samples).
+        let mut header_block = vec![0u8; block_size];
+        reader
+            .read_exact(&mut header_block)
+            .map_err(|e| match e.kind() {
+                std::io::ErrorKind::UnexpectedEof => CustomError::PackedAncestryMapFileSize,
+                _ => CustomError::ReadWithPath {
+                    source: e,
+                    path: geno_path.as_ref().to_path_buf(),
+                },
+            })?;
+        let header = parse_header_block(&header_block)?;
 
         // Sanity-check samples
         if samples.len() != header.n_samples {
@@ -250,5 +251,93 @@ fn decode_sample(bytes: &[u8], sample_idx: usize) -> Genotype {
         0b10 => Genotype::Ref,
         0b11 => Genotype::Missing,
         _ => unreachable!(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use std::path::PathBuf;
+
+    fn write_dataset(
+        name: &str,
+        n_samples: usize,
+        geno_bytes: impl FnOnce(&Header) -> Vec<u8>,
+    ) -> [PathBuf; 3] {
+        let dir =
+            std::env::temp_dir().join(format!("fastpmr-packed-{name}-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let ind = dir.join("data.ind");
+        let snp = dir.join("data.snp");
+        let geno = dir.join("data.geno");
+
+        let samples: Vec<String> = (0..n_samples).map(|i| format!("S{i}")).collect();
+        let variants: Vec<String> = vec!["rs1".to_string(), "rs2".to_string()];
+        let mut f = File::create(&ind).unwrap();
+        for s in &samples {
+            writeln!(f, "{s} M 0").unwrap();
+        }
+        let mut f = File::create(&snp).unwrap();
+        for (i, v) in variants.iter().enumerate() {
+            writeln!(f, "{v} 1 0.0 {} A G", i + 1).unwrap();
+        }
+
+        let (sample_hash, variant_hash) = header_hash(&samples, &variants);
+        let header = Header {
+            n_samples,
+            n_variants: variants.len(),
+            sample_hash,
+            variant_hash,
+        };
+        std::fs::write(&geno, geno_bytes(&header)).unwrap();
+        [ind, geno, snp]
+    }
+
+    fn header_block(header: &Header, block_size: usize) -> Vec<u8> {
+        let s = format!(
+            "GENO {} {} {} {}",
+            header.n_samples, header.n_variants, header.sample_hash, header.variant_hash
+        );
+        let mut block = vec![0u8; block_size];
+        block[..s.len()].copy_from_slice(s.as_bytes());
+        block
+    }
+
+    #[test]
+    fn reads_header_larger_than_bufreader_capacity() {
+        // 40,000 samples gives a 10,000-byte block, above BufReader's 8 KiB default
+        let n_samples: usize = 40_000;
+        let block_size = n_samples.div_ceil(4);
+        let [ind, geno, snp] = write_dataset("large", n_samples, |h| {
+            let mut bytes = header_block(h, block_size);
+            // Variant 1: all Ref (0b10). Variant 2: all Alt except the last sample Het.
+            bytes.extend(std::iter::repeat_n(0b1010_1010u8, block_size));
+            let mut v2 = vec![0u8; block_size];
+            v2[block_size - 1] = 0b0000_0001;
+            bytes.extend(v2);
+            bytes
+        });
+
+        let reader = PackedAncestryMapReader::open(&ind, &geno, &snp, None, None).unwrap();
+        let sites: Vec<Site> = reader.map(|s| s.unwrap()).collect();
+        assert_eq!(sites.len(), 2);
+        assert!(sites[0].genotypes.iter().all(|&g| g == Genotype::Ref));
+        assert_eq!(sites[1].genotypes[0], Genotype::Alt);
+        assert_eq!(sites[1].genotypes[n_samples - 1], Genotype::Het);
+    }
+
+    #[test]
+    fn errors_on_file_shorter_than_header_block() {
+        let [ind, geno, snp] = write_dataset("short", 4, |h| {
+            let mut bytes = header_block(h, MIN_BLOCK_BYTES);
+            bytes.truncate(MIN_BLOCK_BYTES - 1);
+            bytes
+        });
+        match PackedAncestryMapReader::open(&ind, &geno, &snp, None, None) {
+            Err(CustomError::PackedAncestryMapFileSize) => {}
+            Err(other) => panic!("unexpected error: {other:?}"),
+            Ok(_) => panic!("expected an error"),
+        }
     }
 }
