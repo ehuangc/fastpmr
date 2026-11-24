@@ -323,7 +323,7 @@ fn write_tgeno(
     header_block[header_str.len()] = 0;
     file.write_all(&header_block)?;
 
-    let sample_block_size = 48usize.max(variants.len().div_ceil(4));
+    let sample_block_size = variants.len().div_ceil(4);
     for sample_idx in 0..N_SAMPLES {
         let mut block = vec![0u8; sample_block_size];
         for (variant_idx, variant) in variants.iter().enumerate() {

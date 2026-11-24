@@ -45,7 +45,8 @@ impl TransposedPackedAncestryMapReader {
     ) -> Result<Self> {
         let samples = read_eigenstrat_ind(ind_path)?;
         let variants = read_eigenstrat_snp(snp_path)?;
-        let sample_block_size = HEADER_BLOCK_SIZE.max(variants.len().div_ceil(4));
+        // Unlike GENO, TGENO records have no 48-byte minimum (only the header is fixed at 48 bytes)
+        let sample_block_size = variants.len().div_ceil(4);
 
         let geno_file = File::open(geno_path).map_err(|e| CustomError::ReadWithPath {
             source: e,
@@ -247,4 +248,52 @@ fn parse_header_block(block: &[u8]) -> Result<Header> {
         sample_hash,
         variant_hash,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    #[test]
+    fn reads_records_shorter_than_48_bytes() {
+        // With 3 SNPs each record is 1 byte; only the header is padded to 48 bytes
+        let dir = std::env::temp_dir().join(format!("fastpmr-tgeno-short-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let ind = dir.join("data.ind");
+        let snp = dir.join("data.snp");
+        let geno = dir.join("data.geno");
+
+        let samples = vec!["A".to_string(), "B".to_string()];
+        let variants = vec!["rs1".to_string(), "rs2".to_string(), "rs3".to_string()];
+        let mut f = File::create(&ind).unwrap();
+        for s in &samples {
+            writeln!(f, "{s} M 0").unwrap();
+        }
+        let mut f = File::create(&snp).unwrap();
+        for (i, v) in variants.iter().enumerate() {
+            writeln!(f, "{v} 1 0.0 {} A G", i + 1).unwrap();
+        }
+
+        let (sample_hash, variant_hash) = header_hash(&samples, &variants);
+        let header = format!("TGENO 2 3 {sample_hash} {variant_hash}");
+        let mut bytes = vec![0u8; HEADER_BLOCK_SIZE];
+        bytes[..header.len()].copy_from_slice(header.as_bytes());
+        // Sample A: Alt, Het, Ref. Sample B: Ref, Missing, Alt.
+        bytes.push(0b00_01_10_00);
+        bytes.push(0b10_11_00_00);
+        std::fs::write(&geno, bytes).unwrap();
+
+        let reader =
+            TransposedPackedAncestryMapReader::open(&ind, &geno, &snp, None, None).unwrap();
+        let sites: Vec<Vec<Genotype>> = reader.map(|s| s.unwrap().genotypes).collect();
+        assert_eq!(
+            sites,
+            vec![
+                vec![Genotype::Alt, Genotype::Ref],
+                vec![Genotype::Het, Genotype::Missing],
+                vec![Genotype::Ref, Genotype::Alt],
+            ]
+        );
+    }
 }
