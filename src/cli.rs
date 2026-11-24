@@ -626,7 +626,7 @@ fn build_pair_indices_to_count(
             .iter()
             .enumerate()
             .filter_map(|(idx, &count)| {
-                if count > min_covered_snps {
+                if count >= min_covered_snps {
                     Some(idx)
                 } else {
                     None
@@ -1000,5 +1000,16 @@ mod tests {
         assert!(indices.is_empty());
 
         std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn min_covered_snps_keeps_samples_at_threshold() {
+        let samples: Vec<String> = ["a", "b", "c"].iter().map(|s| s.to_string()).collect();
+        // Sample "a" is below the threshold, "b" is exactly at it, "c" is above it
+        let covered_snps = [9, 10, 11];
+        let pairs = build_pair_indices_to_count(&samples, None, &covered_snps, 10)
+            .unwrap()
+            .expect("sample below threshold should trigger filtering");
+        assert_eq!(pairs, HashSet::from([(1, 2)]));
     }
 }
